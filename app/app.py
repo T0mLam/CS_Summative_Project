@@ -2,9 +2,8 @@ import tkinter as tk
 
 
 class CasinoApp(tk.Tk):
-    # Add docstring
+    """A graphical implementation of the casino app using Tkinter"""
     def __init__(self) -> None:
-        # Add docstring
         tk.Tk.__init__(self)
         self.title('Casino')
         self.geometry('800x600')
@@ -12,7 +11,7 @@ class CasinoApp(tk.Tk):
     # Write your code here
 
     def run(self) -> None:
-        # Add docstring
+        """Start the game loop"""
         self.mainloop()
 
 
