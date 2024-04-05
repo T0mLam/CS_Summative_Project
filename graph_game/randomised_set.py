@@ -79,7 +79,20 @@ class RandomisedSet:
                 self.edges.append(new_edge)
 
     def add_edge(self, idx1: int, idx2: int) -> None:
-        pass
+        """
+        Add an edge to the randomised set.
+
+        Args:
+            idx1: Index of the first node.
+            idx2: Index of the second node.
+        """
+        # making sure idx1 is less than idx2 to maintain consistency
+        idx1, idx2 = min(idx1, idx2), max(idx1, idx2)
+        new_edge = (idx1, idx2)
+
+        if new_edge not in self.edge_to_idx:
+            self.edge_to_idx[new_edge] = len(self.edges)
+            self.edges.append(new_edge)
 
     def remove_edge(self, idx1: int, idx2: int) -> None:
         pass
