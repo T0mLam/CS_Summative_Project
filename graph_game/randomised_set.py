@@ -78,7 +78,7 @@ class RandomisedSet:
                 self.edge_to_idx[new_edge] = len(self.edges)
                 self.edges.append(new_edge)
 
-    def add_edge(self, idx1: int, idx2: int) -> None:
+    def add_edge_to_set(self, idx1: int, idx2: int) -> None:
         """
         Add an edge to the randomised set.
 
@@ -95,8 +95,8 @@ class RandomisedSet:
             raise TypeError("Node indices must be integers.")
 
         # Check if indices are greater than 0
-        if idx1 < 0 or idx2 < 0:
-            raise ValueError("Node indices must be non-negative.")
+        if idx1 < 1 or idx2 < 1:
+            raise ValueError("Node indices must be positive.")
         
         # making sure idx1 is less than idx2 to maintain consistency
         idx1, idx2 = min(idx1, idx2), max(idx1, idx2)
@@ -106,8 +106,35 @@ class RandomisedSet:
             self.edge_to_idx[new_edge] = len(self.edges)
             self.edges.append(new_edge)
 
-    def remove_edge(self, idx1: int, idx2: int) -> None:
-        pass
+    def remove_edge_from_set(self, idx1: int, idx2: int) -> None:
+        """
+        Remove an edge from the set.
+
+        Raise:
+            TypeError: If the node indices are not integers.
+            ValueError: If the node indices are out of bounds.
+        """
+        # Check if indices are integers
+        if not isinstance(idx1, int) or not isinstance(idx2, int):
+            raise TypeError("Node indices must be integers.")
+
+        # Check if indices exist in the set
+        removing_edge = (min(idx1, idx2), max(idx1, idx2))
+        if removing_edge not in self.edge_to_idx:
+            return 
+        
+        # Get the indices of the edge to be removed and the last edge in the list
+        removing_edge_index = self.edge_to_idx[removing_edge]
+        last_edge = self.edges[-1]
+        last_edge_index = self.edge_to_idx[last_edge]
+
+        # Replace the edge to be removed with the last edges and change the corresponding index in the node map
+        self.edge_to_idx[last_edge] = removing_edge_index
+        self.edges[removing_edge_index] = last_edge
+
+        # Remove the last entry in the edges list and delete the index map for the removed edge 
+        self.edges.pop()
+        del self.edge_to_idx[removing_edge]
 
     def get_random_edge(self) -> Tuple[int, int]:
         """
@@ -117,8 +144,23 @@ class RandomisedSet:
             A tuple consists of the start and end of the edge. For example: (1, 2).
         """
         if not self.edges:
-            return
+            return (-1, -1)
         edge_idx = rand.randint(0, len(self.edges) - 1)
         edge = self.edges[edge_idx]
-        self.remove_edge(*edge)
+        self.remove_edge_from_set(*edge)
         return edge
+    
+    
+if __name__ == '__main__':
+    rs = RandomisedSet()
+
+    rs.add_edge_to_set(1, 3)
+    rs.add_edge_to_set(2, 4)
+    rs.add_edge_to_set(4, 6)
+
+    rs.get_random_edge()
+    rs.get_random_edge()
+    rs.get_random_edge()
+    rs.get_random_edge()
+
+    print(rs.edge_to_idx)
