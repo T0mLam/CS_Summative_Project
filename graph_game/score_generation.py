@@ -4,8 +4,9 @@ from scipy.stats import norm
 
 class RandomScoreGenerator:
     def __init__(self, base_score: int = 100) -> None:
-        self._mean = None
-        self._sd = None
+        self.__mean = None
+        self.__sd = None
+        self.__generated_distance = None
         self.base_score = base_score
 
     def set_mean(self, mean: int) -> None:
@@ -20,5 +21,3 @@ class RandomScoreGenerator:
     def calculate_score(self, dist: int) -> int:
         pass
 
-    def calculate_scores(self, dists: List[int]) -> List[int]:
-        pass
