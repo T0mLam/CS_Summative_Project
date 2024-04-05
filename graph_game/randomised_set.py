@@ -108,7 +108,7 @@ class RandomisedSet:
             idx1: Index of the first node.
             idx2: Index of the second node.
 
-        Raise:
+        Raises:
             TypeError: Error occurs if the node indices are not integers.
             ValueError: Error occurs if the edge does not exist.
         """
@@ -135,7 +135,7 @@ class RandomisedSet:
         del self.edge_to_idx[removing_edge]
 
     def get_random_edge(self) -> Tuple[int, int]:
-        """Get and remove a random available edge from the set.
+        """Extract and remove a random available edge from the set.
 
         Returns:
             A tuple consists of the start and end of the edge. For example: (1, 2).
