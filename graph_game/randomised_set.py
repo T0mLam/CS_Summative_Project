@@ -85,14 +85,26 @@ class RandomisedSet:
         Args:
             idx1: Index of the first node.
             idx2: Index of the second node.
-        """
-        # making sure idx1 is less than idx2 to maintain consistency
-        idx1, idx2 = min(idx1, idx2), max(idx1, idx2)
-        new_edge = (idx1, idx2)
 
-        if new_edge not in self.edge_to_idx:
-            self.edge_to_idx[new_edge] = len(self.edges)
-            self.edges.append(new_edge)
+        Raises:
+        TypeError: If the node indices are not integers.
+        ValueError: If the node indices are out of bounds.
+    """
+    # Check if indices are integers
+    if not isinstance(idx1, int) or not isinstance(idx2, int):
+        raise TypeError("Node indices must be integers.")
+
+    # Check if indices are greater than 0
+    if idx1 < 0 or idx2 < 0:
+        raise ValueError("Node indices must be non-negative.")
+    
+    # making sure idx1 is less than idx2 to maintain consistency
+    idx1, idx2 = min(idx1, idx2), max(idx1, idx2)
+    new_edge = (idx1, idx2)
+
+    if new_edge not in self.edge_to_idx:
+        self.edge_to_idx[new_edge] = len(self.edges)
+        self.edges.append(new_edge)
 
     def remove_edge(self, idx1: int, idx2: int) -> None:
         pass
