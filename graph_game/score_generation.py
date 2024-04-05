@@ -10,7 +10,7 @@ class RandomScoreGenerator:
         self.base_score = base_score
 
     def set_mean(self, mean: int) -> None:
-        pass
+        self._mean = mean
 
     def set_sd(self, sd: int | float) -> None:
         pass
