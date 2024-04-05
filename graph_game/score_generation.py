@@ -13,7 +13,7 @@ class RandomScoreGenerator:
         self._mean = mean
 
     def set_sd(self, sd: int | float) -> None:
-        pass
+        self._sd = sd
 
     def generate_random_distance(self) -> int:
         pass
