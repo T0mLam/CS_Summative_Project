@@ -3,8 +3,7 @@ import random as rand
 
 
 class RandomisedSet:
-    """
-    A randomised set which enables the insertion, deletion and random extraction of edges in O(1) (constant) time.
+    """A randomised set which enables the insertion, deletion and random extraction of edges in O(1) (constant) time.
 
     Attributes:
         edges: A list storing non-duplicate edges that are not connected in the graph.
@@ -12,21 +11,18 @@ class RandomisedSet:
 
     Methods:
         add_edges_from_node: Add available edges connected to all nodes from the input node.
-        add_edge: Add an edge to the randomised set.
-        remove_edge: Remove an edge from the randomised set.
+        add_edge_to_set: Add an edge to the randomised set.
+        remove_edge_from_set: Remove an edge from the randomised set.
         get_random_edge: Extract a random available edge.
     """
 
     def __init__(self) -> None:
-        """
-        Construct the attributes of the set.
-        """
+        """Construct the attributes of the set."""
         self.edges = []
         self.edge_to_idx = {}
 
     def __contains__(self, item: Tuple[int, int]) -> bool:
-        """
-        Enable the use of membership test operators (in & not in) for the class.
+        """Enable the use of membership test operators (in & not in) for the class.
 
         Args:
             item: A tuple to be checked whether it is contained in the edges set.
@@ -34,11 +30,11 @@ class RandomisedSet:
         Returns:
             True if the edge is found, false otherwise.
         """
-        return item in self.edge_to_idx
+        idx1, idx2 = item
+        return (idx1, idx2) in self.edge_to_idx or (idx2, idx1) in self.edge_to_idx
 
     def add_edges_from_node(self, idx: int, nodes: List[int]) -> None:
-        """
-        Add outcoming edges to the set from a new node.
+        """Add outcoming edges to the set from a new node.
         
         For example:
         idx: 5
@@ -79,16 +75,15 @@ class RandomisedSet:
                 self.edges.append(new_edge)
 
     def add_edge_to_set(self, idx1: int, idx2: int) -> None:
-        """
-        Add an edge to the randomised set.
+        """Add an edge to the randomised set.
 
         Args:
             idx1: Index of the first node.
             idx2: Index of the second node.
 
         Raises:
-            TypeError: If the node indices are not integers.
-            ValueError: If the node indices are out of bounds.
+            TypeError: Error occurs if the node indices are not integers.
+            ValueError: Error occurs if the node indices are out of bounds.
         """
         # Check if indices are integers
         if not isinstance(idx1, int) or not isinstance(idx2, int):
@@ -107,12 +102,15 @@ class RandomisedSet:
             self.edges.append(new_edge)
 
     def remove_edge_from_set(self, idx1: int, idx2: int) -> None:
-        """
-        Remove an edge from the set.
+        """Remove an edge from the set.
+
+        Args:
+            idx1: Index of the first node.
+            idx2: Index of the second node.
 
         Raise:
-            TypeError: If the node indices are not integers.
-            ValueError: If the node indices are out of bounds.
+            TypeError: Error occurs if the node indices are not integers.
+            ValueError: Error occurs if the edge does not exist.
         """
         # Check if indices are integers
         if not isinstance(idx1, int) or not isinstance(idx2, int):
@@ -121,7 +119,7 @@ class RandomisedSet:
         # Check if indices exist in the set
         removing_edge = (min(idx1, idx2), max(idx1, idx2))
         if removing_edge not in self.edge_to_idx:
-            return 
+            raise ValueError("The edge does not exist in the set") 
         
         # Get the indices of the edge to be removed and the last edge in the list
         removing_edge_index = self.edge_to_idx[removing_edge]
@@ -137,30 +135,14 @@ class RandomisedSet:
         del self.edge_to_idx[removing_edge]
 
     def get_random_edge(self) -> Tuple[int, int]:
-        """
-        Get and remove a random available edge from the set.
+        """Get and remove a random available edge from the set.
 
         Returns:
             A tuple consists of the start and end of the edge. For example: (1, 2).
         """
         if not self.edges:
-            return (-1, -1)
+            return
         edge_idx = rand.randint(0, len(self.edges) - 1)
         edge = self.edges[edge_idx]
         self.remove_edge_from_set(*edge)
         return edge
-    
-    
-if __name__ == '__main__':
-    rs = RandomisedSet()
-
-    rs.add_edge_to_set(1, 3)
-    rs.add_edge_to_set(2, 4)
-    rs.add_edge_to_set(4, 6)
-
-    rs.get_random_edge()
-    rs.get_random_edge()
-    rs.get_random_edge()
-    rs.get_random_edge()
-
-    print(rs.edge_to_idx)
