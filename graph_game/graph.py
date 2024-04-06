@@ -23,15 +23,11 @@ class Graph:
         node_idx_count: An integer count for indexing new nodes.
         num_nodes: The total number of nodes in the graph.
         num_edges: The total number of edges in the graph.
-        starting_node: An integer index of the starting node defined by the user.
-        ending_node: An integer index of the ending node defined by the user.
 
     Methods:
         generate_random_nodes: Generate a random number of nodes.
         generate_random_edges: Generate a random number of weighted edges.
-        set_starting_node: A setter method for the starting node.
-        set_ending_node: A setter method for the ending node.
-        add_edge: Add an edge with random weight to the graph.
+        add_edge_to_graph: Add an edge with random weight to the graph.
         delete_edge: Delete an edge from the graph.
         shortest_path: Find the shortest path between 2 nodes.
     """
@@ -63,8 +59,6 @@ class Graph:
         self.node_idx_count = 1
         self.num_nodes = 0
         self.num_edges = 0
-        self.starting_node = None
-        self.ending_node = None
 
         self.generate_random_nodes(init_num_nodes)
         self.__randomly_connect_all_nodes()
@@ -159,27 +153,6 @@ class Graph:
 
             # Decrease the remaining num of edges to be generated
             num -= 1
-
-    def set_starting_node(self, idx: int) -> None:
-        """
-        A setter method for the starting_node attribute.
-
-        Args:
-            idx: A integer index of the node to be set as the starting node.
-        
-        Raises:
-            TypeError: Error caused by non-integer parameter input.
-            ValueError: Error caused by non-existing node parameter input.
-        """
-        if not isinstance(idx, int):
-            raise TypeError("Input parameters 'idx' must be an integer")
-        if idx not in self.node_map:
-            raise ValueError("The node with index 'idx' does not exist in the graph") 
-        
-        self.starting_node = idx
-
-    def set_ending_node(self, idx: int) -> None:
-        pass
 
     def add_edge_to_graph(self, idx1: int, idx2: int) -> None:
         """
