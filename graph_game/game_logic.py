@@ -1,4 +1,7 @@
+from typing import List
+
 from graph import Graph
+
 
 class GraphGame(Graph):
     """
@@ -13,8 +16,12 @@ class GraphGame(Graph):
         set_ending_node: A setter method for the ending node.
     """
 
-    def __init__(self, init_num_nodes: int = 0, init_num_edges: int = 0) -> None:
+    def __init__(self,
+                 player_score: int = 0,
+                 init_num_nodes: int = 0, 
+                 init_num_edges: int = 0) -> None:
         super().__init__(init_num_nodes, init_num_edges)
+        self.player_score = player_score
         self.starting_node = None
         self.ending_node = None
 
@@ -37,4 +44,16 @@ class GraphGame(Graph):
         self.starting_node = idx
 
     def set_ending_node(self, idx: int) -> None:
+        pass
+
+    def calculate_node_scores(self) -> List[float]:
+        pass
+
+    def generate_cutoff(self) -> int:  
+        pass
+
+    def check_player_wins(self) -> bool:
+        pass
+
+    def regenerate_graph(self) -> None:
         pass
