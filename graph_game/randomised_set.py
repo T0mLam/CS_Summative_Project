@@ -39,7 +39,7 @@ class RandomisedSet:
         For example:
         idx: 5
         nodes: [1, 3, 7, 8]
-        # New edges created: (1, 5), (3, 5), (5, 7), (7, 8)
+        # New edges created: (1, 5), (3, 5), (5, 7), (5, 8)
 
         Notes: 
             Adding n edges in O(n) time, where n = num of input nodes.
