@@ -22,8 +22,8 @@ class GraphGameGUI(tk.Tk):
 
         # Create a frame dict
         self.frames = {
-            'menu': MainMenu(self, self.switch_frame, self.soundtrack_state),
-            'play': Play(self, self.switch_frame)
+            'menu': MainMenu(self),
+            'play': Play(self)
         }
 
         # Show main menu frame
@@ -49,13 +49,12 @@ class GraphGameGUI(tk.Tk):
 
 
 class MainMenu(tk.Frame):
-    def __init__(self, parent, switch_frame, soundtrack_state):
+    def __init__(self, parent):
         super().__init__(parent)
         self.configure(bg="white")
-        self.soundtrack_state = soundtrack_state
 
         # Play button
-        play_button = Button(self, text="Play", command=lambda: switch_frame('menu', 'play')
+        play_button = Button(self, text="Play", command=lambda: parent.switch_frame('menu', 'play')
                              , bg='white', fg='black', borderless=1,
                              font='Helvetica, 40', width=300)
         play_button.place(relx=0.5, rely=0.3, anchor='center')
@@ -82,7 +81,7 @@ class MainMenu(tk.Frame):
         quit_button.place(relx=0.5, rely=0.75, anchor='center')
 
         # Soundtrack Switch
-        soundtrack_switch = tk.Checkbutton(self, text='Music', var=self.soundtrack_state,
+        soundtrack_switch = tk.Checkbutton(self, text='Music', var=parent.soundtrack_state,
                                            command=parent.switch_soundtrack,
                                            onvalue=True, offvalue=False,
                                            bg='white', font='Helvetica, 20')
@@ -90,7 +89,7 @@ class MainMenu(tk.Frame):
 
 
 class Play(tk.Frame):
-    def __init__(self, parent, switch_frame):
+    def __init__(self, parent):
         super().__init__(parent)
         self.configure(bg="white")
 
@@ -99,7 +98,7 @@ class Play(tk.Frame):
         # Make the image 10 times smaller
         resized_back_image = back_image.subsample(10, 10)
 
-        back_button = Button(self, text="Back", command=lambda: switch_frame('play', 'menu'),
+        back_button = Button(self, text="Back", command=lambda: parent.switch_frame('play', 'menu'),
                              image=resized_back_image, background="white", borderless=1, )
         back_button.pack(side="top", anchor="nw", padx=10, pady=10)
 
