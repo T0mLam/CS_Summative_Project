@@ -1,6 +1,6 @@
 from typing import List
 from scipy.stats import norm 
-
+import numpy as np
 
 class RandomScoreGenerator:
     def __init__(self, base_score: int = 100) -> None:
