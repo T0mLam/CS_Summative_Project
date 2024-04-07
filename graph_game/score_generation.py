@@ -15,7 +15,12 @@ class RandomScoreGenerator:
 
         Args:
             mean (int): The mean value to set.
+            
+        Raises:
+            ValueError: If the mean is not a non-negative numeric value.
         """
+        if not isinstance(mean, (int, float)) or mean < 0:
+            raise ValueEr
         self._mean = mean
 
     def set_sd(self, sd: int | float) -> None:
