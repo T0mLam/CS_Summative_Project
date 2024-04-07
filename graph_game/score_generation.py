@@ -17,10 +17,10 @@ class RandomScoreGenerator:
             mean (int): The mean value to set.
 
         Raises:
-            ValueError: If the mean is not an integer.
+            ValueError: If the mean is not a non numeric number.
         """
         if not isinstance(mean, (int, float)) or mean < 0:
-            raise ValueEr
+            raise ValueError("Mean must be a non-negative numeric value.")
         self._mean = mean
 
     def set_sd(self, sd: int | float) -> None:
@@ -31,7 +31,7 @@ class RandomScoreGenerator:
             sd (int | float): The standard deviation value to set.
 
         Raises:
-            ValueError: If the standard deviation is not an integer.
+            ValueError: If the standard deviation is not a non negative number.
         """
         if not isinstance(sd, (int, float)) or sd < 0:
             raise ValueError("Standard deviation must be a non-negative numeric value.")
