@@ -33,23 +33,24 @@ class Graph:
 
     def __init__(self,
                  init_num_nodes: int = 0,
-                 init_num_edges: int = 0) -> None:
+                 add_num_edges: int = 0) -> None:
         """
         Construct all attributes of the graph data structure.
 
         Args:
             init_num_nodes: Number of randomly generated nodes during initialization.
-            init_num_edges: Number of randomly generated edges during initialization.
+            add_num_edges: Number of additional randomly generated edges, after 
+                           generating n - 1 edges to connect all nodes, n = init_num_nodes.
 
         Raises:
             TypeError: Errors caused by incompatible data types of input parameters 'init_num_nodes' and 'init_num_edges'.
             ValueError: Errors caused by invalid range inputs of parameters 'init_num_nodes' and 'init_num_edges'.
         """
         if (not isinstance(init_num_nodes, int) or 
-            not isinstance(init_num_edges, int)):
+            not isinstance(add_num_edges, int)):
             raise TypeError("Input parameters 'init_num_nodes' and 'init_num_edges' must be integers")
         
-        if min(init_num_nodes, init_num_edges) < 0:
+        if min(init_num_nodes, add_num_edges) < 0:
             raise ValueError("Input parameters 'init_num_nodes' and 'init_num_edges' must be non-negative")
 
         self.G = nx.Graph()
@@ -61,7 +62,7 @@ class Graph:
 
         self.generate_random_nodes(init_num_nodes)
         self.__randomly_connect_all_nodes()
-        self.generate_random_edges(init_num_edges)
+        self.generate_random_edges(add_num_edges)
 
     def generate_random_nodes(self, 
                               num: int = 0,
@@ -333,6 +334,6 @@ class Graph:
 
 
 if __name__ == '__main__':
-    graph = Graph(init_num_nodes=5, init_num_edges=2)
+    graph = Graph(init_num_nodes=5, add_num_edges=2)
     graph.graph_visualize()
     # set weight in __randomly_connect_all_nodes and add_edge_to_graph  
