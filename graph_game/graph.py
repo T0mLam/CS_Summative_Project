@@ -6,7 +6,7 @@ import random as rand
 from node import Node
 from heap import MinHeap
 from randomised_set import RandomisedSet
-from score_generation import RandomScoreGenerator
+from score_generation import RandomScoreGenerator as RSG
 
 
 class Graph:
@@ -68,7 +68,6 @@ class Graph:
             raise ValueError("All input parameters must be non-negative")
         
         self.G = nx.Graph()
-        self.rsg = RandomScoreGenerator()
         self.unconnected_edges = RandomisedSet()
         self.node_map = {}
         self.node_idx_count = 1
@@ -206,7 +205,7 @@ class Graph:
         end_node = self.node_map[idx2]
 
         # Randomly generate weight for the new edge
-        weight = self.rsg.generate_random_edge(mean=self.edge_mean, sd=self.edge_sd)
+        weight = RSG.generate_random_edge(mean=self.edge_mean, sd=self.edge_sd)
 
         # Set the nodes as their neighors
         start_node.add_neighbour(end_node, weight)
@@ -315,7 +314,7 @@ class Graph:
             node1 = self.node_map[node_indices[i]]
             node2 = self.node_map[node_indices[i - 1]]
 
-            weight = self.rsg.generate_random_edge(mean=self.edge_mean, sd=self.edge_sd)
+            weight = RSG.generate_random_edge(mean=self.edge_mean, sd=self.edge_sd)
 
             node1.add_neighbour(node2, weight=weight)
             node2.add_neighbour(node1, weight=weight)
