@@ -10,9 +10,21 @@ class RandomScoreGenerator:
         self.base_score = base_score
 
     def set_mean(self, mean: int) -> None:
+        """
+        Set the mean value for generating random distances.
+
+        Args:
+            mean (int): The mean value to set.
+        """
         self._mean = mean
 
     def set_sd(self, sd: int | float) -> None:
+        """
+        Set the standard deviation for generating random distances.
+
+        Args:
+            sd (int | float): The standard deviation value to set.
+        """
         self._sd = sd
 
     def generate_random_distance(self) -> int:
