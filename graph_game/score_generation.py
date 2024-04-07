@@ -17,7 +17,7 @@ class RandomScoreGenerator:
             mean (int): The mean value to set.
 
         Raises:
-            ValueError: If the mean is not a non-negative numeric value.
+            ValueError: If the mean is not an integer.
         """
         if not isinstance(mean, (int, float)) or mean < 0:
             raise ValueEr
@@ -29,9 +29,9 @@ class RandomScoreGenerator:
 
         Args:
             sd (int | float): The standard deviation value to set.
-            
+
         Raises:
-            ValueError: If the standard deviation is not a non-negative numeric value.
+            ValueError: If the standard deviation is not an integer.
         """
         if not isinstance(sd, (int, float)) or sd < 0:
             raise ValueError("Standard deviation must be a non-negative numeric value.")
@@ -74,7 +74,12 @@ class RandomScoreGenerator:
 
         Returns:
             int: The calculated score.
+
+        Raises:
+            ValueError: If the distance is not an integer.
         """
+        if not isinstance(dist, int) or dist < 0:
+            raise ValueError("Distance must be a non-negative integer.")
         if self._generated_distance is None:
             self._generated_distance = self.generate_random_distance()
         score = self.base_score - dist + self._generated_distance
