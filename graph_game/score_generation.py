@@ -22,6 +22,7 @@ class RandomScoreGenerator:
         """
         if not isinstance(mean, int) or mean < 0:
             raise ValueError("Mean must be a non-negative integer.")
+        
         self._mean = mean
 
     def set_sd(self, sd: int | float) -> None:
@@ -36,6 +37,7 @@ class RandomScoreGenerator:
         """
         if not isinstance(sd, (int, float)) or sd < 0:
             raise ValueError("Standard deviation must be a non-negative numeric value.")
+        
         self._sd = sd
 
     def generate_random_distance(self) -> int:
@@ -50,23 +52,8 @@ class RandomScoreGenerator:
         """
         if self._mean is None or self._sd is None:
             raise ValueError("Mean and standard deviation must be set.")
-        return int(np.random.normal(loc=self._mean, scale=self._sd))
-
-    def generate_random_edge(self, mean: int, sd: int | float) -> int:
-        """
-        Method generates a random weight using a normal distribution.
-
-        Returns:
-            int: A randomly generated weight.
         
-        Raises:
-            ValueError: If mean is not an integer or standard deviation is neither an integer nor a float num.
-        """
-        if not isinstance(mean, int) or mean < 0:
-            raise ValueError("Mean must be a non-negative integer.")
-        if not isinstance(sd, (int, float)) or sd < 0:
-            raise ValueError("Standard deviation must be a non-negative numeric value.")
-        return max(int(np.random.normal(loc=mean, scale=sd)), 1)
+        return int(np.random.normal(loc=self._mean, scale=self._sd))
 
     def calculate_score(self, dist: int) -> int:
         """
@@ -85,5 +72,24 @@ class RandomScoreGenerator:
             raise ValueError("Distance must be a non-negative integer.")
         if self._generated_distance is None:
             self._generated_distance = self.generate_random_distance()
+
         score = self.base_score - dist + self._generated_distance
         return max(score, 0)
+    
+    @staticmethod
+    def generate_random_edge(mean: int, sd: int | float) -> int:
+        """
+        Method generates a random weight using a normal distribution.
+
+        Returns:
+            int: A randomly generated weight.
+        
+        Raises:
+            ValueError: If mean is not an integer or standard deviation is neither an integer nor a float num.
+        """
+        if not isinstance(mean, int) or mean < 0:
+            raise ValueError("Mean must be a non-negative integer.")
+        if not isinstance(sd, (int, float)) or sd < 0:
+            raise ValueError("Standard deviation must be a non-negative numeric value.")
+        
+        return max(int(np.random.normal(loc=mean, scale=sd)), 1)
