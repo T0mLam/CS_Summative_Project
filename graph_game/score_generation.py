@@ -2,6 +2,7 @@ from typing import List
 from scipy.stats import norm 
 import numpy as np
 
+
 class RandomScoreGenerator:
     def __init__(self, base_score: int = 100) -> None:
         self._mean = None
@@ -19,8 +20,8 @@ class RandomScoreGenerator:
         Raises:
             ValueError: If the mean is not a non numeric number.
         """
-        if not isinstance(mean, (int, float)) or mean < 0:
-            raise ValueError("Mean must be a non-negative numeric value.")
+        if not isinstance(mean, int) or mean < 0:
+            raise ValueError("Mean must be a non-negative integer.")
         self._mean = mean
 
     def set_sd(self, sd: int | float) -> None:
