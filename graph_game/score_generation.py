@@ -66,7 +66,7 @@ class RandomScoreGenerator:
             raise ValueError("Mean must be a non-negative integer.")
         if not isinstance(sd, (int, float)) or sd < 0:
             raise ValueError("Standard deviation must be a non-negative numeric value.")
-        return int(np.random.normal(loc=mean, scale=sd))
+        return max(int(np.random.normal(loc=mean, scale=sd)), 1)
 
     def calculate_score(self, dist: int) -> int:
         """

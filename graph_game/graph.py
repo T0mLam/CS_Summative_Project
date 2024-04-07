@@ -23,6 +23,8 @@ class Graph:
         node_idx_count: An integer count for indexing new nodes.
         num_nodes: The total number of nodes in the graph.
         num_edges: The total number of edges in the graph.
+        edge_mean: The mean weight of the generated edges.
+        edge_sd: The standard deviation of the weight of the generated edges.
 
     Methods:
         generate_random_nodes: Generate a random number of nodes.
@@ -34,7 +36,9 @@ class Graph:
 
     def __init__(self,
                  init_num_nodes: int = 0,
-                 add_num_edges: int = 0) -> None:
+                 add_num_edges: int = 0,
+                 edge_mean: int = 5,
+                 edge_sd: int | float = 3) -> None:
         """
         Construct all attributes of the graph data structure.
 
@@ -42,18 +46,27 @@ class Graph:
             init_num_nodes: Number of randomly generated nodes during initialization.
             add_num_edges: Number of additional randomly generated edges, after 
                            generating n - 1 edges to connect all nodes, n = init_num_nodes.
+            edge_mean: The mean weight of the generated edges.
+            edge_sd: The standard deviation of the weight of the generated edges.
 
         Raises:
-            TypeError: Errors caused by incompatible data types of input parameters 'init_num_nodes' and 'init_num_edges'.
-            ValueError: Errors caused by invalid range inputs of parameters 'init_num_nodes' and 'init_num_edges'.
+            TypeError: Errors caused by incompatible data types of input parameters.
+            ValueError: Errors caused by negative inputs of parameters.
         """
-        if (not isinstance(init_num_nodes, int) or 
-            not isinstance(add_num_edges, int)):
-            raise TypeError("Input parameters 'init_num_nodes' and 'init_num_edges' must be integers")
+        if not all([isinstance(init_num_nodes, int),
+                    isinstance(add_num_edges, int),
+                    isinstance(edge_mean, int)]):
+            raise TypeError("Input parameters 'init_num_nodes', 'init_num_edges' and 'edge_mean' must be integers")
         
-        if min(init_num_nodes, add_num_edges) < 0:
-            raise ValueError("Input parameters 'init_num_nodes' and 'init_num_edges' must be non-negative")
+        if not isinstance(edge_sd, (int, float)):
+            raise TypeError("Input parameter 'edge_sd' must be an integer or a float")
 
+        if min(init_num_nodes, 
+               add_num_edges, 
+               edge_mean, 
+               edge_sd) < 0:
+            raise ValueError("All input parameters must be non-negative")
+        
         self.G = nx.Graph()
         self.rsg = RandomScoreGenerator()
         self.unconnected_edges = RandomisedSet()
@@ -61,13 +74,15 @@ class Graph:
         self.node_idx_count = 1
         self.num_nodes = 0
         self.num_edges = 0
+        self.edge_mean = edge_mean
+        self.edge_sd = edge_sd
 
         self.generate_random_nodes(init_num_nodes)
         self.__randomly_connect_all_nodes()
         self.generate_random_edges(add_num_edges)
 
     def generate_random_nodes(self, 
-                              num: int = 0,
+                              num: int | None = None,
                               low: int = 10,
                               high: int = 15) -> None:
         """
@@ -83,20 +98,24 @@ class Graph:
             ValueError: Errors caused by non-negative parameters input or the invalid ranges of 'low' and 'high'.
         """
         # Check data type of input parameters
-        if not all([isinstance(num, int),
+        if not all([isinstance(num, (int, None)),
                    isinstance(low, int),
                    isinstance(high, int)]):
             raise TypeError("All input parameters must be integers")
     
         # Check values of input parameters
-        if min(num, low, high) < 0:
-            raise ValueError("All input parameters must be non-negative")
+        if min(low, high) < 0:
+            raise ValueError("Input parameters 'low' and 'high' must be non-negative")
         if low > high:
             raise ValueError("Input parameter 'high' must be equal or larger than 'low'")
         
         # Generate random num of nodes if the user does not define a fixed num
-        if num == 0:
+        if num is None:
             num = rand.randint(low, high)
+
+        if num < 0:
+            raise ValueError("Input parameter 'num' must be non-negative")
+
         self.num_nodes += num
 
         # Generate nodes
@@ -111,7 +130,7 @@ class Graph:
             num -= 1
 
     def generate_random_edges(self,
-                              num: int = 0,
+                              num: int | None = None,
                               low: int = 5,
                               high: int = 10) -> None:
         """
@@ -127,23 +146,25 @@ class Graph:
             ValueError: Errors caused by non-negative parameters input or the invalid ranges of 'low' and 'high'.
         """
         # Check data type of input parameters
-        if not all([isinstance(num, int),
+        if not all([isinstance(num, (int, None)),
                    isinstance(low, int),
                    isinstance(high, int)]):
             raise TypeError("All input parameters must be integers")
-    
-        # Check value ranges of input parameters
-        if min(num, low, high) < 0:
+
+        if min(low, high) < 0:
             raise ValueError("All input parameters must be non-negative")
         if low > high:
             raise ValueError("Input parameter 'high' must be equal or larger than 'low'")
+        
+        # Generate random num of edges if the user does not define a fixed num
+        if num is None:
+            num = rand.randint(low, high)
+
+        if num < 0:
+            raise ValueError("Input parameter 'num' must be non-negative")
 
         # Get the maximum number of edges that could exist in the graph
         max_num_edges = self.__get_max_num_edges()
-
-        # Generate random num of edges if the user does not define a fixed num
-        if num == 0:
-            num = rand.randint(low, high)
             
         # Generate edges while the number of edges in the graph has not reached the maximum
         while num and self.num_edges < max_num_edges:
@@ -185,7 +206,7 @@ class Graph:
         end_node = self.node_map[idx2]
 
         # Randomly generate weight for the new edge
-        weight = rand.randint(1, 10)
+        weight = self.rsg.generate_random_edge(mean=self.edge_mean, sd=self.edge_sd)
 
         # Set the nodes as their neighors
         start_node.add_neighbour(end_node, weight)
@@ -294,17 +315,19 @@ class Graph:
             node1 = self.node_map[node_indices[i]]
             node2 = self.node_map[node_indices[i - 1]]
 
-            node1.add_neighbour(node2, weight=1)
-            node2.add_neighbour(node1, weight=1)
+            weight = self.rsg.generate_random_edge(mean=self.edge_mean, sd=self.edge_sd)
 
-            self.G.add_edge(node_indices[i], node_indices[i - 1], weight=1)
+            node1.add_neighbour(node2, weight=weight)
+            node2.add_neighbour(node1, weight=weight)
+
+            self.G.add_edge(node_indices[i], node_indices[i - 1], weight=weight)
 
             # Remove the edge from the unconnected edges set
             self.unconnected_edges.remove_edge_from_set(node_indices[i], node_indices[i - 1])
             
             self.num_edges += 1
             
-    def graph_visualize(self, with_labels=True, node_size=700):
+    def graph_visualize(self, with_labels=True, node_size=700) -> None:
         """
         Graphical visualization of the graph using matplotlib libary.
 
@@ -336,6 +359,6 @@ class Graph:
 
 
 if __name__ == '__main__':
-    graph = Graph(init_num_nodes=5, add_num_edges=2)
+    graph = Graph(init_num_nodes=4, add_num_edges=8)
     graph.graph_visualize()
     # set weight in __randomly_connect_all_nodes and add_edge_to_graph  
