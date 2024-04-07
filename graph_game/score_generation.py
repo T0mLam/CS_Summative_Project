@@ -15,7 +15,7 @@ class RandomScoreGenerator:
 
         Args:
             mean (int): The mean value to set.
-            
+
         Raises:
             ValueError: If the mean is not a non-negative numeric value.
         """
@@ -29,7 +29,12 @@ class RandomScoreGenerator:
 
         Args:
             sd (int | float): The standard deviation value to set.
+            
+        Raises:
+            ValueError: If the standard deviation is not a non-negative numeric value.
         """
+        if not isinstance(sd, (int, float)) or sd < 0:
+            raise ValueError("Standard deviation must be a non-negative numeric value.")
         self._sd = sd
 
     def generate_random_distance(self) -> int:
