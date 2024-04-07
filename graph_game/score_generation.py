@@ -16,11 +16,22 @@ class RandomScoreGenerator:
         self._sd = sd
 
     def generate_random_distance(self) -> int:
-        pass
+         """
+        method generates a random distance using a normal distribution.
+
+        Returns:
+            int: A randomly generated distance.
+        
+        Raises:
+            ValueError: If mean or standard deviation is not set.
+        """
+        if self.__mean is None or self.__sd is None:
+            raise ValueError("Mean and standard deviation must be set.")
+        return int(np.random.normal(loc=self.__mean, scale=self.__sd))
 
     def generate_random_edge(self) -> int:
         """
-        Generate a weight using a normal distribution.
+        method genertate a random weight using a normal distribution.
 
         Returns:
             integer: A randomly generated weight.
