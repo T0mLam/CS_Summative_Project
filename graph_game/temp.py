@@ -1,28 +1,5 @@
 import tkinter as tk
-
-
-class MainMenu(tk.Frame):
-    def __init__(self, parent, switch_frame):
-        super().__init__(parent)
-        self.configure(bg="red")
-
-        play_button = tk.Button(self, text="Play", command=lambda: switch_frame('menu', 'play'))
-        play_button.pack()
-
-        label = tk.Label(self, text="Main Menu Frame")
-        label.pack()
-
-        
-class Play(tk.Frame):
-    def __init__(self, parent, switch_frame):
-        super().__init__(parent)
-        self.configure(bg="blue")
-
-        back_button = tk.Button(self, text="Back", command=lambda: switch_frame('play', 'menu'))
-        back_button.pack()
-
-        label = tk.Label(self, text="Play Frame")
-        label.pack()
+from tkmacosx import Button
 
 
 class GraphGameGUI(tk.Tk):
@@ -33,15 +10,14 @@ class GraphGameGUI(tk.Tk):
         self['bg'] = 'white'
         self.resizable(True, True)  # Make the window resizable
 
-        self.main_menu_frame = MainMenu(self, self.switch_frame)
-        self.play_frame = Play(self, self.switch_frame)  # Pass the callback function
-
+        # Create a frame dict
         self.frames = {
-            'menu': self.main_menu_frame,
-            'play': self.play_frame
+            'menu': MainMenu(self, self.switch_frame),
+            'play': Play(self, self.switch_frame)
         }
+        
         # Show main menu frame
-        self.main_menu_frame.pack(fill='both', expand=True)
+        self.frames['menu'].pack(fill='both', expand=True)
 
     def switch_frame(self, current_frame, new_frame):
         # Hide the current frame
@@ -54,6 +30,30 @@ class GraphGameGUI(tk.Tk):
         self.geometry('800x600')
         # Show the main menu frame
         self.frames[new_frame].pack(fill='both', expand=True)
+
+
+class MainMenu(tk.Frame):
+    def __init__(self, parent, switch_frame):
+        super().__init__(parent)
+        self.configure(bg="red")
+
+        play_button = Button(self, text="Play", command=lambda: switch_frame('menu', 'play'))
+        play_button.pack()
+
+        label = tk.Label(self, text="Main Menu Frame")
+        label.pack()
+
+        
+class Play(tk.Frame):
+    def __init__(self, parent, switch_frame):
+        super().__init__(parent)
+        self.configure(bg="blue")
+
+        back_button = Button(self, text="Back", command=lambda: switch_frame('play', 'menu'))
+        back_button.pack()
+
+        label = tk.Label(self, text="Play Frame")
+        label.pack()
 
 
 # Create an instance of the GraphGameGUI class and start the application
