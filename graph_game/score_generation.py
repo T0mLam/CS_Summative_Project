@@ -52,7 +52,7 @@ class RandomScoreGenerator:
             raise ValueError("Mean and standard deviation must be set.")
         return int(np.random.normal(loc=self._mean, scale=self._sd))
 
-    def generate_random_edge(self) -> int:
+    def generate_random_edge(self, mean: int, sd: int | float) -> int:
         """
         Method generates a random weight using a normal distribution.
 
@@ -60,11 +60,13 @@ class RandomScoreGenerator:
             int: A randomly generated weight.
         
         Raises:
-            ValueError: If mean or standard deviation is not set.
+            ValueError: If mean is not an integer or standard deviation is neither an integer nor a float num.
         """
-        if self._mean is None or self._sd is None:
-            raise ValueError("Mean and standard deviation must be set.")
-        return int(np.random.normal(loc=self._mean, scale=self._sd))
+        if not isinstance(mean, int) or mean < 0:
+            raise ValueError("Mean must be a non-negative integer.")
+        if not isinstance(sd, (int, float)) or sd < 0:
+            raise ValueError("Standard deviation must be a non-negative numeric value.")
+        return int(np.random.normal(loc=mean, scale=sd))
 
     def calculate_score(self, dist: int) -> int:
         """
