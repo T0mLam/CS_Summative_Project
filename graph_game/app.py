@@ -3,6 +3,7 @@ from tkmacosx import Button
 import pygame
 from tkinter import ttk
 
+
 class GraphGameGUI(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -185,8 +186,6 @@ class Play(tk.Frame):
         canvas.place(relx=0.27, rely=0.64, anchor='center')
 
 
-
-
 # Create an instance of the GraphGameGUI class and start the application
-gui = GraphGameGUI()
-gui.mainloop()
+app = GraphGameGUI()
+app.mainloop()
