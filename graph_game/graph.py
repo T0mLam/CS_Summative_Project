@@ -77,6 +77,15 @@ class Graph:
         self.generate_random_nodes(init_num_nodes)
         self.__randomly_connect_all_nodes()
         self.generate_random_edges(add_num_edges)
+    
+    def __str__(self) -> str:
+        """Return the basic information about the Graph object.
+        
+        Returns:
+            A string including the number of edges (|E|), the number of vertices (|V|),
+            the mean weight of the edges (E.x̄) and the standard deviation of the edge weights (E.σ).
+        """
+        return f'Graph: |E| = {self.num_edges}, |V| = {self.num_nodes}, E.x̄ = {self.edge_mean}, E.σ = {self.edge_sd}'
 
     def generate_random_nodes(self, 
                               num: int | None = None,
@@ -359,8 +368,8 @@ class Graph:
 
 
 if __name__ == '__main__':
-    graph = Graph(init_num_nodes=7, add_num_edges=8)
-    print(graph.shortest_path.__doc__)
+    graph = Graph(init_num_nodes=5, add_num_edges=3)
+    print(graph)
     print(graph.shortest_path(1, 4))
     print(graph.shortest_path(1, None))
     graph.graph_visualize()
