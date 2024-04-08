@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 import matplotlib.pyplot as plt
 import networkx as nx
 import random as rand
@@ -223,7 +223,6 @@ class Graph:
             idx1: The index of the first node.
             idx2: The index of the second node.
         """
-
         # Check if nodes are in the graph
         if(idx1 in self.G and idx2 in self.G):
 
@@ -241,24 +240,32 @@ class Graph:
         else:
             return False
 
-    def shortest_path(self, starting_node: int, ending_node: int) -> int:
-        """Find the shortest path between starting node and ending node in the graph.
+    def shortest_path(self, starting_node: int, ending_node: int | None = None) -> int | Dict[int, int]:
+        """Find the shortest path between nodes in the graph.
+
+        Notes:
+            If the user does not pass in the ending_node parameter, the program will return 
+            a dictionary mapping the shortest distance to all nodes. 
 
         Args:
             starting_node: Index of the starting node.
-            ending_node: Index of the ending node.
+            ending_node: Index of the ending node (optional).
 
         Returns:
-            The length of the shortest path or -1 if the path does not exist.
+            The length of the shortest path or a dictionary containing the shortest paths to all nodes.
         """
-
         # Check if both starting node and ending node are in the graph
-        if starting_node not in self.node_map or ending_node not in self.node_map:
-            raise ValueError('The input node(s) do(es) not exist in the graph')
+        if (starting_node not in self.node_map or
+            ending_node is not None and ending_node not in self.node_map):
+            raise ValueError("The input nodes does not exist in the graph")
 
         # Create priority queue as the object of MinHeap class
         priority_queue = MinHeap([(0, self.node_map[starting_node])])  
         visited_nodes = set()
+
+        # Create a dictionaray storing the the shortest path from the source node to every other nodes
+        paths = {node_idx: float('inf') for node_idx in self.node_map.keys()}
+        paths[starting_node] = 0
 
          # Checking each node until all nodes are visited
         while len(priority_queue) > 0:  
@@ -269,6 +276,10 @@ class Graph:
             # If the current node is the ending_node, the current distance will be returned
             if current_node == ending_node:
                 return current_distance
+            
+            # Update the shortest path of a node in paths if a shorter path is found
+            if current_distance < paths[current_node]:
+                paths[current_node] = current_distance
 
              # Go through each neighbor of the current_node
             if current_node not in visited_nodes:
@@ -281,8 +292,9 @@ class Graph:
 
                         # Use push method to add neighbors
                         priority_queue.push((new_distance, neighbor_object))  
-        # If the ending node was not reached, return -1
-        return -1
+        
+        # Return the path dict if the user does not specify an ending node
+        return paths
 
     def __get_max_num_edges(self) -> int:
         """Calculate the maximum number of edges can be connected in the graph.
@@ -347,6 +359,9 @@ class Graph:
 
 
 if __name__ == '__main__':
-    graph = Graph(init_num_nodes=4, add_num_edges=8)
+    graph = Graph(init_num_nodes=7, add_num_edges=8)
+    print(graph.shortest_path.__doc__)
+    print(graph.shortest_path(1, 4))
+    print(graph.shortest_path(1, None))
     graph.graph_visualize()
     # set weight in __randomly_connect_all_nodes and add_edge_to_graph  
