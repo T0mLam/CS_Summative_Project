@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Tuple, List
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -355,6 +356,12 @@ class Graph:
 
         # Visualize the graph
         plt.show() 
+
+    @classmethod
+    def generate_random_graph(cls) -> type[Graph]:
+        init_num_nodes = rand.randint(5, 10)
+        add_num_edges = init_num_nodes // rand.randint(2, 4)
+        return cls(init_num_nodes, add_num_edges)
 
 
 if __name__ == '__main__':
