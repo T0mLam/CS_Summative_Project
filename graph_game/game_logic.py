@@ -1,11 +1,12 @@
+from __future__ import annotations
 from typing import List
+import random as rand
 
 from graph import Graph
 
 
 class GraphGame(Graph):
-    """
-    A subclass inherited from the Graph class which handles the operation and the winning conditions of the game.
+    """A subclass inherited from the Graph class which handles the operation and the winning conditions of the game.
 
     Attributes:
         starting_node: An integer index of the starting node defined by the user.
@@ -17,17 +18,22 @@ class GraphGame(Graph):
     """
 
     def __init__(self,
-                 player_score: int = 0,
                  init_num_nodes: int = 0, 
                  init_num_edges: int = 0) -> None:
+        """Construct the attributes of the graph.
+
+
+        Args:
+            init_num_nodes: Number of randomly generated nodes during initialization.
+            add_num_edges: Number of additional randomly generated edges, after 
+                           generating n - 1 edges to connect all nodes, n = init_num_nodes.
+        """
         super().__init__(init_num_nodes, init_num_edges)
-        self.player_score = player_score
         self.starting_node = None
         self.ending_node = None
 
     def set_starting_node(self, idx: int) -> None:
-        """
-        A setter method for the starting_node attribute.
+        """A setter method for the starting_node attribute.
 
         Args:
             idx: A integer index of the node to be set as the starting node.
@@ -55,5 +61,22 @@ class GraphGame(Graph):
     def check_player_wins(self) -> bool:
         pass
 
-    def regenerate_graph(self) -> None:
-        pass
+    @classmethod
+    def new_game(cls) -> type[GraphGame]:
+        """An alternative initization method which generates a new game with a random graph.
+
+        Returns:
+            A GraphGame object with random nodes and weighted edges.
+
+        To instantiate:
+            game = GraphGame.new_game()
+        """
+        init_num_nodes = rand.randint(8, 12)
+        add_num_edges = init_num_nodes // rand.randint(2, 3)
+        return cls(init_num_nodes, add_num_edges)
+
+
+if __name__ == '__main__':
+    game = GraphGame.new_game()
+    game.node_map.keys()
+    game.graph_visualize()
