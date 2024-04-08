@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing import Tuple, List
 import matplotlib.pyplot as plt
 import networkx as nx
