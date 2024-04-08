@@ -357,12 +357,6 @@ class Graph:
         # Visualize the graph
         plt.show() 
 
-    @classmethod
-    def generate_random_graph(cls) -> type[Graph]:
-        init_num_nodes = rand.randint(5, 10)
-        add_num_edges = init_num_nodes // rand.randint(2, 4)
-        return cls(init_num_nodes, add_num_edges)
-
 
 if __name__ == '__main__':
     graph = Graph(init_num_nodes=4, add_num_edges=8)
