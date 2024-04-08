@@ -104,6 +104,9 @@ class RandomisedSet:
     def remove_edge_from_set(self, idx1: int, idx2: int) -> None:
         """Remove an edge from the set.
 
+        Notes:
+            First swap the target edge with the last edge in the edges list and pop it out of the list.
+            
         Args:
             idx1: Index of the first node.
             idx2: Index of the second node.
@@ -124,7 +127,6 @@ class RandomisedSet:
         # Get the indices of the edge to be removed and the last edge in the list
         removing_edge_index = self.edge_to_idx[removing_edge]
         last_edge = self.edges[-1]
-        last_edge_index = self.edge_to_idx[last_edge]
 
         # Replace the edge to be removed with the last edges and change the corresponding index in the node map
         self.edge_to_idx[last_edge] = removing_edge_index
