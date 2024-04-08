@@ -10,8 +10,7 @@ from score_generation import RandomScoreGenerator as RSG
 
 
 class Graph:
-    """
-    An undirected and connected graph data structure storing uniquely indexed nodes with weighted edges.
+    """An undirected and connected graph data structure storing uniquely indexed nodes with weighted edges.
 
     Notes:
         Class attributes can only be accessed by class methods.
@@ -39,8 +38,7 @@ class Graph:
                  add_num_edges: int = 0,
                  edge_mean: int = 5,
                  edge_sd: int | float = 3) -> None:
-        """
-        Construct all attributes of the graph data structure.
+        """Construct all attributes of the graph data structure.
 
         Args:
             init_num_nodes: Number of randomly generated nodes during initialization.
@@ -84,8 +82,7 @@ class Graph:
                               num: int | None = None,
                               low: int = 10,
                               high: int = 15) -> None:
-        """
-        Generate a random number of nodes in the graph.
+        """Generate a random number of nodes in the graph.
 
         Args:
             num: An integer representing the fixed number of nodes to be generated (optional).
@@ -132,8 +129,7 @@ class Graph:
                               num: int | None = None,
                               low: int = 5,
                               high: int = 10) -> None:
-        """
-        Generate a random number of edges in the graph.
+        """Generate a random number of edges in the graph.
 
         Args:
             num: An integer representing the fixed number of edges to be generated (optional).
@@ -177,8 +173,7 @@ class Graph:
             num -= 1
 
     def add_edge_to_graph(self, idx1: int, idx2: int) -> None:
-        """
-        Add an edge to the graph with random integer weight from 1 to 10.
+        """Add an edge to the graph with random integer weight from 1 to 10.
 
         Args:
             idx1: The index of the first node.
@@ -222,8 +217,7 @@ class Graph:
         self.num_edges += 1
 
     def delete_edge(self, idx1: int, idx2: int) -> None:
-        """
-        Delete the edge between two existing nodes
+        """Delete the edge between two existing nodes
 
         Args:
             idx1: The index of the first node.
@@ -248,8 +242,7 @@ class Graph:
             return False
 
     def shortest_path(self, starting_node: int, ending_node: int) -> int:
-        """
-        Find the shortest path between starting node and ending node in the graph.
+        """Find the shortest path between starting node and ending node in the graph.
 
         Args:
             starting_node: Index of the starting node.
@@ -292,8 +285,7 @@ class Graph:
         return -1
 
     def __get_max_num_edges(self) -> int:
-        """
-        Calculate the maximum number of edges can be connected in the graph.
+        """Calculate the maximum number of edges can be connected in the graph.
 
         Returns:
             An integer representing the maximum number of edges.
@@ -302,9 +294,7 @@ class Graph:
         return n * (n - 1) // 2
     
     def __randomly_connect_all_nodes(self) -> None:
-        """
-        Randomly shuffle the list of nodes and connect them.
-        """
+        """Randomly shuffle the list of nodes and connect them."""
         # Get the all the node indicies in the graph and shuffle them
         node_indices = list(self.node_map.keys())
         shuffled_nodes = rand.shuffle(node_indices)
@@ -327,8 +317,7 @@ class Graph:
             self.num_edges += 1
             
     def graph_visualize(self, with_labels=True, node_size=700) -> None:
-        """
-        Graphical visualization of the graph using matplotlib libary.
+        """Graphical visualization of the graph using matplotlib libary.
 
         Args:
             with_labels (bool): If True, nodes will show their ID as label.
