@@ -62,7 +62,7 @@ class GraphGame(Graph):
         pass
 
     @classmethod
-    def new_game(cls) -> type[GraphGame]:
+    def random_start(cls) -> type[GraphGame]:
         """An alternative initization method which generates a new game with a random graph.
 
         Returns:
@@ -77,6 +77,6 @@ class GraphGame(Graph):
 
 
 if __name__ == '__main__':
-    game = GraphGame.new_game()
+    game = GraphGame.random_start()
     game.node_map.keys()
     game.graph_visualize()
