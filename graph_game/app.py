@@ -111,7 +111,7 @@ class Play(tk.Frame):
         self.chance_of_winning = int(0)
         # Chance of winning variable for putting into Label
         chance_of_winning_variable = tk.StringVar()
-        chance_of_winning_variable.set("Chance of Winning: " + str(self.chance_of_winning) + "%")
+        chance_of_winning_variable.set("Chance of Win: " + str(self.chance_of_winning) + "%")
 
         # Put the back arrow image for the button
         back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/Images/back_arrow.png")
@@ -133,58 +133,58 @@ class Play(tk.Frame):
         buy_button.pack(side="top", anchor="ne", padx=10, pady=10)
 
         #Label with the balance and balance wariable
-        Balance_Label = tk.Label(self, textvariable=balance_variable, bg='white', fg='black', font='Helvetica, 30')
-        Balance_Label.place(relx=0.7, rely=0.05, anchor='center')
+        Balance_Label = tk.Label(self, textvariable=balance_variable, bg='white', fg='black', font='Helvetica, 20')
+        Balance_Label.place(relx=0.8, rely=0.05, anchor='center')
 
         # Label Bid before the scale
         Bid_Label = tk.Label(self, text = "Bid:", bg='white', fg='black',
-                             font='Helvetica, 30')
-        Bid_Label.place(relx=0.58, rely=0.58, anchor='center')
+                             font='Helvetica, 20')
+        Bid_Label.place(relx=0.76, rely=0.57, anchor='center')
 
         # Scale with changing the bid
         bid_scale = tk.Scale(self, from_=0, to=self.balance, orient=tk.HORIZONTAL,
-                                  length=250,
+                                  length=160,
                                   bg='white', fg='black',
-                                  font = 'Helvetica, 30',
+                                  font = 'Helvetica, 20',
                                   )
-        bid_scale.place(relx=0.8, rely=0.55, anchor='center')
+        bid_scale.place(relx=0.89, rely=0.55, anchor='center')
 
         # Starting node label
         Starting_node = ttk.Combobox(self, width=5)
         Starting_node['values'] = ('1', '2', '3', '4','5', '6', '7','8', '9', '10', '11', '12', '13','14','15')
-        Starting_node.place(relx=0.84, rely=0.36, anchor='center')
+        Starting_node.place(relx=0.94, rely=0.36, anchor='center')
 
         # Starting node combobox
-        Starting_node_Label = tk.Label(self, text = "Starting node: ", bg='white', fg='black',
-                                       font='Helvetica, 30')
-        Starting_node_Label.place(relx=0.67, rely=0.35, anchor='center')
+        Starting_node_Label = tk.Label(self, text = "Starting node:", bg='white', fg='black',
+                                       font='Helvetica, 20')
+        Starting_node_Label.place(relx=0.81, rely=0.35, anchor='center')
 
         # Ending node label
         Ending_node = ttk.Combobox(self, width=5)
         Ending_node['values'] = ('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15')
-        Ending_node.place(relx=0.84, rely=0.46, anchor='center')
+        Ending_node.place(relx=0.94, rely=0.46, anchor='center')
 
         # Starting node combobox
-        Ending_node = tk.Label(self, text="Ending node: ", bg='white', fg='black',
-                                       font='Helvetica, 30')
-        Ending_node.place(relx=0.66, rely=0.45, anchor='center')
+        Ending_node_label = tk.Label(self, text="Ending node: ", bg='white', fg='black',
+                                       font='Helvetica, 20')
+        Ending_node_label.place(relx=0.81, rely=0.45, anchor='center')
 
         # Coefficient label with coefficient variable
-        Coefficient_label = tk.Label(self, textvariable=coefficient_variable, bg='white', font='Helvetica, 30')
-        Coefficient_label.place(relx=0.66, rely=0.68, anchor='center')
+        Coefficient_label = tk.Label(self, textvariable=coefficient_variable, bg='white', font='Helvetica, 20')
+        Coefficient_label.place(relx=0.82, rely=0.68, anchor='center')
 
         # Chance of winning label with chance of winning variable
-        Chance_Of_Winning_label = tk.Label(self, textvariable=chance_of_winning_variable, bg='white', font='Helvetica, 30')
-        Chance_Of_Winning_label.place(relx=0.74, rely=0.78, anchor='center')
+        Chance_Of_Winning_label = tk.Label(self, textvariable=chance_of_winning_variable, bg='white', font='Helvetica, 20')
+        Chance_Of_Winning_label.place(relx=0.85, rely=0.78, anchor='center')
 
         Bet_Button = Button(self, text = "BET", bg = 'white', fg = 'black',
-                               font='Helvetica, 30',
+                               font='Helvetica, 20',
                                borderless=1,
-                               width=305)
-        Bet_Button.place(relx=0.74, rely=0.9, anchor='center')
+                               width=150)
+        Bet_Button.place(relx=0.87, rely=0.9, anchor='center')
 
-        canvas = tk.Canvas(self, width=400, height=400, bg="white")
-        canvas.place(relx=0.27, rely=0.64, anchor='center')
+        canvas = tk.Canvas(self, width=530, height=480, bg="white")
+        canvas.place(relx=0.34, rely=0.59, anchor='center')
 
 
 # Create an instance of the GraphGameGUI class and start the application
