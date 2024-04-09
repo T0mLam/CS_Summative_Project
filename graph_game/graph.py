@@ -17,6 +17,7 @@ class Graph:
 
     Attributes:
         G: An instance of the Graph class of the networkx module.
+        node_position: The positions of each nodes in the networkx graph.
         unconnected_edges: An instance of the RandomisedSet class storing all unconnected edges.
         node_map: A hashmap mapping the index of the node to its Node object.
         node_idx_count: An integer count for indexing new nodes.
@@ -29,7 +30,6 @@ class Graph:
         generate_random_nodes: Generate a random number of nodes.
         generate_random_edges: Generate a random number of weighted edges.
         add_edge_to_graph: Add an edge with random weight to the graph.
-        delete_edge: Delete an edge from the graph.
         shortest_path: Find the shortest path between 2 nodes.
     """
 
@@ -66,6 +66,7 @@ class Graph:
             raise ValueError("All input parameters must be non-negative")
         
         self.G = nx.Graph()
+        self.node_position = None
         self.unconnected_edges = RandomisedSet()
         self.node_map = {}
         self.node_idx_count = 1
@@ -181,6 +182,9 @@ class Graph:
             # Decrease the remaining num of edges to be generated
             num -= 1
 
+        # Assigning a position for each node of the graph using the srping layout algorithm
+        self.node_position = nx.spring_layout(self.G)
+
     def add_edge_to_graph(self, idx1: int, idx2: int) -> None:
         """Add an edge to the graph with random integer weight from 1 to 10.
 
@@ -224,30 +228,6 @@ class Graph:
 
         # Increase the num of edges in the graph
         self.num_edges += 1
-
-    def delete_edge(self, idx1: int, idx2: int) -> None:
-        """Delete the edge between two existing nodes
-
-        Args:
-            idx1: The index of the first node.
-            idx2: The index of the second node.
-        """
-        # Check if nodes are in the graph
-        if(idx1 in self.G and idx2 in self.G):
-
-            # Check if the nodes have an edge
-            if(self.G.has_edge(idx1, idx2)):
-
-                # Deleting the edge
-                self.G.remove_edge(idx1, idx2)
-
-                # Decrease the num of edges in the graph
-                self.num_edges -= 1
-                return True 
-            else:
-                return False
-        else:
-            return False
 
     def shortest_path(self, starting_node: int, ending_node: int | None = None) -> int | Dict[int, int]:
         """Find the shortest path between nodes in the graph.
@@ -303,6 +283,7 @@ class Graph:
                         priority_queue.push((new_distance, neighbor_object))  
         
         # Return the path dict if the user does not specify an ending node
+        del paths[starting_node]
         return paths
 
     def __get_max_num_edges(self) -> int:
@@ -344,21 +325,18 @@ class Graph:
             with_labels (bool): If True, nodes will show their ID as label.
             node_size (int): The size of the nodes.
         """
-        # Assigning a position for each node of the graph using the srping layout algorithm
-        node_position = nx.spring_layout(self.G)
-
         # Drawing nodes of the graph
-        nx.draw_networkx_nodes(self.G, node_position, node_size=node_size)
+        nx.draw_networkx_nodes(self.G, self.node_position, node_size=node_size)
 
         # Drawing edges of the nodes and set the width of each edge to be proportional to its weight
         edge_width = list(nx.get_edge_attributes(self.G, 'weight').values())
-        nx.draw_networkx_edges(self.G, node_position, alpha=0.5, width=edge_width)
+        nx.draw_networkx_edges(self.G, self.node_position, alpha=0.5, width=edge_width)
         
         # If the labels exist - draw them
         if with_labels:
-            nx.draw_networkx_labels(self.G, node_position, font_size=12)
+            nx.draw_networkx_labels(self.G, self.node_position, font_size=12)
             edge_labels = nx.get_edge_attributes(self.G, 'weight')
-            nx.draw_networkx_edge_labels(self.G, node_position, edge_labels)
+            nx.draw_networkx_edge_labels(self.G, self.node_position, edge_labels)
 
         # Axis are not needed for the project
         plt.axis('off') 
