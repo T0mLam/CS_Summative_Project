@@ -3,12 +3,14 @@ from typing import List
 import random as rand
 
 from graph import Graph
+from score_generation import RandomScoreGenerator 
 
 
 class GraphGame(Graph):
     """A subclass inherited from the Graph class which handles the operation and the winning conditions of the game.
 
     Attributes:
+        score_generator: An instance of the RandomScoreGenerator class used for generating scores for each node.
         starting_node: An integer index of the starting node defined by the user.
         ending_node: An integer index of the ending node defined by the user.
 
@@ -28,6 +30,7 @@ class GraphGame(Graph):
                            generating n - 1 edges to connect all nodes, n = init_num_nodes.
         """
         super().__init__(init_num_nodes, init_num_edges)
+        self.score_generator = RandomScoreGenerator()
         self.starting_node = None
         self.ending_node = None
 
@@ -46,6 +49,7 @@ class GraphGame(Graph):
         if idx not in self.node_map:
             raise ValueError("The node with index 'idx' does not exist in the graph") 
         
+        # add score generation here ...
         # add node color change here ...
 
         self.starting_node = idx
@@ -68,7 +72,7 @@ class GraphGame(Graph):
         self.ending_node = idx
 
     def calculate_node_scores(self) -> List[float]:
-        pass
+        pass 
 
     def generate_cutoff(self) -> int:  
         pass
