@@ -15,7 +15,7 @@ class GraphGameGUI(tk.Tk):
 
         # Initialize pygame mixer for music
         pygame.mixer.init()
-        self.soundtrack_path = os.path.dirname(__file__) + '/Audio/Menu_Audio.mp3'
+        self.soundtrack_path = os.path.dirname(__file__) + '/audio/Menu_Audio.mp3'
         pygame.mixer.music.load(self.soundtrack_path)
         pygame.mixer.music.set_volume(0.5)
         pygame.mixer.music.play(-1)
@@ -114,7 +114,7 @@ class Play(tk.Frame):
         chance_of_winning_variable.set("Chance of Win: " + str(self.chance_of_winning) + "%")
 
         # Put the back arrow image for the button
-        back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/Images/back_arrow.png")
+        back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
         # Make the image 10 times smaller
         resized_back_image = back_image.subsample(10, 10)
 
@@ -123,7 +123,7 @@ class Play(tk.Frame):
         back_button.pack(side="top", anchor="nw", padx=10, pady=10)
 
         # Put the back arrow image for the button
-        buy_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/Images/shopping_cart.png")
+        buy_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/shopping_cart.png")
         # Make the image 10 times smaller
         resized_buy_image = buy_image.subsample(10, 10)
 

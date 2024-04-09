@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import random as rand
 
-from node import Node
-from heap import MinHeap
-from randomised_set import RandomisedSet
+from utils.node import Node
+from utils.heap import MinHeap
+from utils.randomised_set import RandomisedSet
 from score_generation import RandomScoreGenerator as RSG
 
 
