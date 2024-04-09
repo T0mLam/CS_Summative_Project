@@ -22,7 +22,6 @@ class GraphGame(Graph):
                  init_num_edges: int = 0) -> None:
         """Construct the attributes of the graph.
 
-
         Args:
             init_num_nodes: Number of randomly generated nodes during initialization.
             add_num_edges: Number of additional randomly generated edges, after 
@@ -47,10 +46,26 @@ class GraphGame(Graph):
         if idx not in self.node_map:
             raise ValueError("The node with index 'idx' does not exist in the graph") 
         
+        # add node color change here ...
+
         self.starting_node = idx
 
     def set_ending_node(self, idx: int) -> None:
-        pass
+        """A setter method for the ending_node attribute.
+
+        Args:
+            idx: A integer index of the node to be set as the ending node.
+        
+        Raises:
+            TypeError: Error caused by non-integer parameter input.
+            ValueError: Error caused by non-existing node parameter input.
+        """
+        if not isinstance(idx, int):
+            raise TypeError("Input parameters 'idx' must be an integer")
+        if idx not in self.node_map:
+            raise ValueError("The node with index 'idx' does not exist in the graph") 
+        
+        self.ending_node = idx
 
     def calculate_node_scores(self) -> List[float]:
         pass
