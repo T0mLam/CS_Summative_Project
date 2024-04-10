@@ -9,13 +9,30 @@ from typing import List
 
 
 class TrieNode:
+    """An individual trie node.
+    
+    Attributes:
+        children: A dictionary mapping the char to its TrieNode object.
+        end_of_word: A boolean value indicating whether the current char is the end of the word.
+    """
     def __init__(self):
+        """Consturct the children and end_of_word attributes."""
         self.children = {}
         self.end_of_word = False
 
 
 class Trie:
-    def __init__(self):
+    """A prefix tree data structure which stores an alphabet as value in each node.
+    
+    Attributes:
+        root: A pointer to the root of the Trie.
+
+    Methods:
+        find: Return True if the word is in the dictionary else False
+        complete: Complete a word based on the input of the user and return the list of words ordered by their length
+    """
+    def __init__(self) -> None:
+        """Construct the root of the trie."""
         self.root = TrieNode()
 
     def find(self, word: str) -> bool:
