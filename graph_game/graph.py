@@ -327,6 +327,7 @@ class Graph:
         """
         # Drawing nodes of the graph
         nx.draw_networkx_nodes(self.G, self.node_position, node_size=node_size)
+        nx.draw_networkx_labels(self.G, self.node_position, font_size=12)
 
         # Drawing edges of the nodes and set the width of each edge to be proportional to its weight
         edge_width = list(nx.get_edge_attributes(self.G, 'weight').values())
@@ -334,7 +335,6 @@ class Graph:
         
         # If the labels exist - draw them
         if with_labels:
-            nx.draw_networkx_labels(self.G, self.node_position, font_size=12)
             edge_labels = nx.get_edge_attributes(self.G, 'weight')
             nx.draw_networkx_edge_labels(self.G, self.node_position, edge_labels)
 
