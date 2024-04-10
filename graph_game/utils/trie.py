@@ -37,6 +37,9 @@ class Trie:
 
     def find(self, word: str) -> bool:
         """Search whether the word is stored in the trie.
+
+        Args:
+            word (str): A word to be searched for in the trie.
         
         Returns:
             True if the word is found else false.
@@ -61,6 +64,9 @@ class Trie:
     
     def complete(self, word: str) -> List[str]:
         """Complete the given word by searching words in the trie with the same prefix.
+
+        Args:
+            word (str): A word to be completed.
         
         Returns:
             A list of possible words in the trie.
@@ -152,6 +158,9 @@ class Trie:
     
     def insert(self, word: str) -> None:
         """Insert the word into the trie.
+
+        Args:
+            word (str): A word to be inserted into the trie.
 
         Raises:
             TypeError: Errors caused by non-string input of 'word'.
