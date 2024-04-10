@@ -187,6 +187,7 @@ class Play(tk.Frame):
         canvas.place(relx=0.34, rely=0.59, anchor='center')
 
 
-# Create an instance of the GraphGameGUI class and start the application
-app = GraphGameGUI()
-app.mainloop()
+if __name__ == '__main__':
+    # Create an instance of the GraphGameGUI class and start the application
+    app = GraphGameGUI()
+    app.mainloop()
