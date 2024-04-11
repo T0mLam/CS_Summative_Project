@@ -138,6 +138,59 @@ class Trie:
                      word: str,
                      threshold: int, 
                      num_return: int = int(1e9)) -> List[str]:
+        """
+        Notes:
+            This implementation of the fizzy search method is inspired by a software blog post.
+
+        References:
+        Hanov, S. 2011. Fast and Easy Levenshtein distance using a Trie. [Online]. [Accessed 11 April 2024].
+        Available from: http://stevehanov.ca/blog/?id=114.
+        """
         heap = MinHeap()
+        root = self.root
         res = []
         curr_row = range(len(word) + 1)
+
+        def dfs(node: type[TrieNode],
+                letter: str,
+                curr_str: str,
+                prev_row: int) -> None:
+            curr_str += letter
+
+            cols = len(word) + 1
+            curr_row = [prev_row[0] + 1]
+
+            for col in range(1, cols):
+                if word[col - 1] == letter:
+                    curr_row.append(prev_row[col - 1])
+                    continue
+            
+                replace_cost = prev_row[col - 1] + 1
+                insert_cost = curr_row[col - 1] + 1
+                delete_cost = prev_row[col] + 1
+
+                curr_row.append(min(replace_cost, insert_cost, delete_cost))
+
+            if curr_row[-1] <= threshold and node.end_of_word:
+                heap.push((curr_row[-1], curr_str))
+
+            if min(curr_row) <= threshold:
+                for child in node.children:
+                    dfs(node.children[child], child, curr_str, curr_row)
+
+        for child in root.children:
+            dfs(root.children[child], child, '', curr_row)
+
+        while len(heap) and num_return:
+            res.append(heap.pop()[1])
+
+        return res
+    
+
+if __name__ == '__main__':
+    trie = Trie()
+    trie.insert('goober')
+    trie.insert('goobers')
+    trie.insert('gowier')
+    trie.insert('goobr')
+    print(trie.fizzy_search('goober', threshold=3))
