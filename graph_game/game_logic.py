@@ -214,9 +214,20 @@ class GraphGame(Graph):
         return cls(init_num_nodes, add_num_edges)
 
 
+    
+    def get_nodes(self) -> List[int]:
+        """The method for getting the list of nodes in the graph which is needed for tkinter combobox
+
+            Returns: The list of nodes in the graph
+        """
+        return list(self.G.nodes)
+
 if __name__ == '__main__':
+    
     game = GraphGame.random_start()
+    #print(game.get_node_numbers())
     game.set_base_score(100)
+    
     game.set_starting_node(1)
     game.generate_cutoff()
     game.calculate_node_scores()
