@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from .node import Node
+from node import Node
 
 
 class MinHeap:
