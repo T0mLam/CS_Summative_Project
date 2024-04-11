@@ -46,6 +46,14 @@ class GraphGame(Graph):
         self.cutoff_distance = None
         self.base_score = None
 
+    def get_nodes(self) -> List[int]:
+        """The method for getting the list of nodes in the graph which is needed for tkinter combobox.
+
+        Returns: 
+            The list of nodes in the graph.
+        """
+        return list(self.node_map.keys())
+
     def set_base_score(self, score: int) -> None:
         """A setter method for the base_score attribute.
 
@@ -212,15 +220,6 @@ class GraphGame(Graph):
         init_num_nodes = rand.randint(6, 10)
         add_num_edges = init_num_nodes // rand.randint(2, 3)
         return cls(init_num_nodes, add_num_edges)
-
-
-    
-    def get_nodes(self) -> List[int]:
-        """The method for getting the list of nodes in the graph which is needed for tkinter combobox
-
-            Returns: The list of nodes in the graph
-        """
-        return list(self.G.nodes)
 
 if __name__ == '__main__':
     
