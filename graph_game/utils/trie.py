@@ -183,6 +183,7 @@ class Trie:
 
         while len(heap) and num_return:
             res.append(heap.pop()[1])
+            num_return -= 1
 
         return res
     
