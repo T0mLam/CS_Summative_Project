@@ -4,12 +4,16 @@ class DatabaseConnection:
     """A context manager class for handling database connections."""
     
     def __init__(self, db_name):
-        
+
         """Initialize the DatabaseConnection object."""
         self.db_name = db_name  # Store the name of the database file
         self.connection = None  # Initialize the connection attribute to None
 
     def __enter__(self):
+        """Enter method for the context manager."""
+        try:
+            self.connection = sqlite3.connect(self.db_name)  # Establish a connection to the database
+            return self.connection  # Return the database connection
        
     def __exit__(self, exc_type, exc_val, exc_tb):
 
