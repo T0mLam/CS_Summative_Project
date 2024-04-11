@@ -20,6 +20,7 @@ class GraphGame(Graph):
         base_score: An integer base score of the game.
 
     Methods:
+        get_nodes: A getter method for all node indcies in the graph.
         set_base_score: A setter method for the base_score attribute.
         set_starting_node: A setter method for the starting node.
         set_ending_node: A setter method for the ending node.
@@ -52,7 +53,7 @@ class GraphGame(Graph):
         Returns: 
             The list of nodes in the graph.
         """
-        return list(self.node_map.keys())
+        return sorted(list(self.node_map.keys()))
 
     def set_base_score(self, score: int) -> None:
         """A setter method for the base_score attribute.
@@ -222,7 +223,6 @@ class GraphGame(Graph):
         return cls(init_num_nodes, add_num_edges)
 
 if __name__ == '__main__':
-    
     game = GraphGame.random_start()
     #print(game.get_node_numbers())
     game.set_base_score(100)
