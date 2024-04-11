@@ -3,7 +3,10 @@ import tkinter as tk
 from tkmacosx import Button
 import pygame
 from tkinter import ttk
-
+from game_logic import GraphGame
+from matplotlib.figure import Figure 
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  
+NavigationToolbar2Tk) 
 
 class GraphGameGUI(tk.Tk):
     def __init__(self):
@@ -50,6 +53,7 @@ class GraphGameGUI(tk.Tk):
         self.frames[new_frame].pack(fill='both', expand=True)
 
 
+
 class MainMenu(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -90,12 +94,16 @@ class MainMenu(tk.Frame):
         soundtrack_switch.place(relx=0.93, rely=0.95, anchor='center')
 
 
+
+
 class Play(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.configure(bg="white")
 
-        # Balance variable
+        self.game = GraphGame.random_start()
+        self.game.set_base_score(100)
+
         self.balance = int(100)
         #Balance variable for putting into Label
         balance_variable = tk.StringVar()
@@ -149,9 +157,11 @@ class Play(tk.Frame):
                                   )
         bid_scale.place(relx=0.89, rely=0.55, anchor='center')
 
+        
+
         # Starting node label
         Starting_node = ttk.Combobox(self, width=5)
-        Starting_node['values'] = ('1', '2', '3', '4','5', '6', '7','8', '9', '10', '11', '12', '13','14','15')
+        Starting_node['values'] = Starting_node['values'] = self.game.get_node_numbers()
         Starting_node.place(relx=0.94, rely=0.36, anchor='center')
 
         # Starting node combobox
@@ -161,7 +171,7 @@ class Play(tk.Frame):
 
         # Ending node label
         Ending_node = ttk.Combobox(self, width=5)
-        Ending_node['values'] = ('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15')
+        Ending_node['values'] = Starting_node['values'] = self.game.get_node_numbers()
         Ending_node.place(relx=0.94, rely=0.46, anchor='center')
 
         # Starting node combobox
@@ -183,11 +193,12 @@ class Play(tk.Frame):
                                width=150)
         Bet_Button.place(relx=0.87, rely=0.9, anchor='center')
 
+
         canvas = tk.Canvas(self, width=530, height=480, bg="white")
         canvas.place(relx=0.34, rely=0.59, anchor='center')
 
 
 if __name__ == '__main__':
-    # Create an instance of the GraphGameGUI class and start the application
     app = GraphGameGUI()
+
     app.mainloop()
