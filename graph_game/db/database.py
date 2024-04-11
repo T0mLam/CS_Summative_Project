@@ -41,10 +41,7 @@ def initialize_database(db_name):
             cursor.execute("CREATE TABLE IF NOT EXISTS games (id INTEGER PRIMARY KEY, player_id INTEGER, nodes INTEGER, result TEXT)")
         print(f"Error initializing database: {e}")  # Print an error message if initialization fails
 
-def register_player(name, initial_balance, db_name):
-    """
-    Register a new player in the database.
-    Args:
+
     
 def register_player(name, initial_balance, db_name):
     
