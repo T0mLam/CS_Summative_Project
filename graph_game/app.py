@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-from tkmacosx import Button
+
 import pygame
 from tkinter import ttk
 import networkx as nx
@@ -62,9 +62,9 @@ class MainMenu(tk.Frame):
         self.configure(bg="white")
 
         # Play button
-        play_button = Button(self, text="Play", command=lambda: parent.switch_frame('menu', 'play')
-                             , bg='white', fg='black', borderless=1,
-                             font='Helvetica, 40', width=300)
+        play_button = tk.Button(self, text="Play", command=lambda: parent.switch_frame('menu', 'play')
+                             , bg='white', fg='black',
+                             font='Helvetica, 40', width=10)
         play_button.place(relx=0.5, rely=0.3, anchor='center')
 
         # Title
@@ -72,19 +72,19 @@ class MainMenu(tk.Frame):
         title.place(relx=0.5, rely=0.12, anchor='center')
 
         # How To Play Button
-        how_to_play_button = Button(self, text='How To Play', bg='white', fg='black', borderless=1,
-                                    font='Helvetica, 40', width=300)
+        how_to_play_button = tk.Button(self, text='How To Play', bg='white', fg='black',
+                                    font='Helvetica, 40', width=10)
         # command=self.show_how_to_play_frame)
         how_to_play_button.place(relx=0.5, rely=0.45, anchor='center')
 
         # Leaderboards Button
-        leaderboards_button = Button(self, text='Leaderboards', bg='white', fg='black', borderless=1,
-                                     font='Helvetica, 40', width=300)
+        leaderboards_button = tk.Button(self, text='Leaderboards', bg='white', fg='black',
+                                     font='Helvetica, 40', width=10)
         # command=self.show_leaderboards_frame)
         leaderboards_button.place(relx=0.5, rely=0.6, anchor='center')
 
         # Quit Button
-        quit_button = Button(self, text='Quit', bg='white', fg='black', borderless=1, font='Helvetica, 40', width=300)
+        quit_button = tk.Button(self, text='Quit', bg='white', fg='black', font='Helvetica, 40', width=10)
         # command=self.master.quit)
         quit_button.place(relx=0.5, rely=0.75, anchor='center')
 
@@ -128,8 +128,8 @@ class Play(tk.Frame):
         # Make the image 10 times smaller
         self.resized_back_image = self.back_image.subsample(10, 10)
 
-        self.back_button = Button(self, command=lambda: parent.switch_frame('play', 'menu'),
-                             image=self.resized_back_image, background="white", borderless=1)
+        self.back_button = tk.Button(self, command=lambda: parent.switch_frame('play', 'menu'),
+                             image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
 
         # Put the back arrow image for the button
@@ -138,8 +138,8 @@ class Play(tk.Frame):
         self.resized_buy_image = self.buy_image.subsample(10, 10)
 
         # Button for buying credits
-        self.buy_button = Button(self, command=lambda: parent.switch_frame('play', 'menu'),
-                            image=self.resized_buy_image, background="white", borderless=1)
+        self.buy_button = tk.Button(self, command=lambda: parent.switch_frame('play', 'menu'),
+                            image=self.resized_buy_image, background="white")
         self.buy_button.pack(side="top", anchor="ne", padx=10, pady=10)
 
         #Label with the balance and balance wariable
@@ -193,11 +193,10 @@ class Play(tk.Frame):
         self.Chance_Of_Winning_label = tk.Label(self, textvariable=self.chance_of_winning_variable, bg='white', font='Helvetica, 20')
         self.Chance_Of_Winning_label.place(relx=0.85, rely=0.78, anchor='center')
 
-        self.Bet_Button = Button(self, text = "BET", bg = 'white', fg = 'black',
-                               font='Helvetica, 20',
-                               borderless=1,
-                               width=150)
-        self.Bet_Button.place(relx=0.87, rely=0.9, anchor='center')
+        self.Bet_Button = tk.Button(self, text = "BET", bg = 'white', fg = 'black',
+                               font='Helvetica, 25',
+                               width=12)
+        self.Bet_Button.place(relx=0.84, rely=0.9, anchor='center')
 
         self.canvas = tk.Canvas(self, width=530, height=480, bg="white")
         self.canvas.place(relx=0.34, rely=0.59, anchor='center')
