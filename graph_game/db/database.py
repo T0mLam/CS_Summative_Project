@@ -29,6 +29,22 @@ class DatabaseConnection:
                 self.connection.close()  # Close the database connection, regardless of success or failure
 
 def initialize_database(db_name):
+    """
+    Initialize the database with necessary tables.
+    Args:
+        db_name (str): The name of the database file.
+    """
+    try:
+        with DatabaseConnection(db_name) as connection:
+            cursor = connection.cursor()  # Create a cursor object for executing SQL queries
+            cursor.execute("CREATE TABLE IF NOT EXISTS players (id INTEGER PRIMARY KEY, name TEXT, balance INTEGER)")  # Create players table if it does not exist
+            cursor.execute("CREATE TABLE IF NOT EXISTS games (id INTEGER PRIMARY KEY, player_id INTEGER, nodes INTEGER, result TEXT)")
+        print(f"Error initializing database: {e}")  # Print an error message if initialization fails
+
+def register_player(name, initial_balance, db_name):
+    """
+    Register a new player in the database.
+    Args:
     
 def register_player(name, initial_balance, db_name):
     
