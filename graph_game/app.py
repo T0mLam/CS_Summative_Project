@@ -158,27 +158,44 @@ class Play(tk.Frame):
                                   )
         bid_scale.place(relx=0.89, rely=0.55, anchor='center')
 
-        
-
-        # Starting node label
-        Starting_node = ttk.Combobox(self, width=5)
-        Starting_node['values'] = self.game.get_nodes()
-        Starting_node.place(relx=0.94, rely=0.36, anchor='center')
-
-        # Starting node combobox
-        Starting_node_Label = tk.Label(self, text = "Starting node:", bg='white', fg='black',
-                                       font='Helvetica, 20')
-        Starting_node_Label.place(relx=0.81, rely=0.35, anchor='center')
-
-        # Ending node label
-        Ending_node = ttk.Combobox(self, width=5)
-        Ending_node['values'] = Starting_node['values'] = self.game.get_nodes()
-        Ending_node.place(relx=0.94, rely=0.46, anchor='center')
+        def update_ending_node_state(event=None):
+            """Method makes ending node combobox disabled if starting node combobox is not chosen"""
+            
+            # Check if starting node combobox is empty
+            if not Starting_node_combobox.get():  
+                # Delete ending node selection
+                Ending_node_combobox.set('')  
+                # Disable the combobox
+                Ending_node_combobox['state'] = 'disabled'  
+            else:
+                # Enable combobox
+                Ending_node_combobox['state'] = 'normal'  
 
         # Starting node combobox
-        Ending_node_label = tk.Label(self, text="Ending node: ", bg='white', fg='black',
-                                       font='Helvetica, 20')
-        Ending_node_label.place(relx=0.81, rely=0.45, anchor='center')
+        Starting_node_combobox = ttk.Combobox(self, width=5)
+        # Fill the combobox with the values of the graph
+        Starting_node_combobox['values'] = self.game.get_nodes()
+        Starting_node_combobox.place(relx=0.94, rely=0.36, anchor='center')
+        # Bind the method update_ending node state to the combobox
+        Starting_node_combobox.bind("<<ComboboxSelected>>", update_ending_node_state)
+        # Bind the same method but as Focus Out to always check if the starting node combobox value was not deleted
+        Starting_node_combobox.bind("<FocusOut>", update_ending_node_state)
+
+        # Starting node combobox label
+        Starting_node_combobox_Label = tk.Label(self, text="Starting node:", bg='white', fg='black',
+                                    font='Helvetica, 20')
+        Starting_node_combobox_Label.place(relx=0.81, rely=0.35, anchor='center')
+
+        # Ending node combobox
+        Ending_node_combobox = ttk.Combobox(self, width=5, state='disabled')
+        # Fill the combobox with the values of the graph
+        Ending_node_combobox['values'] = self.game.get_nodes()
+        Ending_node_combobox.place(relx=0.94, rely=0.46, anchor='center')
+
+        # Ending node combobox label
+        Ending_node_combobox_Label = tk.Label(self, text="Ending node:", bg='white', fg='black',
+                                    font='Helvetica, 20')
+        Ending_node_combobox_Label.place(relx=0.81, rely=0.45, anchor='center')
 
         # Coefficient label with coefficient variable
         Coefficient_label = tk.Label(self, textvariable=coefficient_variable, bg='white', font='Helvetica, 20')
