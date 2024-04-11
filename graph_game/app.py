@@ -109,6 +109,7 @@ class Play(tk.Frame):
         balance_variable = tk.StringVar()
         balance_variable.set("Balance: " + str(self.balance))
 
+        
         # Coefficient variable
         self.coefficient = int(0)
         # Coefficient variable for putting into Label
@@ -161,7 +162,7 @@ class Play(tk.Frame):
 
         # Starting node label
         Starting_node = ttk.Combobox(self, width=5)
-        Starting_node['values'] = Starting_node['values'] = self.game.get_node_numbers()
+        Starting_node['values'] = self.game.get_nodes()
         Starting_node.place(relx=0.94, rely=0.36, anchor='center')
 
         # Starting node combobox
@@ -171,7 +172,7 @@ class Play(tk.Frame):
 
         # Ending node label
         Ending_node = ttk.Combobox(self, width=5)
-        Ending_node['values'] = Starting_node['values'] = self.game.get_node_numbers()
+        Ending_node['values'] = Starting_node['values'] = self.game.get_nodes()
         Ending_node.place(relx=0.94, rely=0.46, anchor='center')
 
         # Starting node combobox
