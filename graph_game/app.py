@@ -195,8 +195,8 @@ class Play(tk.Frame):
 
         self.Bet_Button = tk.Button(self, text = "BET", bg = 'white', fg = 'black',
                                font='Helvetica, 25',
-                               width=12)
-        self.Bet_Button.place(relx=0.84, rely=0.9, anchor='center')
+                               width=10)
+        self.Bet_Button.place(relx=0.86, rely=0.9, anchor='center')
 
         self.canvas = tk.Canvas(self, width=530, height=480, bg="white")
         self.canvas.place(relx=0.34, rely=0.59, anchor='center')
@@ -237,7 +237,7 @@ class Play(tk.Frame):
         # Draw the figure on the canvas
         self.canvas = FigureCanvasTkAgg(self.fig, self)
         self.canvas.draw() 
-        self.canvas.get_tk_widget().place(relx=0.34, rely=0.59, anchor='center', width=530, height=480)
+        self.canvas.get_tk_widget().place(relx=0.33, rely=0.60, anchor='center', width=600, height=500)
 
 
 if __name__ == '__main__':
