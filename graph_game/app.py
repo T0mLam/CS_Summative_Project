@@ -22,7 +22,9 @@ class GraphGameGUI(tk.Tk):
         pygame.mixer.init()
         self.soundtrack_path = os.path.dirname(__file__) + '/audio/Menu_Audio.mp3'
         pygame.mixer.music.load(self.soundtrack_path)
+        # Change the voulme of music
         pygame.mixer.music.set_volume(0.5)
+        # Loop
         pygame.mixer.music.play(-1)
 
         self.soundtrack_state = tk.BooleanVar(value=True)
@@ -30,11 +32,15 @@ class GraphGameGUI(tk.Tk):
         # Create a frame dict
         self.frames = {
             'menu': MainMenu(self),
-            'play': Play(self)
+            'play': Play(self),
+            'win': Win(self),
+            'loose' : Loose(self)
         }
 
         # Show main menu frame
         self.frames['menu'].pack(fill='both', expand=True)
+
+        
 
     def switch_soundtrack(self):
         if self.soundtrack_state.get():
@@ -53,6 +59,7 @@ class GraphGameGUI(tk.Tk):
         self.geometry('800x600')
         # Show the main menu frame
         self.frames[new_frame].pack(fill='both', expand=True)
+        
 
 
 
@@ -126,8 +133,8 @@ class Play(tk.Frame):
         # Put the back arrow image for the button
         self.back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
         # Make the image 10 times smaller
-        self.resized_back_image = self.back_image.subsample(10, 10)
-
+        self.resized_back_image = self.back_image.subsample(10, 10) 
+        # Back Button 
         self.back_button = tk.Button(self, command=lambda: parent.switch_frame('play', 'menu'),
                              image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
@@ -138,7 +145,7 @@ class Play(tk.Frame):
         self.resized_buy_image = self.buy_image.subsample(10, 10)
 
         # Button for buying credits
-        self.buy_button = tk.Button(self, command=lambda: parent.switch_frame('play', 'menu'),
+        self.buy_button = tk.Button(self, command=lambda: parent.switch_frame('play', 'loose'),
                             image=self.resized_buy_image, background="white")
         self.buy_button.pack(side="top", anchor="ne", padx=10, pady=10)
 
@@ -195,7 +202,8 @@ class Play(tk.Frame):
 
         self.Bet_Button = tk.Button(self, text = "BET", bg = 'white', fg = 'black',
                                font='Helvetica, 25',
-                               width=10)
+                               width=10,
+                               command=self.Bet_Start_Game)
         self.Bet_Button.place(relx=0.86, rely=0.9, anchor='center')
 
         self.canvas = tk.Canvas(self, width=530, height=480, bg="white")
@@ -238,7 +246,106 @@ class Play(tk.Frame):
         self.canvas = FigureCanvasTkAgg(self.fig, self)
         self.canvas.draw() 
         self.canvas.get_tk_widget().place(relx=0.33, rely=0.60, anchor='center', width=600, height=500)
+    
+    def Bet_Start_Game(self):
+        # Get the value of the bid 
+        bid_amount = self.bid_scale.get()
+        # Set the base score of the game to the bid amount
+        self.game.set_base_score(bid_amount)
 
+        # Check if the starting node was selected and get its value
+        starting_node = self.Starting_node_combobox.get()
+        if starting_node:
+            self.game.set_starting_node(int(starting_node))
+
+        # Generate cutoff and score
+        self.game.generate_cutoff()
+        self.game.calculate_node_scores()
+
+        # Check if the ending node was selected and get its value
+        ending_node = self.Ending_node_combobox.get()
+        if ending_node:
+            self.game.set_ending_node(int(ending_node))
+
+        print(self.game.check_player_wins())
+        print(self.game.get_player_score())
+
+        # Update the graph visualization
+        self.update_plot(with_labels=False)
+
+class Win(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.configure(bg="white")
+
+        self.amount_of_winning = int(100)
+        #Balance variable for putting into Label
+        self.amount_of_winning_variable = tk.StringVar()
+        self.amount_of_winning_variable.set("Amount of winning: " + str(self.amount_of_winning))
+
+        # Put the back arrow image for the button
+        self.back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
+        # Make the image 10 times smaller
+        self.resized_back_image = self.back_image.subsample(10, 10) 
+        # Back Button
+        self.back_button = tk.Button(self, command=lambda: parent.switch_frame('win', 'play'),
+                             image=self.resized_back_image, background="white")
+        self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
+
+
+        # Put the back arrow image for the button
+        self.win_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/win_picture.png")
+        # Make the image 10 times smaller
+        self.win_image = self.win_image.subsample(3, 3) 
+        
+        # Place the picture as a Label
+        self.win_label_picture = tk.Label(self, image=self.win_image)
+        self.win_label_picture.place(relx= 0.5, rely = 0.5, anchor='center')  
+    
+        self.you_won_label = tk.Label(self, text="YOU WON!!!", font = 'Helvetica, 50', bg = 'white')
+        self.you_won_label.place(relx=0.5, rely=0.1, anchor='center')
+        
+        self.amount_of_winning_label = tk.Label(self, textvariable=self.amount_of_winning_variable, 
+                                                font='Helvetica, 30',
+                                                bg = 'white')
+        self.amount_of_winning_label.place(relx= 0.5, rely= 0.88, anchor='center')
+
+class Loose(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.configure(bg="white")
+
+        self.amount_of_loose = int(100)
+        #Balance variable for putting into Label
+        self.amount_of_loose_variable = tk.StringVar()
+        self.amount_of_loose_variable.set("You lost: " + str(self.amount_of_loose))
+
+        # Put the back arrow image for the button
+        self.back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
+        # Make the image 10 times smaller
+        self.resized_back_image = self.back_image.subsample(10, 10) 
+        # Back Button
+        self.back_button = tk.Button(self, command=lambda: parent.switch_frame('loose', 'play'),
+                             image=self.resized_back_image, background="white")
+        self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
+
+
+        # Put the back arrow image for the button
+        self.loose_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/Loose_picture.png")
+        # Make the image 10 times smaller
+        self.loose_image = self.loose_image.subsample(3, 3) 
+        
+        # Place the picture as a Label
+        self.loose_label_picture = tk.Label(self, image=self.loose_image)
+        self.loose_label_picture.place(relx= 0.5, rely = 0.5, anchor='center')  
+    
+        self.you_lost_label = tk.Label(self, text="you lost):", font = 'Helvetica, 50', bg = 'white')
+        self.you_lost_label.place(relx=0.5, rely=0.1, anchor='center')
+        
+        self.amount_of_loosing_label = tk.Label(self, textvariable=self.amount_of_loose_variable, 
+                                                font='Helvetica, 30',
+                                                bg = 'white')
+        self.amount_of_loosing_label.place(relx= 0.5, rely= 0.88, anchor='center')
 
 if __name__ == '__main__':
     app = GraphGameGUI()
