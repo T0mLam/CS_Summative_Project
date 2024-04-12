@@ -36,8 +36,8 @@ class GraphGame(Graph):
         """Construct the attributes of the graph.
 
         Args:
-            init_num_nodes: Number of randomly generated nodes during initialization.
-            add_num_edges: Number of additional randomly generated edges, after 
+            init_num_nodes (int): Number of randomly generated nodes during initialization.
+            add_num_edges (int): Number of additional randomly generated edges, after 
                            generating n - 1 edges to connect all nodes, n = init_num_nodes.
         """
         super().__init__(init_num_nodes, init_num_edges)
@@ -59,7 +59,7 @@ class GraphGame(Graph):
         """A setter method for the base_score attribute.
 
         Args:
-            score: A integer to be set as the base score.
+            score (int): A integer to be set as the base score.
         
         Raises:
             TypeError: Error caused by non-integer parameter input.
@@ -91,7 +91,7 @@ class GraphGame(Graph):
         """A setter method for the ending_node attribute.
 
         Args:
-            idx: A integer index of the node to be set as the ending node.
+            idx (int): A integer index of the node to be set as the ending node.
         
         Raises:
             TypeError: Error caused by non-integer parameter input.
