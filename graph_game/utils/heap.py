@@ -21,8 +21,8 @@ class MinHeap:
         """Construct a heap by heapifying the input array.
 
         Args:
-            arr: A list of tuple to be heapified during the initializing stage.
-                 For example: [(1, Node_Obj1), (2, Node_Obj2), ...]
+            arr (list): A list of tuple to be heapified during the initializing stage.
+                        For example: [(1, Node_Obj1), (2, Node_Obj2), ...]
 
         Raises:
             TypeError: An error due to the invalid input data type of arr.
@@ -51,7 +51,7 @@ class MinHeap:
         """Push the value into MinHeap.
 
         Args:
-            val: Tuple with the integer and a node that will be pushed to the heap.
+            val (tuple): Tuple with the integer and a node that will be pushed to the heap.
         """
         #The current index where the new value will be put 
         curr = len(self.__heap)
