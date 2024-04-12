@@ -1,8 +1,8 @@
 import unittest
 from graph_game.utils.node import Node
 
-class TestNode(unittest.TestCase):
 
+class TestNode(unittest.TestCase):
     def setUp(self):
         self.node1 = Node(1)
         self.node2 = Node(2)
@@ -45,5 +45,3 @@ class TestNode(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-
