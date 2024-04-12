@@ -25,7 +25,7 @@ class RandomisedSet:
         """Enable the use of membership test operators (in & not in) for the class.
 
         Args:
-            item: A tuple to be checked whether it is contained in the edges set.
+            item (tuple): A tuple to be checked whether it is contained in the edges set.
 
         Returns:
             True if the edge is found, false otherwise.
@@ -46,8 +46,8 @@ class RandomisedSet:
             Amortized time complexity for adding an edge: O(1).
 
         Args:
-            idx: The index of the new node.
-            nodes: The indices of the existing nodes.
+            idx (int): The index of the new node.
+            nodes (list): The indices of the existing nodes.
 
         Raises:
             TypeError: Errors caused by incompatible input data type of 'idx' and 'nodes'.
@@ -78,8 +78,8 @@ class RandomisedSet:
         """Add an edge to the randomised set.
 
         Args:
-            idx1: Index of the first node.
-            idx2: Index of the second node.
+            idx1 (int): Index of the first node.
+            idx2 (int): Index of the second node.
 
         Raises:
             TypeError: Error occurs if the node indices are not integers.
@@ -97,6 +97,7 @@ class RandomisedSet:
         idx1, idx2 = min(idx1, idx2), max(idx1, idx2)
         new_edge = (idx1, idx2)
 
+        # Add the new edge to the randomised set 
         if new_edge not in self.edge_to_idx:
             self.edge_to_idx[new_edge] = len(self.edges)
             self.edges.append(new_edge)
@@ -108,8 +109,8 @@ class RandomisedSet:
             First swap the target edge with the last edge in the edges list and pop it out of the list.
             
         Args:
-            idx1: Index of the first node.
-            idx2: Index of the second node.
+            idx1 (int): Index of the first node.
+            idx2 (int): Index of the second node.
 
         Raises:
             TypeError: Error occurs if the node indices are not integers.
@@ -144,7 +145,11 @@ class RandomisedSet:
         """
         if not self.edges:
             return
+        
+        # Randomly select an edge from the list
         edge_idx = rand.randint(0, len(self.edges) - 1)
         edge = self.edges[edge_idx]
+
+        # Delete the edge from the set and return it
         self.remove_edge_from_set(*edge)
         return edge
