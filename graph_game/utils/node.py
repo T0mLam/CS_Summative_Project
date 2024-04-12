@@ -9,7 +9,7 @@ class Node:
         """Initializes a Node object with the parameter value.
 
         Args:
-            idx: This are the values associated with the node.
+            idx (int): This are the values associated with the node.
         """
         self.idx = idx
         self.neighbours = {}  # A dictionary to keep the neighbours and their weight
@@ -18,7 +18,7 @@ class Node:
         """Compares two nodes based on their values.
 
         Args:
-            other: Another node in the graph to compare with.
+            other (Node): Another node in the graph to compare with.
 
         Returns:
             True if the value of the other node is greater than the value of the this node, False otherwise.
@@ -29,8 +29,8 @@ class Node:
         """Adds a neighbour to the nodes in the graph with an associated weight.
 
         Args:
-            neighbour: Neighbour node to be added.
-            weight: the Weight of the edge connecting the neighbour to the node.
+            neighbour (Node): Neighbour node to be added.
+            weight (int, float): the Weight of the edge connecting the neighbour to the node.
             
         Raises:
             TypeError: If neighbour is not an instance of Node in the graph or if the weight inputed is not numeric (eg" writing a word instead of a number").
