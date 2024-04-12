@@ -4,22 +4,40 @@ import numpy as np
 
 
 class RandomScoreGenerator:
+    """A random score generator which based on a normal distribution.
+
+    Attributes:
+        base_score: The base score of the game which determines the range of score generated for each node.
+
+    Methods:
+        set_mean: Set the mean value for generating random distances.
+        set_sd: Set the standard deviation for generating random distances.
+        generate_random_distance: Generates a random distance using a normal distribution.
+        calculate_score: Calculates a score based on the given distance and base score.
+        generate_random_edge: Generates a random weight using a normal distribution.
+    """
     def __init__(self, base_score: int = 100) -> None:
-        # Initialize the variables
+        """Construct the attributes of the random score generator.
+
+        Args:
+            base_score (int): The base score of the game which determines the range of score generated for each node.
+
+        Raises:
+            ValueError: If the base score is not a integer.
+        """
         self._mean = None
         self._sd = None
         self._generated_distance = None
         self.base_score = base_score
 
     def set_mean(self, mean: int) -> None:
-        """
-        Set the mean value for generating random distances.
+        """Set the mean value for generating random distances.
 
         Args:
             mean (int): The mean value to set.
 
         Raises:
-            ValueError: If the mean is not a non numeric number.
+            ValueError: If the mean is a non numeric number.
         """
         # Check if mean is a non-negative integer
         if not isinstance(mean, int) or mean < 0:
@@ -28,8 +46,7 @@ class RandomScoreGenerator:
         self._mean = mean
 
     def set_sd(self, sd: int | float) -> None:
-        """
-        Set the standard deviation for generating random distances.
+        """Set the standard deviation for generating random distances.
 
         Args:
             sd (int | float): The standard deviation value to set.
@@ -44,8 +61,7 @@ class RandomScoreGenerator:
         self._sd = sd
 
     def generate_random_distance(self) -> int:
-        """
-        Method generates a random distance using a normal distribution.
+        """Generates a random distance using a normal distribution.
 
         Returns:
             int: A randomly generated distance.
@@ -60,8 +76,7 @@ class RandomScoreGenerator:
         return int(np.random.normal(loc=self._mean, scale=self._sd))
 
     def calculate_score(self, dist: int) -> int:
-        """
-        Method calculates a score based on the given distance and base score.
+        """Calculates a score based on the given distance and base score.
 
         Args:
             dist (int): The distance to calculate the score for.
@@ -84,8 +99,7 @@ class RandomScoreGenerator:
     
     @staticmethod
     def generate_random_edge(mean: int, sd: int | float) -> int:
-        """
-        Method generates a random weight using a normal distribution.
+        """Generates a random weight using a normal distribution.
 
         Returns:
             int: A randomly generated weight.
