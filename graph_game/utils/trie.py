@@ -6,7 +6,7 @@ Tom Lam. 2024. Word Ladder Game. [Software]. [Accessed 10 April 2024].
 Available from: https://github.com/T0mLam/Word-Ladder-Game
 """
 from typing import List
-from heap import MinHeap
+from .heap import MinHeap
 
 
 class TrieNode:
@@ -138,7 +138,16 @@ class Trie:
                      word: str,
                      threshold: int, 
                      num_return: int = int(1e9)) -> List[str]:
-        """
+        """A search method which returns all similar words in the trie with at most (threshold) Levenshtein distance. 
+
+        Args:
+            word (str): The target word.
+            threshold (int): The maximum Levenshtein distance difference.
+            num_return (int): The maximum number of return words sorted by ascending levenshtein distance.
+
+        Returns:
+            A list of words that are within the Levenshtein distance threshold.
+        
         Notes:
             This implementation of the fizzy search method is inspired by a software blog post.
 
