@@ -147,6 +147,10 @@ class Trie:
 
         Returns:
             A list of words that are within the Levenshtein distance threshold.
+
+        Raises:
+            TypeError: Invalid data type of input parameter 'word'.
+            ValueError: Invalid data type and range of input parameters 'threshold' or 'num_return'.
         
         Notes:
             This implementation of the fizzy search method is inspired by a software blog post.
@@ -155,6 +159,14 @@ class Trie:
         Hanov, S. 2011. Fast and Easy Levenshtein distance using a Trie. [Online]. [Accessed 11 April 2024].
         Available from: http://stevehanov.ca/blog/?id=114.
         """
+        if not isinstance(word, str):
+            raise TypeError("The input parameter 'word' must be a string")
+        
+        if not isinstance(threshold, int) or threshold < 0:
+            raise ValueError("The input parameter 'threshold' must be a non-negative integer")
+        if not isinstance(num_return, int) or num_return < 1:
+            raise ValueError("The input parameter 'num_return' must be a positive integer")
+
         heap = MinHeap()
         root = self.root
         res = []
