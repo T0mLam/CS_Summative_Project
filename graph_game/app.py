@@ -275,7 +275,8 @@ class Play(tk.Frame):
 
             # Check if the starting noded was selected, if it not, paint the label red
             starting_node = self.Starting_node_combobox.get()
-            if not starting_node:
+            if (not starting_node 
+                or self.Starting_node_combobox.get() == self.Ending_node_combobox):
                 self.Starting_node_combobox_Label.config(fg='red')
                 all_inputs_valid = False
             else:
@@ -286,7 +287,8 @@ class Play(tk.Frame):
             ending_node = self.Ending_node_combobox.get()
 
             # Check if the ending noded was selected, if it not, paint the label red
-            if not ending_node:
+            if( not ending_node 
+               or self.Starting_node_combobox.get() == self.Ending_node_combobox.get()):
                 self.Ending_node_combobox_Label.config(fg='red')
                 all_inputs_valid = False
             else:
@@ -312,7 +314,15 @@ class Play(tk.Frame):
 
             self.Bet_Button.config(text="Play Again")
             self.Bet_Button.update()
+
+            self.Starting_node_combobox['state'] = 'disabled'
+            self.Ending_node_combobox['state'] = 'disabled'
+            self.Starting_node_combobox.set('') 
+            self.Ending_node_combobox.set('')
+            self.bid_scale.set(0)
+            self.bid_scale['state'] = 'disabled'   
             
+
             self.balance += int(self.game.get_player_score())
 
         else:
@@ -321,11 +331,15 @@ class Play(tk.Frame):
             self.update_plot(result=False)  
             self.game_started = True
 
+            self.Starting_node_combobox['state'] = 'normal'
+            self.bid_scale['state'] = 'normal' 
+
             self.Starting_node_combobox['values'] = self.game.get_nodes()
             self.Ending_node_combobox['values'] = self.game.get_nodes()
 
             self.Starting_node_combobox.set('') 
-            self.Ending_node_combobox.set('')   
+            self.Ending_node_combobox.set('')  
+            self.bid_scale.set(0)
 
             self.Ending_node_combobox['state'] = 'disabled'
 
@@ -414,7 +428,7 @@ class Lose(tk.Frame):
                                                 font='Helvetica, 30',
                                                 bg = 'white')
         self.amount_of_loosing_label.place(relx= 0.5, rely= 0.88, anchor='center')
-        
+
 
 if __name__ == '__main__':
     app = GraphGameGUI()
