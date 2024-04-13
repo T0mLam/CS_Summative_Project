@@ -30,7 +30,15 @@ class SearchEngine:
         """
         return self.trie.complete(input_str)
     
-    def search_result(self, name: str) -> List[str]:
+    def search_result(self, name: str) -> List[Tuple[str, int]]:
+        """Get a list of the players with their balance according to the user input.
+
+        Args:
+            name (str): The target player name.
+
+        Returns:
+            A list of tuples consist of the players' name and balance. 
+        """
         # Get at most 10 users with at most 2 Levenshtein distance away from the name input
         players = self.trie.fizzy_search(name, threshold=2, num_return=10)
 
@@ -48,7 +56,21 @@ class SearchEngine:
 
         return res
 
-    def get_leaders(self, n: int) -> List[Tuple[str]]:
+    def get_leaders(self, n: int) -> List[Tuple[str, int]]:
+        """Get the n players with the highest balance.
+
+        Args:
+            n (int): The number of top players.
+
+        Returns:
+            A list of tuples consist of the players' name and balance. 
+
+        Raises:
+            ValueError: Invalid data type or range of n.
+        """
+        if not isinstance(n, int) or n < 1:
+            raise ValueError("Input parameter 'n' must be a postive integer")
+
         with DatabaseConnection('db') as conn:
             leaders_name_score = conn.get_cursor().execute(
                 'SELECT name, balance FROM players ORDER BY balance DESC'
@@ -57,13 +79,16 @@ class SearchEngine:
         return leaders_name_score[:n]
 
     def fetch_all_users_to_trie(self) -> None:  
+        """Fetch all the players from the database to the trie."""
         with DatabaseConnection('db') as conn:
+            # Get a list of all players
             players = conn.get_cursor().execute(
                 'SELECT name FROM players'
             ).fetchall()
         
         self.trie = Trie()
 
+        # Insert every player into the trie
         for player in players:
             self.trie.insert(*player)
 
