@@ -58,3 +58,16 @@ class DatabaseConnection:
         
     def log_game(player_id, nodes, result, db_name):
         """
+        Log a game played by a player in the database.
+    Args:
+        player_id (int): The ID of the player.
+        nodes (int): The number of nodes in the game.
+        result (str): The result of the game (win/loss).
+        db_name (str): The name of the database file.
+    """
+    try:
+        with DatabaseConnection(db_name) as connection:
+            cursor = connection.cursor()  # Create a cursor object for executing SQL queries
+            cursor.execute("INSERT INTO games (player_id, nodes, result) VALUES (?, ?, ?)", (player_id, nodes, result))  # Insert game data into games table
+    except sqlite3.Error as e:
+        print(f"Error logging game: {e}")  # Print an error message if logging fails
