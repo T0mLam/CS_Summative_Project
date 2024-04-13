@@ -157,7 +157,7 @@ class GraphGame(Graph):
                                 font_weight='bold')
         
     def check_player_wins(self) -> bool:
-        """Check whether the player wins and update the graph visualization.
+        """Check whether the player wins.
         
         Returns:
             True if the player wins, false otherwise.
@@ -169,18 +169,9 @@ class GraphGame(Graph):
             raise NameError('The starting node and ending node have not been defined')
         if not self.cutoff_distance:
             raise NameError('The generate_cutoff method has to be called before this method')
+        
         # Find the shortest distance between the starting node and the ending node
         shortest_dist = self.shortest_path(self.starting_node, self.ending_node)
-        
-        # Find all the nodes between the shortest path using the nx library
-        path = nx.shortest_path(self.G, source=self.starting_node, target=self.ending_node)
-        path_edges = list(zip(path,path[1:]))
-
-        # Draw the edges between in green if the player wins, red otherwise
-        if shortest_dist < self.cutoff_distance:
-            nx.draw_networkx_edges(self.G, self.node_position, edgelist=path_edges, edge_color='g', width=10)
-        else:
-            nx.draw_networkx_edges(self.G, self.node_position, edgelist=path_edges, edge_color='r', width=10)
 
         # Return a boolean of whether the player wins
         return shortest_dist < self.cutoff_distance
