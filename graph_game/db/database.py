@@ -1,6 +1,7 @@
 import sqlite3
 import os
 
+
 class DatabaseConnection:
     """A context manager class for handling database connections."""
     
