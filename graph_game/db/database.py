@@ -71,3 +71,28 @@ class DatabaseConnection:
             cursor.execute("INSERT INTO games (player_id, nodes, result) VALUES (?, ?, ?)", (player_id, nodes, result))  # Insert game data into games table
     except sqlite3.Error as e:
         print(f"Error logging game: {e}")  # Print an error message if logging fails
+
+    def authenticate(self, username, password):
+        """Authenticate the user based on provided username and password."""
+        try:
+            with self.connection:
+                cursor = self.connection.cursor()
+                
+                # Execute SQL query to check if a user with the provided username and password exists
+                cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
+                
+                # Fetch the first row of the result
+                user = cursor.fetchone()
+                
+                # If user is not None, authentication is successful
+                if user:
+                    print("Authentication successful.")
+                    return True
+                else:
+                    # If user is None, authentication failed
+                    print("Invalid username or password.")
+                    return False
+        except sqlite3.Error as e:
+            # Print error message if any database error occurs during authentication
+            print(f"Error authenticating user: {e}")
+            return False
