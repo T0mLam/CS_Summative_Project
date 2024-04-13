@@ -34,7 +34,7 @@ class GraphGameGUI(tk.Tk):
             'menu': MainMenu(self),
             'play': Play(self),
             'win': Win(self),
-            'loose' : Loose(self)
+            'lose' : Lose(self)
         }
 
         # Show main menu frame
@@ -145,7 +145,7 @@ class Play(tk.Frame):
         self.resized_buy_image = self.buy_image.subsample(10, 10)
 
         # Button for buying credits
-        self.buy_button = tk.Button(self, command=lambda: parent.switch_frame('play', 'loose'),
+        self.buy_button = tk.Button(self, command=lambda: parent.switch_frame('play', 'lose'),
                             image=self.resized_buy_image, background="white")
         self.buy_button.pack(side="top", anchor="ne", padx=10, pady=10)
 
@@ -310,39 +310,39 @@ class Win(tk.Frame):
                                                 bg = 'white')
         self.amount_of_winning_label.place(relx= 0.5, rely= 0.88, anchor='center')
 
-class Loose(tk.Frame):
+class Lose(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.configure(bg="white")
 
-        self.amount_of_loose = int(100)
+        self.amount_of_lose = int(100)
         #Balance variable for putting into Label
-        self.amount_of_loose_variable = tk.StringVar()
-        self.amount_of_loose_variable.set("You lost: " + str(self.amount_of_loose))
+        self.amount_of_lose_variable = tk.StringVar()
+        self.amount_of_lose_variable.set("You lost: " + str(self.amount_of_lose))
 
         # Put the back arrow image for the button
         self.back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
         # Make the image 10 times smaller
         self.resized_back_image = self.back_image.subsample(10, 10) 
         # Back Button
-        self.back_button = tk.Button(self, command=lambda: parent.switch_frame('loose', 'play'),
+        self.back_button = tk.Button(self, command=lambda: parent.switch_frame('lose', 'play'),
                              image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
 
 
         # Put the back arrow image for the button
-        self.loose_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/Loose_picture.png")
+        self.lose_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/Loose_picture.png")
         # Make the image 10 times smaller
-        self.loose_image = self.loose_image.subsample(3, 3) 
+        self.lose_image = self.lose_image.subsample(3, 3) 
         
         # Place the picture as a Label
-        self.loose_label_picture = tk.Label(self, image=self.loose_image)
-        self.loose_label_picture.place(relx= 0.5, rely = 0.5, anchor='center')  
+        self.lose_label_picture = tk.Label(self, image=self.lose_image)
+        self.lose_label_picture.place(relx= 0.5, rely = 0.5, anchor='center')  
     
         self.you_lost_label = tk.Label(self, text="you lost):", font = 'Helvetica, 50', bg = 'white')
         self.you_lost_label.place(relx=0.5, rely=0.1, anchor='center')
         
-        self.amount_of_loosing_label = tk.Label(self, textvariable=self.amount_of_loose_variable, 
+        self.amount_of_loosing_label = tk.Label(self, textvariable=self.amount_of_lose_variable, 
                                                 font='Helvetica, 30',
                                                 bg = 'white')
         self.amount_of_loosing_label.place(relx= 0.5, rely= 0.88, anchor='center')
