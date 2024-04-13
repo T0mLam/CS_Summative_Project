@@ -1,6 +1,6 @@
 from typing import List
-from db.database import DatabaseConnection
-from utils.trie import Trie
+from ..db.database import DatabaseConnection
+from ..utils.trie import Trie
 
 
 class SearchEngine:
@@ -15,7 +15,14 @@ class SearchEngine:
         players = self.trie.fizzy_search(name, threshold=3, num_return=10)
 
     def get_leaders(self, n: int) -> List[str]:
-        pass
+        with DatabaseConnection('db') as conn:
+            leaders = conn.get_cursor().execute(
+                # add your code here
+            )
 
     def fetch_all_users(self) -> None:  
         pass
+
+
+if __name__ == '__main__':
+    print('success')
