@@ -1,6 +1,5 @@
 import os
 import tkinter as tk
-
 import pygame
 from tkinter import ttk
 import networkx as nx
@@ -9,6 +8,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 from game_logic import GraphGame
+
 
 class GraphGameGUI(tk.Tk):
     def __init__(self):
@@ -40,8 +40,6 @@ class GraphGameGUI(tk.Tk):
         # Show main menu frame
         self.frames['menu'].pack(fill='both', expand=True)
 
-        
-
     def switch_soundtrack(self):
         if self.soundtrack_state.get():
             pygame.mixer.music.unpause()
@@ -60,8 +58,6 @@ class GraphGameGUI(tk.Tk):
         # Show the main menu frame
         self.frames[new_frame].pack(fill='both', expand=True)
         
-
-
 
 class MainMenu(tk.Frame):
     def __init__(self, parent):
@@ -101,8 +97,6 @@ class MainMenu(tk.Frame):
                                            onvalue=True, offvalue=False,
                                            bg='white', font='Helvetica, 20')
         soundtrack_switch.place(relx=0.93, rely=0.95, anchor='center')
-
-
 
 
 class Play(tk.Frame):
