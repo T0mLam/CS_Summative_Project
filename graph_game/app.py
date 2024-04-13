@@ -106,6 +106,9 @@ class Play(tk.Frame):
         self.game = GraphGame.random_start()
         self.game.set_base_score(100)
 
+        # The variable for new game
+        self.game_started = True
+
         self.configure(bg="white")
 
         self.balance = int(100)
@@ -256,55 +259,85 @@ class Play(tk.Frame):
         self.canvas.get_tk_widget().place(relx=0.33, rely=0.60, anchor='center', width=600, height=500)
     
     def Bet_Start_Game(self):
-        # Create the variable that states if all parameters are selected
-        all_inputs_valid = True
+        if self.game_started == True:
+            # Create the variable that states if all parameters are selected
+            all_inputs_valid = True
 
-        # Get the value of the bid 
-        bid_amount = self.bid_scale.get()
+            # Get the value of the bid 
+            bid_amount = self.bid_scale.get()
 
-        # Check if the bid amount is higher that zero, if it is zero, paint the label red
-        if bid_amount == 0:
-            self.Bid_Label.config(fg='red')
-            all_inputs_valid = False
-        else:
-            self.Bid_Label.config(fg='black')
-
-        # Check if the starting noded was selected, if it not, paint the label red
-        starting_node = self.Starting_node_combobox.get()
-        if not starting_node:
-            self.Starting_node_combobox_Label.config(fg='red')
-            all_inputs_valid = False
-        else:
-            self.Starting_node_combobox_Label.config(fg='black')
-            self.game.set_starting_node(int(starting_node))
-
-        # Check if the ending node was selected and get its value
-        ending_node = self.Ending_node_combobox.get()
-
-        # Check if the ending noded was selected, if it not, paint the label red
-        if not ending_node:
-            self.Ending_node_combobox_Label.config(fg='red')
-            all_inputs_valid = False
-        else:
-            self.Ending_node_combobox_Label.config(fg='black')
-            self.game.set_ending_node(int(ending_node))
-
-        # If all inputs are valid -> proceed with the game logic
-        if all_inputs_valid:
-            self.game.set_base_score(bid_amount)
-            self.game.generate_cutoff()
-            self.game.calculate_node_scores()
-            
-            print(self.game.check_player_wins())
-            print(self.game.get_player_score())
-
-            if(self.game.check_player_wins() == True):
-                self.parent.switch_frame('play', 'win')
+            # Check if the bid amount is higher that zero, if it is zero, paint the label red
+            if bid_amount == 0:
+                self.Bid_Label.config(fg='red')
+                all_inputs_valid = False
             else:
-                self.parent.switch_frame('play', 'lose')
+                self.Bid_Label.config(fg='black')
 
-        self.update_plot(result=True)
-        
+            # Check if the starting noded was selected, if it not, paint the label red
+            starting_node = self.Starting_node_combobox.get()
+            if not starting_node:
+                self.Starting_node_combobox_Label.config(fg='red')
+                all_inputs_valid = False
+            else:
+                self.Starting_node_combobox_Label.config(fg='black')
+                self.game.set_starting_node(int(starting_node))
+
+            # Check if the ending node was selected and get its value
+            ending_node = self.Ending_node_combobox.get()
+
+            # Check if the ending noded was selected, if it not, paint the label red
+            if not ending_node:
+                self.Ending_node_combobox_Label.config(fg='red')
+                all_inputs_valid = False
+            else:
+                self.Ending_node_combobox_Label.config(fg='black')
+                self.game.set_ending_node(int(ending_node))
+
+            # If all inputs are valid -> proceed with the game logic
+            if all_inputs_valid:
+                self.game.set_base_score(bid_amount)
+                self.game.generate_cutoff()
+                self.game.calculate_node_scores()
+                
+                print(self.game.check_player_wins())
+                print(self.game.get_player_score())
+
+                if(self.game.check_player_wins() == True):
+                    self.parent.switch_frame('play', 'win')
+                else:
+                    self.parent.switch_frame('play', 'lose')
+
+            self.update_plot(result=True)
+            self.game_started = False
+
+            self.Bet_Button.config(text="Play Again")
+            self.Bet_Button.update()
+            
+            self.balance += int(self.game.get_player_score())
+
+        else:
+            self.Bet_Button.config(text="Play Again")
+            self.game = GraphGame.random_start()
+            self.update_plot(result=False)  
+            self.game_started = True
+
+            self.Starting_node_combobox['values'] = self.game.get_nodes()
+            self.Ending_node_combobox['values'] = self.game.get_nodes()
+
+            self.Starting_node_combobox.set('') 
+            self.Ending_node_combobox.set('')   
+
+            self.Ending_node_combobox['state'] = 'disabled'
+
+            self.bid_scale.set(0)  
+
+            self.Bet_Button.config(text="BET")
+            self.Bet_Button.update()
+            
+
+
+            self.balance += int(self.game.get_player_score())
+            
 
 class Win(tk.Frame):
     def __init__(self, parent):
@@ -381,7 +414,7 @@ class Lose(tk.Frame):
                                                 font='Helvetica, 30',
                                                 bg = 'white')
         self.amount_of_loosing_label.place(relx= 0.5, rely= 0.88, anchor='center')
-
+        
 
 if __name__ == '__main__':
     app = GraphGameGUI()
