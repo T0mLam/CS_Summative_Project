@@ -82,3 +82,5 @@ if __name__ == '__main__':
     with DatabaseConnection('db') as conn:
         conn.initialize_database()
         conn.register_player('Tom', 10)
+        conn.register_player('Femi', 2)
+        conn.register_player('Artem', 2)
