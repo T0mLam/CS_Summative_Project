@@ -225,7 +225,7 @@ class Play(tk.Frame):
             # Enable combobox
             self.Ending_node_combobox['state'] = 'normal'  
 
-    def update_plot(self, with_labels=True):
+    def update_plot(self, result=False):
         # Create a matplotlib figure
         self.fig = Figure(figsize=(3,3), dpi=200)
         self.ax = self.fig.add_subplot(111)
@@ -239,17 +239,29 @@ class Play(tk.Frame):
         nx.draw_networkx_edges(self.game.G, self.game.node_position, alpha=0.5, ax=self.ax, width=edge_width)
         
         # If the labels exist - draw them
-        if with_labels:
+        if result:
+            # Find the shortest distance between the starting node and the ending node
+            shortest_dist = self.game.shortest_path(self.game.starting_node, self.game.ending_node)
+        
+            # Find all the nodes between the shortest path using the nx library
+            path = nx.shortest_path(self.game.G, source=self.game.starting_node, target=self.game.ending_node)
+            path_edges = list(zip(path,path[1:]))
+
+            # Draw the edges between in green if the player wins, red otherwise
+            if shortest_dist < self.game.cutoff_distance:
+                nx.draw_networkx_edges(self.game.G, self.game.node_position, ax=self.ax, edgelist=path_edges, edge_color='g', width=3)
+            else:
+                nx.draw_networkx_edges(self.game.G, self.game.node_position, ax=self.ax, edgelist=path_edges, edge_color='r', width=3)
+
             edge_labels = nx.get_edge_attributes(self.game.G, 'weight')
-            nx.draw_networkx_edge_labels(self.game.G, self.game.node_position, edge_labels)
-    
+            nx.draw_networkx_edge_labels(self.game.G, self.game.node_position, edge_labels, ax=self.ax, font_size=4)
+            
         # Draw the figure on the canvas
         self.canvas = FigureCanvasTkAgg(self.fig, self)
         self.canvas.draw() 
         self.canvas.get_tk_widget().place(relx=0.33, rely=0.60, anchor='center', width=600, height=500)
     
     def Bet_Start_Game(self):
-        
         # Create the variable that states if all parameters are selected
         all_inputs_valid = True
 
@@ -288,7 +300,6 @@ class Play(tk.Frame):
             self.game.set_base_score(bid_amount)
             self.game.generate_cutoff()
             self.game.calculate_node_scores()
-
             
             print(self.game.check_player_wins())
             print(self.game.get_player_score())
@@ -297,15 +308,17 @@ class Play(tk.Frame):
                 self.parent.switch_frame('play', 'win')
             else:
                 self.parent.switch_frame('play', 'lose')
-        
 
+        self.update_plot(result=True)
+        
 
 class Win(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.configure(bg="white")
 
-        self.amount_of_winning = int(100)
+        self.amount_of_winning = 100
+
         #Balance variable for putting into Label
         self.amount_of_winning_variable = tk.StringVar()
         self.amount_of_winning_variable.set("Amount of winning: " + str(self.amount_of_winning))
@@ -336,6 +349,7 @@ class Win(tk.Frame):
                                                 font='Helvetica, 30',
                                                 bg = 'white')
         self.amount_of_winning_label.place(relx= 0.5, rely= 0.88, anchor='center')
+
 
 class Lose(tk.Frame):
     def __init__(self, parent):
@@ -373,6 +387,7 @@ class Lose(tk.Frame):
                                                 font='Helvetica, 30',
                                                 bg = 'white')
         self.amount_of_loosing_label.place(relx= 0.5, rely= 0.88, anchor='center')
+
 
 if __name__ == '__main__':
     app = GraphGameGUI()
