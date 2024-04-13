@@ -1,98 +1,82 @@
-import sqlite3  # Import the sqlite3 module for interacting with SQLite databases
+import sqlite3
 
 class DatabaseConnection:
     """A context manager class for handling database connections."""
     
     def __init__(self, db_name):
-
         """Initialize the DatabaseConnection object."""
-        self.db_name = db_name  # Store the name of the database file
-        self.connection = None  # Initialize the connection attribute to None
+        self.db_name = db_name
+        self.connection = None
 
     def __enter__(self):
         """Enter method for the context manager."""
         try:
-            self.connection = sqlite3.connect(self.db_name)  # Establish a connection to the database
-            return self.connection  # Return the database connection
+            self.connection = sqlite3.connect(self.db_name)
+            return self.connection
         except sqlite3.Error as e:
-            print(f"Error connecting to database: {e}")  # Print an error message if connection fails
-            raise  # Raise the exception to propagate it to the calling code
+            print(f"Error connecting to database: {e}")
+            raise
        
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Exit method for the context manager."""
-        if self.connection:  # Check if a connection exists
+        if self.connection:
             try:
-                self.connection.commit()  # Commit any changes to the database
+                self.connection.commit()
             except sqlite3.Error as e:
-                print(f"Error committing changes to database: {e}")  # Print an error message if commit fails
+                print(f"Error committing changes to database: {e}")
             finally:
-                self.connection.close()  # Close the database connection, regardless of success or failure
+                self.connection.close()
 
-    def initialize_database(db_name):
+    def initialize_database(self):
         """
         Initialize the database with necessary tables.
-        Args:
-            db_name (str): The name of the database file.
         """
         try:
-            with DatabaseConnection(db_name) as connection:
-                cursor = connection.cursor()  # Create a cursor object for executing SQL queries
-                cursor.execute("CREATE TABLE IF NOT EXISTS players (id INTEGER PRIMARY KEY, name TEXT, balance INTEGER, username TEXT UNIQUE, password TEXT)")  # Create players table if it does not exist
+            with self:
+                cursor = self.connection.cursor()
+                cursor.execute("CREATE TABLE IF NOT EXISTS players (id INTEGER PRIMARY KEY, name TEXT, balance INTEGER, username TEXT UNIQUE, password TEXT)")
                 cursor.execute("CREATE TABLE IF NOT EXISTS games (id INTEGER PRIMARY KEY, player_id INTEGER, nodes INTEGER, result TEXT)")
-            print(f"Error initializing database: {e}")  # Print an error message if initialization fails
+            print("Database initialized successfully.")
+        except sqlite3.Error as e:
+            print(f"Error initializing database: {e}")
 
-    def register_player(name, initial_balance, db_name):
+    def register_player(self, name, initial_balance):
         """
-    Register a new player in the database.
-    Args:
-        name (str): The name of the player.
-        initial_balance (int): The initial balance of the player.
-        db_name (str): The name of the database file.
-    """
-    try:
-        with DatabaseConnection(db_name) as connection:
-            cursor = connection.cursor()  # Create a cursor object for executing SQL queries
-            cursor.execute("INSERT INTO players (name, balance) VALUES (?, ?)", (name, initial_balance))  # Insert player data into players table
-    except sqlite3.Error as e:
-        print(f"Error registering player: {e}")  # Print an error message if registration fails
+        Register a new player in the database.
+        """
+        try:
+            with self:
+                cursor = self.connection.cursor()
+                cursor.execute("INSERT INTO players (name, balance) VALUES (?, ?)", (name, initial_balance))
+            print("Player registered successfully.")
+        except sqlite3.Error as e:
+            print(f"Error registering player: {e}")
         
-    def log_game(player_id, nodes, result, db_name):
+    def log_game(self, player_id, nodes, result):
         """
         Log a game played by a player in the database.
-    Args:
-        player_id (int): The ID of the player.
-        nodes (int): The number of nodes in the game.
-        result (str): The result of the game (win/loss).
-        db_name (str): The name of the database file.
-    """
-    try:
-        with DatabaseConnection(db_name) as connection:
-            cursor = connection.cursor()  # Create a cursor object for executing SQL queries
-            cursor.execute("INSERT INTO games (player_id, nodes, result) VALUES (?, ?, ?)", (player_id, nodes, result))  # Insert game data into games table
-    except sqlite3.Error as e:
-        print(f"Error logging game: {e}")  # Print an error message if logging fails
+        """
+        try:
+            with self:
+                cursor = self.connection.cursor()
+                cursor.execute("INSERT INTO games (player_id, nodes, result) VALUES (?, ?, ?)", (player_id, nodes, result))
+            print("Game logged successfully.")
+        except sqlite3.Error as e:
+            print(f"Error logging game: {e}")
 
     def authenticate(self, username, password):
         """Authenticate the user based on provided username and password."""
         try:
-            with self.connection:
+            with self:
                 cursor = self.connection.cursor()
-                
-                # Execute SQL query to check if a user with the provided username and password exists
-                cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
-                
-                # Fetch the first row of the result
+                cursor.execute("SELECT * FROM players WHERE username = ? AND password = ?", (username, password))
                 user = cursor.fetchone()
-                
-                # If user is not None, authentication is successful
                 if user:
                     print("Authentication successful.")
                     return True
                 else:
-                    # If user is None, authentication failed
                     print("Invalid username or password.")
                     return False
         except sqlite3.Error as e:
-            # Print error message if any database error occurs during authentication
             print(f"Error authenticating user: {e}")
             return False
