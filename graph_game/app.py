@@ -283,7 +283,11 @@ class Play(tk.Frame):
         self.canvas = FigureCanvasTkAgg(self.fig, self)
         self.canvas.draw() 
         self.canvas.get_tk_widget().place(relx=0.33, rely=0.60, anchor='center', width=600, height=500)
-    
+
+    # Function to update the maximum value of the bid scale
+    def update_max_bid(self):
+        self.bid_scale.config(to=self.balance)
+
     def Bet_Start_Game(self):
         if self.game_started == True:
             # Create the variable that states if all parameters are selected
@@ -345,7 +349,6 @@ class Play(tk.Frame):
             self.bid_scale['state'] = 'disabled'   
             
             self.balance += int(self.game.get_player_score())
-
         else:
             self.bet_button.config(text="Play Again")
             self.game = GraphGame.random_start()
@@ -370,8 +373,10 @@ class Play(tk.Frame):
             self.bet_button.update()
             
             self.balance += int(self.game.get_player_score())
+            
 
         self.balance_variable.set(f'Balance: {self.balance}')
+        self.update_max_bid()
         # update ... user score in db
             
 

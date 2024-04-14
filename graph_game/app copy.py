@@ -1,6 +1,5 @@
 import os
 import tkinter as tk
-
 import pygame
 from tkinter import ttk
 import networkx as nx
@@ -9,6 +8,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 from game_logic import GraphGame
+
 
 class GraphGameGUI(tk.Tk):
     def __init__(self):
@@ -40,8 +40,6 @@ class GraphGameGUI(tk.Tk):
         # Show main menu frame
         self.frames['menu'].pack(fill='both', expand=True)
 
-        
-
     def switch_soundtrack(self):
         if self.soundtrack_state.get():
             pygame.mixer.music.unpause()
@@ -60,8 +58,6 @@ class GraphGameGUI(tk.Tk):
         # Show the main menu frame
         self.frames[new_frame].pack(fill='both', expand=True)
         
-
-
 
 class MainMenu(tk.Frame):
     def __init__(self, parent):
@@ -103,8 +99,6 @@ class MainMenu(tk.Frame):
         soundtrack_switch.place(relx=0.93, rely=0.95, anchor='center')
 
 
-
-
 class Play(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -112,9 +106,14 @@ class Play(tk.Frame):
         self.game = GraphGame.random_start()
         self.game.set_base_score(100)
 
+        # The variable for new game
+        self.game_started = True
+
         self.configure(bg="white")
 
         self.balance = int(100)
+
+        self.old_balance = self.balance
         #Balance variable for putting into Label
         self.balance_variable = tk.StringVar()
         self.balance_variable.set("Balance: " + str(self.balance))
@@ -168,14 +167,14 @@ class Play(tk.Frame):
         self.bid_scale.place(relx=0.89, rely=0.55, anchor='center')
 
         # Starting node combobox
-        self.Starting_node_combobox = ttk.Combobox(self, width=5)
+        self.starting_node_combobox = ttk.Combobox(self, width=5)
         # Fill the combobox with the values of the graph
-        self.Starting_node_combobox['values'] = self.game.get_nodes()
-        self.Starting_node_combobox.place(relx=0.94, rely=0.36, anchor='center')
+        self.starting_node_combobox['values'] = self.game.get_nodes()
+        self.starting_node_combobox.place(relx=0.94, rely=0.36, anchor='center')
         # Bind the method update_ending node state to the combobox
-        self.Starting_node_combobox.bind("<<ComboboxSelected>>", self.update_ending_node_state)
+        self.starting_node_combobox.bind("<<ComboboxSelected>>", self.update_starting_ending_node_combobox_state)
         # Bind the same method but as Focus Out to always check if the starting node combobox value was not deleted
-        self.Starting_node_combobox.bind("<FocusOut>", self.update_ending_node_state)
+        self.starting_node_combobox.bind("<FocusOut>", self.update_starting_ending_node_combobox_state)
 
         # Starting node combobox label
         self.Starting_node_combobox_Label = tk.Label(self, text="Starting node:", bg='white', fg='black',
@@ -183,10 +182,10 @@ class Play(tk.Frame):
         self.Starting_node_combobox_Label.place(relx=0.81, rely=0.35, anchor='center')
 
         # Ending node combobox
-        self.Ending_node_combobox = ttk.Combobox(self, width=5, state='disabled')
+        self.ending_node_combobox = ttk.Combobox(self, width=5, state='disabled')
         # Fill the combobox with the values of the graph
-        self.Ending_node_combobox['values'] = self.game.get_nodes()
-        self.Ending_node_combobox.place(relx=0.94, rely=0.46, anchor='center')
+        self.ending_node_combobox['values'] = self.game.get_nodes()
+        self.ending_node_combobox.place(relx=0.94, rely=0.46, anchor='center')
 
         # Ending node combobox label
         self.Ending_node_combobox_Label = tk.Label(self, text="Ending node:", bg='white', fg='black',
@@ -201,31 +200,33 @@ class Play(tk.Frame):
         self.Chance_Of_Winning_label = tk.Label(self, textvariable=self.chance_of_winning_variable, bg='white', font='Helvetica, 20')
         self.Chance_Of_Winning_label.place(relx=0.85, rely=0.78, anchor='center')
 
-        self.Bet_Button = tk.Button(self, text = "BET", bg = 'white', fg = 'black',
+        self.bet_button = tk.Button(self, text = "BET", bg = 'white', fg = 'black',
                                font='Helvetica, 25',
                                width=10,
                                command=self.Bet_Start_Game)
-        self.Bet_Button.place(relx=0.86, rely=0.9, anchor='center')
+        self.bet_button.place(relx=0.86, rely=0.9, anchor='center')
 
         self.canvas = tk.Canvas(self, width=530, height=480, bg="white")
         self.canvas.place(relx=0.34, rely=0.59, anchor='center')
 
         self.update_plot()
     
-    def update_ending_node_state(self, event=None):
+    def update_starting_ending_node_combobox_state(self, event=None):
         """Method makes ending node combobox disabled if starting node combobox is not chosen"""
         
         # Check if starting node combobox is empty
-        if not self.Starting_node_combobox.get():  
+        if not self.starting_node_combobox.get():  
             # Delete ending node selection
-            self.Ending_node_combobox.set('')  
+            self.ending_node_combobox.set('')  
             # Disable the combobox
-            self.Ending_node_combobox['state'] = 'disabled'  
+            self.ending_node_combobox['state'] = 'disabled'  
         else:
-            # Enable combobox
-            self.Ending_node_combobox['state'] = 'normal'  
+            # Enable ending_node combobox
+            self.ending_node_combobox['state'] = 'normal'  
+            # Disable starting_node combobox
+            self.starting_node_combobox['state'] = 'disable'  
 
-    def update_plot(self, with_labels=True):
+    def update_plot(self, with_node_scores=False, result=False):
         # Create a matplotlib figure
         self.fig = Figure(figsize=(3,3), dpi=200)
         self.ax = self.fig.add_subplot(111)
@@ -237,78 +238,160 @@ class Play(tk.Frame):
         # Draw edges of the nodes and set the width of each edge to be proportional to its weight
         edge_width = list(nx.get_edge_attributes(self.game.G, 'weight').values())
         nx.draw_networkx_edges(self.game.G, self.game.node_position, alpha=0.5, ax=self.ax, width=edge_width)
+
+        if with_node_scores:
+            if not self.game.starting_node or not self.game.score_generator:
+                raise NameError('The score_generator or the starting node have not been defined.')
+
+            # Get the shortest distances from the starting node to all other nodes
+            node_to_dist = self.game.shortest_path(starting_node=self.game.starting_node)
+
+            # Map the distance to each node to its score using the score_generator
+            for node, dist in node_to_dist.items():
+                node_to_dist[node] = self.game.score_generator.calculate_score(dist)
+
+            # Create score labels for the networkx graph visualization
+            label_pos = {}
+            for node, coords in self.game.node_position.items():
+                # Set the label to be 0.135 units above the original node position
+                label_pos[node] = (coords[0], coords[1] + 0.135)
+
+            nx.draw_networkx_labels(self.game.G, 
+                                    pos=label_pos,
+                                    ax=self.ax,
+                                    labels=node_to_dist,
+                                    font_size=4, 
+                                    font_weight='bold')
         
         # If the labels exist - draw them
-        if with_labels:
+        if result:
+            # Find the shortest distance between the starting node and the ending node
+            shortest_dist = self.game.shortest_path(self.game.starting_node, self.game.ending_node)
+        
+            # Find all the nodes between the shortest path using the nx library
+            path = nx.shortest_path(self.game.G, source=self.game.starting_node, target=self.game.ending_node)
+            path_edges = list(zip(path,path[1:]))
+
+            # Draw the edges between in green if the player wins, red otherwise
+            if shortest_dist < self.game.cutoff_distance:
+                nx.draw_networkx_edges(self.game.G, self.game.node_position, ax=self.ax, edgelist=path_edges, edge_color='g', width=3)
+            else:
+                nx.draw_networkx_edges(self.game.G, self.game.node_position, ax=self.ax, edgelist=path_edges, edge_color='r', width=3)
+
             edge_labels = nx.get_edge_attributes(self.game.G, 'weight')
-            nx.draw_networkx_edge_labels(self.game.G, self.game.node_position, edge_labels)
-    
+            nx.draw_networkx_edge_labels(self.game.G, self.game.node_position, edge_labels, ax=self.ax, font_size=4)
+            
         # Draw the figure on the canvas
         self.canvas = FigureCanvasTkAgg(self.fig, self)
         self.canvas.draw() 
         self.canvas.get_tk_widget().place(relx=0.33, rely=0.60, anchor='center', width=600, height=500)
     
     def Bet_Start_Game(self):
-        
-        # Create the variable that states if all parameters are selected
-        all_inputs_valid = True
+        if self.game_started == True:
+            # Create the variable that states if all parameters are selected
+            all_inputs_valid = True
 
-        # Get the value of the bid 
-        bid_amount = self.bid_scale.get()
+            # Get the value of the bid 
+            bid_amount = self.bid_scale.get()
 
-        # Check if the bid amount is higher that zero, if it is zero, paint the label red
-        if bid_amount == 0:
-            self.Bid_Label.config(fg='red')
-            all_inputs_valid = False
-        else:
-            self.Bid_Label.config(fg='black')
-
-        # Check if the starting noded was selected, if it not, paint the label red
-        starting_node = self.Starting_node_combobox.get()
-        if not starting_node:
-            self.Starting_node_combobox_Label.config(fg='red')
-            all_inputs_valid = False
-        else:
-            self.Starting_node_combobox_Label.config(fg='black')
-            self.game.set_starting_node(int(starting_node))
-
-        # Check if the ending node was selected and get its value
-        ending_node = self.Ending_node_combobox.get()
-
-        # Check if the ending noded was selected, if it not, paint the label red
-        if not ending_node:
-            self.Ending_node_combobox_Label.config(fg='red')
-            all_inputs_valid = False
-        else:
-            self.Ending_node_combobox_Label.config(fg='black')
-            self.game.set_ending_node(int(ending_node))
-
-        # If all inputs are valid -> proceed with the game logic
-        if all_inputs_valid:
-            self.game.set_base_score(bid_amount)
-            self.game.generate_cutoff()
-            self.game.calculate_node_scores()
-
-            
-            print(self.game.check_player_wins())
-            print(self.game.get_player_score())
-
-            if(self.game.check_player_wins() == True):
-                self.parent.switch_frame('play', 'win')
+            # Check if the bid amount is higher that zero, if it is zero, paint the label red
+            if bid_amount == 0:
+                self.Bid_Label.config(fg='red')
+                all_inputs_valid = False
             else:
-                self.parent.switch_frame('play', 'lose')
-        
+                self.Bid_Label.config(fg='black')
 
+            # Check if the starting noded was selected, if it not, paint the label red
+            starting_node = self.starting_node_combobox.get()
+            if (not starting_node 
+                or self.starting_node_combobox.get() == self.ending_node_combobox):
+                self.Starting_node_combobox_Label.config(fg='red')
+                all_inputs_valid = False
+            else:
+                self.Starting_node_combobox_Label.config(fg='black')
+                self.game.set_starting_node(int(starting_node))
 
-class Win(tk.Frame):
+            # Check if the ending node was selected and get its value
+            ending_node = self.ending_node_combobox.get()
+
+            # Check if the ending noded was selected, if it not, paint the label red
+            if( not ending_node 
+               or self.starting_node_combobox.get() == self.ending_node_combobox.get()):
+                self.Ending_node_combobox_Label.config(fg='red')
+                all_inputs_valid = False
+            else:
+                self.Ending_node_combobox_Label.config(fg='black')
+                self.game.set_ending_node(int(ending_node))
+
+            # If all inputs are valid -> proceed with the game logic
+            if all_inputs_valid:
+                self.game.set_base_score(bid_amount)
+                self.game.generate_cutoff()
+                
+                if(self.game.check_player_wins() == True):
+                    self.parent.switch_frame('play', 'win')
+                else:
+                    self.parent.switch_frame('play', 'lose')
+
+            self.update_plot(result=True, with_node_scores=True)
+            self.game_started = False
+
+            self.bet_button.config(text="Play Again")
+            self.bet_button.update()
+
+            self.starting_node_combobox['state'] = 'disabled'
+            self.ending_node_combobox['state'] = 'disabled'
+            self.starting_node_combobox.set('') 
+            self.ending_node_combobox.set('')
+            self.bid_scale.set(0)
+            self.bid_scale['state'] = 'disabled'   
+            
+            self.balance += int(self.game.get_player_score())
+
+        else:
+            self.bet_button.config(text="Play Again")
+            self.game = GraphGame.random_start()
+            self.update_plot(result=False)  
+            self.game_started = True
+
+            self.starting_node_combobox['state'] = 'normal'
+            self.bid_scale['state'] = 'normal' 
+
+            self.starting_node_combobox['values'] = self.game.get_nodes()
+            self.ending_node_combobox['values'] = self.game.get_nodes()
+
+            self.starting_node_combobox.set('') 
+            self.ending_node_combobox.set('')  
+            self.bid_scale.set(0)
+
+            self.ending_node_combobox['state'] = 'disabled'
+
+            self.bid_scale.set(0)  
+
+            self.bet_button.config(text="BET")
+            self.bet_button.update()
+            
+            self.balance += int(self.game.get_player_score())
+
+        self.balance_variable.set(f'Balance: {self.balance}')
+        # update ... user score in db
+
+class Win(tk.Frame):  
     def __init__(self, parent):
-        super().__init__(parent)
+        super().__init__(parent)  
         self.configure(bg="white")
 
-        self.amount_of_winning = int(100)
+        #self.amount_of_winning = 100
+        current_balance = Play.balance
+        old_balance = Play.old_balance
+        self.amount_of_winning = current_balance - old_balance
+
+        self.configure(bg="white")
+        #self.winning_label = tk.Label(self, text=f"You won: ${self.amount_of_winning}", bg='white', fg='black', font='Helvetica, 20')
+        #self.winning_label.pack(pady=20)
         #Balance variable for putting into Label
-        self.amount_of_winning_variable = tk.StringVar()
-        self.amount_of_winning_variable.set("Amount of winning: " + str(self.amount_of_winning))
+        #self.amount_of_winning_variable = tk.StringVar()
+        #self.amount_of_winning_variable.set("Amount of winning: " + str(self.amount_of_winning))
 
         # Put the back arrow image for the button
         self.back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
@@ -316,7 +399,7 @@ class Win(tk.Frame):
         self.resized_back_image = self.back_image.subsample(10, 10) 
         # Back Button
         self.back_button = tk.Button(self, command=lambda: parent.switch_frame('win', 'play'),
-                             image=self.resized_back_image, background="white")
+                            image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
 
 
@@ -324,18 +407,19 @@ class Win(tk.Frame):
         self.win_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/win_picture.png")
         # Make the image 10 times smaller
         self.win_image = self.win_image.subsample(3, 3) 
-        
+            
         # Place the picture as a Label
         self.win_label_picture = tk.Label(self, image=self.win_image)
         self.win_label_picture.place(relx= 0.5, rely = 0.5, anchor='center')  
-    
+        
         self.you_won_label = tk.Label(self, text="YOU WON!!!", font = 'Helvetica, 50', bg = 'white')
         self.you_won_label.place(relx=0.5, rely=0.1, anchor='center')
-        
-        self.amount_of_winning_label = tk.Label(self, textvariable=self.amount_of_winning_variable, 
-                                                font='Helvetica, 30',
-                                                bg = 'white')
-        self.amount_of_winning_label.place(relx= 0.5, rely= 0.88, anchor='center')
+            
+        #self.amount_of_winning_label = tk.Label(self, textvariable=self.amount_of_winning_variable, 
+                                      #          font='Helvetica, 30',
+                              #                 bg = 'white')
+        #self.amount_of_winning_label.place(relx= 0.5, rely= 0.88, anchor='center')
+
 
 class Lose(tk.Frame):
     def __init__(self, parent):
@@ -373,6 +457,7 @@ class Lose(tk.Frame):
                                                 font='Helvetica, 30',
                                                 bg = 'white')
         self.amount_of_loosing_label.place(relx= 0.5, rely= 0.88, anchor='center')
+
 
 if __name__ == '__main__':
     app = GraphGameGUI()
