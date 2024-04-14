@@ -165,14 +165,14 @@ class Play(tk.Frame):
         self.bid_scale.place(relx=0.89, rely=0.55, anchor='center')
 
         # Starting node combobox
-        self.Starting_node_combobox = ttk.Combobox(self, width=5)
+        self.starting_node_combobox = ttk.Combobox(self, width=5)
         # Fill the combobox with the values of the graph
-        self.Starting_node_combobox['values'] = self.game.get_nodes()
-        self.Starting_node_combobox.place(relx=0.94, rely=0.36, anchor='center')
+        self.starting_node_combobox['values'] = self.game.get_nodes()
+        self.starting_node_combobox.place(relx=0.94, rely=0.36, anchor='center')
         # Bind the method update_ending node state to the combobox
-        self.Starting_node_combobox.bind("<<ComboboxSelected>>", self.update_ending_node_state)
+        self.starting_node_combobox.bind("<<ComboboxSelected>>", self.update_starting_ending_node_combobox_state)
         # Bind the same method but as Focus Out to always check if the starting node combobox value was not deleted
-        self.Starting_node_combobox.bind("<FocusOut>", self.update_ending_node_state)
+        self.starting_node_combobox.bind("<FocusOut>", self.update_starting_ending_node_combobox_state)
 
         # Starting node combobox label
         self.Starting_node_combobox_Label = tk.Label(self, text="Starting node:", bg='white', fg='black',
@@ -180,10 +180,10 @@ class Play(tk.Frame):
         self.Starting_node_combobox_Label.place(relx=0.81, rely=0.35, anchor='center')
 
         # Ending node combobox
-        self.Ending_node_combobox = ttk.Combobox(self, width=5, state='disabled')
+        self.ending_node_combobox = ttk.Combobox(self, width=5, state='disabled')
         # Fill the combobox with the values of the graph
-        self.Ending_node_combobox['values'] = self.game.get_nodes()
-        self.Ending_node_combobox.place(relx=0.94, rely=0.46, anchor='center')
+        self.ending_node_combobox['values'] = self.game.get_nodes()
+        self.ending_node_combobox.place(relx=0.94, rely=0.46, anchor='center')
 
         # Ending node combobox label
         self.Ending_node_combobox_Label = tk.Label(self, text="Ending node:", bg='white', fg='black',
@@ -198,31 +198,33 @@ class Play(tk.Frame):
         self.Chance_Of_Winning_label = tk.Label(self, textvariable=self.chance_of_winning_variable, bg='white', font='Helvetica, 20')
         self.Chance_Of_Winning_label.place(relx=0.85, rely=0.78, anchor='center')
 
-        self.Bet_Button = tk.Button(self, text = "BET", bg = 'white', fg = 'black',
+        self.bet_button = tk.Button(self, text = "BET", bg = 'white', fg = 'black',
                                font='Helvetica, 25',
                                width=10,
                                command=self.Bet_Start_Game)
-        self.Bet_Button.place(relx=0.86, rely=0.9, anchor='center')
+        self.bet_button.place(relx=0.86, rely=0.9, anchor='center')
 
         self.canvas = tk.Canvas(self, width=530, height=480, bg="white")
         self.canvas.place(relx=0.34, rely=0.59, anchor='center')
 
         self.update_plot()
     
-    def update_ending_node_state(self, event=None):
+    def update_starting_ending_node_combobox_state(self, event=None):
         """Method makes ending node combobox disabled if starting node combobox is not chosen"""
         
         # Check if starting node combobox is empty
-        if not self.Starting_node_combobox.get():  
+        if not self.starting_node_combobox.get():  
             # Delete ending node selection
-            self.Ending_node_combobox.set('')  
+            self.ending_node_combobox.set('')  
             # Disable the combobox
-            self.Ending_node_combobox['state'] = 'disabled'  
+            self.ending_node_combobox['state'] = 'disabled'  
         else:
-            # Enable combobox
-            self.Ending_node_combobox['state'] = 'normal'  
+            # Enable ending_node combobox
+            self.ending_node_combobox['state'] = 'normal'  
+            # Disable starting_node combobox
+            self.starting_node_combobox['state'] = 'disable'  
 
-    def update_plot(self, result=False):
+    def update_plot(self, with_node_scores=False, result=False):
         # Create a matplotlib figure
         self.fig = Figure(figsize=(3,3), dpi=200)
         self.ax = self.fig.add_subplot(111)
@@ -234,6 +236,30 @@ class Play(tk.Frame):
         # Draw edges of the nodes and set the width of each edge to be proportional to its weight
         edge_width = list(nx.get_edge_attributes(self.game.G, 'weight').values())
         nx.draw_networkx_edges(self.game.G, self.game.node_position, alpha=0.5, ax=self.ax, width=edge_width)
+
+        if with_node_scores:
+            if not self.game.starting_node or not self.game.score_generator:
+                raise NameError('The score_generator or the starting node have not been defined.')
+
+            # Get the shortest distances from the starting node to all other nodes
+            node_to_dist = self.game.shortest_path(starting_node=self.game.starting_node)
+
+            # Map the distance to each node to its score using the score_generator
+            for node, dist in node_to_dist.items():
+                node_to_dist[node] = self.game.score_generator.calculate_score(dist)
+
+            # Create score labels for the networkx graph visualization
+            label_pos = {}
+            for node, coords in self.game.node_position.items():
+                # Set the label to be 0.135 units above the original node position
+                label_pos[node] = (coords[0], coords[1] + 0.135)
+
+            nx.draw_networkx_labels(self.game.G, 
+                                    pos=label_pos,
+                                    ax=self.ax,
+                                    labels=node_to_dist,
+                                    font_size=4, 
+                                    font_weight='bold')
         
         # If the labels exist - draw them
         if result:
@@ -274,9 +300,9 @@ class Play(tk.Frame):
                 self.Bid_Label.config(fg='black')
 
             # Check if the starting noded was selected, if it not, paint the label red
-            starting_node = self.Starting_node_combobox.get()
+            starting_node = self.starting_node_combobox.get()
             if (not starting_node 
-                or self.Starting_node_combobox.get() == self.Ending_node_combobox):
+                or self.starting_node_combobox.get() == self.ending_node_combobox):
                 self.Starting_node_combobox_Label.config(fg='red')
                 all_inputs_valid = False
             else:
@@ -284,11 +310,11 @@ class Play(tk.Frame):
                 self.game.set_starting_node(int(starting_node))
 
             # Check if the ending node was selected and get its value
-            ending_node = self.Ending_node_combobox.get()
+            ending_node = self.ending_node_combobox.get()
 
             # Check if the ending noded was selected, if it not, paint the label red
             if( not ending_node 
-               or self.Starting_node_combobox.get() == self.Ending_node_combobox.get()):
+               or self.starting_node_combobox.get() == self.ending_node_combobox.get()):
                 self.Ending_node_combobox_Label.config(fg='red')
                 all_inputs_valid = False
             else:
@@ -299,58 +325,54 @@ class Play(tk.Frame):
             if all_inputs_valid:
                 self.game.set_base_score(bid_amount)
                 self.game.generate_cutoff()
-                self.game.calculate_node_scores()
                 
-                print(self.game.check_player_wins())
-                print(self.game.get_player_score())
-
                 if(self.game.check_player_wins() == True):
                     self.parent.switch_frame('play', 'win')
                 else:
                     self.parent.switch_frame('play', 'lose')
 
-            self.update_plot(result=True)
+            self.update_plot(result=True, with_node_scores=True)
             self.game_started = False
 
-            self.Bet_Button.config(text="Play Again")
-            self.Bet_Button.update()
+            self.bet_button.config(text="Play Again")
+            self.bet_button.update()
 
-            self.Starting_node_combobox['state'] = 'disabled'
-            self.Ending_node_combobox['state'] = 'disabled'
-            self.Starting_node_combobox.set('') 
-            self.Ending_node_combobox.set('')
+            self.starting_node_combobox['state'] = 'disabled'
+            self.ending_node_combobox['state'] = 'disabled'
+            self.starting_node_combobox.set('') 
+            self.ending_node_combobox.set('')
             self.bid_scale.set(0)
             self.bid_scale['state'] = 'disabled'   
             
-
             self.balance += int(self.game.get_player_score())
 
         else:
-            self.Bet_Button.config(text="Play Again")
+            self.bet_button.config(text="Play Again")
             self.game = GraphGame.random_start()
             self.update_plot(result=False)  
             self.game_started = True
 
-            self.Starting_node_combobox['state'] = 'normal'
+            self.starting_node_combobox['state'] = 'normal'
             self.bid_scale['state'] = 'normal' 
 
-            self.Starting_node_combobox['values'] = self.game.get_nodes()
-            self.Ending_node_combobox['values'] = self.game.get_nodes()
+            self.starting_node_combobox['values'] = self.game.get_nodes()
+            self.ending_node_combobox['values'] = self.game.get_nodes()
 
-            self.Starting_node_combobox.set('') 
-            self.Ending_node_combobox.set('')  
+            self.starting_node_combobox.set('') 
+            self.ending_node_combobox.set('')  
             self.bid_scale.set(0)
 
-            self.Ending_node_combobox['state'] = 'disabled'
+            self.ending_node_combobox['state'] = 'disabled'
 
             self.bid_scale.set(0)  
 
-            self.Bet_Button.config(text="BET")
-            self.Bet_Button.update()
+            self.bet_button.config(text="BET")
+            self.bet_button.update()
             
-
-
             self.balance += int(self.game.get_player_score())
+
+        self.balance_variable.set(f'Balance: {self.balance}')
+        # update ... user score in db
             
 
 class Win(tk.Frame):
