@@ -209,7 +209,7 @@ class GraphGame(Graph):
         To instantiate:
             game = GraphGame.random_start()
         """
-        init_num_nodes = rand.randint(6, 10)
+        init_num_nodes = rand.randint(8, 10)
         add_num_edges = init_num_nodes // rand.randint(2, 3)
         return cls(init_num_nodes, add_num_edges)
 
