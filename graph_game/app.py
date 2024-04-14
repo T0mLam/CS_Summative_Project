@@ -329,10 +329,13 @@ class Play(tk.Frame):
             if all_inputs_valid:
                 self.game.set_base_score(bid_amount)
                 self.game.generate_cutoff()
+                score = self.game.get_player_score()
                 
                 if(self.game.check_player_wins() == True):
+                    self.parent.frames['win'].amount_of_winning_variable.set("Amount of winning: " + str(score))
                     self.parent.switch_frame('play', 'win')
                 else:
+                    self.parent.frames['lose'].amount_of_lose_variable.set("You lost: " + str(score)) 
                     self.parent.switch_frame('play', 'lose')
 
             self.update_plot(result=True, with_node_scores=True)
@@ -346,9 +349,10 @@ class Play(tk.Frame):
             self.starting_node_combobox.set('') 
             self.ending_node_combobox.set('')
             self.bid_scale.set(0)
-            self.bid_scale['state'] = 'disabled'   
+            self.bid_scale['state'] = 'disabled' 
             
-            self.balance += int(self.game.get_player_score())
+            self.balance += score
+
         else:
             self.bet_button.config(text="Play Again")
             self.game = GraphGame.random_start()
@@ -372,7 +376,7 @@ class Play(tk.Frame):
             self.bet_button.config(text="BET")
             self.bet_button.update()
             
-            self.balance += int(self.game.get_player_score())
+            self.balance += score
             
 
         self.balance_variable.set(f'Balance: {self.balance}')
@@ -385,11 +389,9 @@ class Win(tk.Frame):
         super().__init__(parent)
         self.configure(bg="white")
 
-        self.amount_of_winning = 100
-
         #Balance variable for putting into Label
         self.amount_of_winning_variable = tk.StringVar()
-        self.amount_of_winning_variable.set("Amount of winning: " + str(self.amount_of_winning))
+        self.amount_of_winning_variable.set("Amount of winning: " + str(self.amount_of_winning_variable))
 
         # Put the back arrow image for the button
         self.back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
@@ -424,10 +426,9 @@ class Lose(tk.Frame):
         super().__init__(parent)
         self.configure(bg="white")
 
-        self.amount_of_lose = int(100)
         #Balance variable for putting into Label
         self.amount_of_lose_variable = tk.StringVar()
-        self.amount_of_lose_variable.set("You lost: " + str(self.amount_of_lose))
+        self.amount_of_lose_variable.set("You lost: " + str(self.amount_of_lose_variable))
 
         # Put the back arrow image for the button
         self.back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
