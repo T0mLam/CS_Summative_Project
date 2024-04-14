@@ -1,10 +1,3 @@
-"""
-The implementation of the Trie data structure is based on the work submitted in a formative assessment.
-
-References:
-Tom Lam. 2024. Word Ladder Game. [Software]. [Accessed 10 April 2024]. 
-Available from: https://github.com/T0mLam/Word-Ladder-Game
-"""
 from typing import List
 from .heap import MinHeap
 
