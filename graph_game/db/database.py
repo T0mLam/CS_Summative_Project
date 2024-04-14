@@ -43,11 +43,14 @@ class DatabaseConnection:
         except sqlite3.Error as e:
             print(f"Error initializing database: {e}")
 
-    def register_player(self, name, initial_balance):
-        """Register a new player in the database."""
+    def register_player(self, name, initial_balance, username, password):
+        """
+        Register a new player in the database.
+        """
         try:
-            cursor = self.connection.cursor()
-            cursor.execute("INSERT INTO players (name, balance) VALUES (?, ?)", (name, initial_balance))
+            with self:
+                cursor = self.connection.cursor()
+                cursor.execute("INSERT INTO players (name, balance, username, password) VALUES (?, ?, ?, ?)", (name, initial_balance, username, password))
             print("Player registered successfully.")
         except sqlite3.Error as e:
             print(f"Error registering player: {e}")
