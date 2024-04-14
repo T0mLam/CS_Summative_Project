@@ -47,7 +47,7 @@ class SearchEngine:
         with DatabaseConnection('db') as conn:
             for player in players:
                 # Fetch the player name and score from the database
-                player_name_score = conn.get_cursor().execute(
+                player_name_score = conn.cursor.execute(
                     'SELECT name, balance FROM players WHERE name = ?', (player,)
                 ).fetchone()
 
@@ -72,7 +72,7 @@ class SearchEngine:
             raise ValueError("Input parameter 'n' must be a postive integer")
 
         with DatabaseConnection('db') as conn:
-            leaders_name_score = conn.get_cursor().execute(
+            leaders_name_score = conn.cursor().execute(
                 'SELECT name, balance FROM players ORDER BY balance DESC'
             ).fetchall()
             
@@ -82,7 +82,7 @@ class SearchEngine:
         """Fetch all the players from the database to the trie."""
         with DatabaseConnection('db') as conn:
             # Get a list of all players
-            players = conn.get_cursor().execute(
+            players = conn.cursor().execute(
                 'SELECT name FROM players'
             ).fetchall()
         
