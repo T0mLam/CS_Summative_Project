@@ -7,7 +7,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from .game_logic import GraphGame
-from .db.database import DatabaseConnection
+from .db.database import DatabaseConnection, initialize_database, authenticate, log_game, register_player
 # To run app.py, enter 'python3 -m graph_game.app_copy' in terminal.
 
 
@@ -64,7 +64,6 @@ class GraphGameGUI(tk.Tk):
 
 class Login(tk.Frame):
     def __init__(self, parent):
-        self.app_ab = DatabaseConnection.initialize_database()
         super().__init__(parent)
         self.parent = parent
         self.configure(bg="white")
@@ -82,16 +81,16 @@ class Login(tk.Frame):
         self.password_Entry = tk.Entry(self, font='Helvetica, 30', width=15, bg='white', show='*')
         self.password_Entry.place(relx=0.5, rely=0.4, anchor='center')
         
-        self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=DatabaseConnection.register)
+        self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=lambda: parent.switch_frame('login', 'register'))
         self.register_Button.place(relx=0.5, rely=0.5, anchor='center')
 
-        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=DatabaseConnection.authenticate)
+        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=self.login())
         self.login_Button.place(relx=0.5, rely=0.6, anchor='center')
 
     def login(self):
         username = self.username_Entry.get()
         password = self.password_Entry.get()
-        user = self.app_db.authenticate(username, password)
+        user = authenticate(username, password)
         if user:
             self.parent.switch_frame('login', 'menu')
 
@@ -124,24 +123,22 @@ class Register(tk.Frame):
         self.password_repeat_Entry = tk.Entry(self, font='Helvetica, 30', width=15, bg='white', show='*')
         self.password_repeat_Entry.place(relx=0.5, rely=0.5, anchor='center')
 
-        self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=DatabaseConnection.register)
+        self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=self.register)
         self.register_Button.place(relx=0.5, rely=0.6, anchor='center')
 
-        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=DatabaseConnection.login)
+        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=lambda: parent.switch_frame('register', 'login'))
         self.login_Button.place(relx=0.5, rely=0.7, anchor='center')
         
-        def register(self):
-            username = self.username_Entry.get()
-            password = self.password_Entry.get()
-            password_repeat = self.password_repeat_Entry.get()
-            if password == password_repeat:
-                DatabaseConnection.register_player("", 0, username, password)
-                self.parent.switch_frame('register', 'menu')
-            else:
-                print("Passwords do not match.")
+    def register(self):
+        username = self.username_Entry.get()
+        password = self.password_Entry.get()
+        password_repeat = self.password_repeat_Entry.get()
+        if password == password_repeat:
+            register_player("", 0, username, password)
+            self.parent.switch_frame('register', 'menu')
+        else:
+            print("Passwords do not match.")
 
-        def login(self):
-            self.parent.switch_frame('register', 'login')
         
 class MainMenu(tk.Frame):
     def __init__(self, parent):
@@ -564,8 +561,8 @@ class Lose(tk.Frame):
                                                 bg = 'white')
         self.amount_of_loosing_label.place(relx= 0.5, rely= 0.88, anchor='center')
 
-# To run app.py, enter 'python3 -m graph_game.app' in terminal.
+# To run app.py, enter 'python3 -m graph_game.app_copy' in terminal.
 if __name__ == '__main__':
     app = GraphGameGUI()
-    DatabaseConnection.initialize_database()
+    register_player("0", 100, "Artem123", "123")
     app.mainloop()
