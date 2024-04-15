@@ -19,6 +19,9 @@ class GraphGameGUI(tk.Tk):
         self['bg'] = 'white'
         self.resizable(False, False)  # Make the window resizable
 
+        # Initialize the database
+        initialize_database()
+
         # Initialize pygame mixer for music
         pygame.mixer.init()
         self.soundtrack_path = os.path.dirname(__file__) + '/audio/Menu_Audio.mp3'
@@ -42,6 +45,7 @@ class GraphGameGUI(tk.Tk):
 
         # Show main menu frame
         self.frames['login'].pack(fill='both', expand=True)
+
 
     def switch_soundtrack(self):
         if self.soundtrack_state.get():
@@ -84,7 +88,7 @@ class Login(tk.Frame):
         self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=lambda: parent.switch_frame('login', 'register'))
         self.register_Button.place(relx=0.5, rely=0.5, anchor='center')
 
-        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=self.login())
+        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=self.login)
         self.login_Button.place(relx=0.5, rely=0.6, anchor='center')
 
     def login(self):
@@ -93,7 +97,6 @@ class Login(tk.Frame):
         user = authenticate(username, password)
         if user:
             self.parent.switch_frame('login', 'menu')
-
 
 
 class Register(tk.Frame):
@@ -131,7 +134,7 @@ class Register(tk.Frame):
         password = self.password_Entry.get()
         password_repeat = self.password_repeat_Entry.get()
         if password == password_repeat:
-            register_player("", 0, username, password)
+            register_player(username, password, 0)
             self.parent.switch_frame('register', 'menu')
         else:
             print("Passwords do not match.")
@@ -561,5 +564,5 @@ class Lose(tk.Frame):
 # To run app.py, enter 'python3 -m graph_game.app_copy' in terminal.
 if __name__ == '__main__':
     app = GraphGameGUI()
-    register_player("0", 100, "Artem123", "123")
+    register_player("Artem123", "123", 100)
     app.mainloop()
