@@ -94,9 +94,6 @@ class Login(tk.Frame):
         if user:
             self.parent.switch_frame('login', 'menu')
 
-    def register(self):
-        self.parent.switch_frame('login', 'register')
-
 
 
 class Register(tk.Frame):
