@@ -6,7 +6,8 @@ import networkx as nx
 from matplotlib.figure import Figure 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-from game_logic import GraphGame
+from .game_logic import GraphGame
+# To run app.py, enter 'python3 -m graph_game.app' in terminal.
 
 
 class GraphGameGUI(tk.Tk):
