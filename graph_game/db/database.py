@@ -34,7 +34,7 @@ def initialize_database():
     """Initialize the database with necessary tables."""
     try:
         with DatabaseConnection('db') as connection:
-            cursor = connection.get_cursor()
+            cursor = connection.cursor()
             cursor.execute("CREATE TABLE IF NOT EXISTS players (id INTEGER PRIMARY KEY, name TEXT, balance INTEGER, username TEXT UNIQUE, password TEXT)")
             cursor.execute("CREATE TABLE IF NOT EXISTS games (id INTEGER PRIMARY KEY, player_id INTEGER, nodes INTEGER, result TEXT)")
         print("Database initialized successfully.")
