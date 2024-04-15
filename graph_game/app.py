@@ -3,9 +3,8 @@ import tkinter as tk
 import pygame
 from tkinter import ttk
 import networkx as nx
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from game_logic import GraphGame
 
