@@ -58,6 +58,7 @@ class GraphGameGUI(tk.Tk):
         # Show the main menu frame
         self.frames[new_frame].pack(fill='both', expand=True)
         
+        
 class Login(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -215,15 +216,13 @@ class Play(tk.Frame):
         self.configure(bg="white")
 
         self.balance = int(100)
-        #Balance variable for putting into Label
+        # Balance variable for putting into Label
         self.balance_variable = tk.StringVar()
         self.balance_variable.set("Balance: " + str(self.balance))
 
-        # Coefficient variable
-        self.coefficient = int(0)
-        # Coefficient variable for putting into Label
-        self.coefficient_variable = tk.StringVar()
-        self.coefficient_variable.set("Coefficient: " + str(self.coefficient))
+        # generated_distance_variable for putting into Label
+        self.generated_distance_variable = tk.StringVar()
+        self.generated_distance_variable.set("Generated distance: -")
 
         # Chance of winning variable
         self.chance_of_winning = int(0)
@@ -257,7 +256,7 @@ class Play(tk.Frame):
         # Label Bid before the scale
         self.Bid_Label = tk.Label(self, text = "Bid:", bg='white', fg='black',
                              font='Helvetica, 20')
-        self.Bid_Label.place(relx=0.76, rely=0.57, anchor='center')
+        self.Bid_Label.place(relx=0.76, rely=0.35, anchor='center')
 
         # Scale with changing the bid
         self.bid_scale = tk.Scale(self, from_=0, to=self.balance, orient=tk.HORIZONTAL,
@@ -265,14 +264,16 @@ class Play(tk.Frame):
                                   bg='white', fg='black',
                                   font = 'Helvetica, 20',
                                   )
-        self.bid_scale.place(relx=0.89, rely=0.55, anchor='center')
+        self.bid_scale.place(relx=0.89, rely=0.33, anchor='center')
+         # Bind the method update_bid_scale_combobox_state to the combobox
+        self.bid_scale.bind("<ButtonRelease-1>", self.update_bid_scale_combobox_state)
 
         # Starting node combobox
-        self.starting_node_combobox = ttk.Combobox(self, width=5)
+        self.starting_node_combobox = ttk.Combobox(self, width=5, state='disabled')
         # Fill the combobox with the values of the graph
         self.starting_node_combobox['values'] = self.game.get_nodes()
-        self.starting_node_combobox.place(relx=0.94, rely=0.36, anchor='center')
-        # Bind the method update_ending node state to the combobox
+        self.starting_node_combobox.place(relx=0.94, rely=0.46, anchor='center')
+        # Bind the method update_starting_ending_node_combobox_state to the combobox
         self.starting_node_combobox.bind("<<ComboboxSelected>>", self.update_starting_ending_node_combobox_state)
         # Bind the same method but as Focus Out to always check if the starting node combobox value was not deleted
         self.starting_node_combobox.bind("<FocusOut>", self.update_starting_ending_node_combobox_state)
@@ -280,37 +281,50 @@ class Play(tk.Frame):
         # Starting node combobox label
         self.Starting_node_combobox_Label = tk.Label(self, text="Starting node:", bg='white', fg='black',
                                     font='Helvetica, 20')
-        self.Starting_node_combobox_Label.place(relx=0.81, rely=0.35, anchor='center')
+        self.Starting_node_combobox_Label.place(relx=0.81, rely=0.46, anchor='center')
 
         # Ending node combobox
         self.ending_node_combobox = ttk.Combobox(self, width=5, state='disabled')
         # Fill the combobox with the values of the graph
         self.ending_node_combobox['values'] = self.game.get_nodes()
-        self.ending_node_combobox.place(relx=0.94, rely=0.46, anchor='center')
+        self.ending_node_combobox.place(relx=0.94, rely=0.57, anchor='center')
 
         # Ending node combobox label
         self.Ending_node_combobox_Label = tk.Label(self, text="Ending node:", bg='white', fg='black',
                                     font='Helvetica, 20')
-        self.Ending_node_combobox_Label.place(relx=0.81, rely=0.45, anchor='center')
+        self.Ending_node_combobox_Label.place(relx=0.81, rely=0.57, anchor='center')
 
-        # Coefficient label with coefficient variable
-        self.Coefficient_label = tk.Label(self, textvariable=self.coefficient_variable, bg='white', font='Helvetica, 20')
-        self.Coefficient_label.place(relx=0.82, rely=0.68, anchor='center')
-
-        # Chance of winning label with chance of winning variable
-        self.Chance_Of_Winning_label = tk.Label(self, textvariable=self.chance_of_winning_variable, bg='white', font='Helvetica, 20')
-        self.Chance_Of_Winning_label.place(relx=0.85, rely=0.78, anchor='center')
+        # generated_distance_label with coefficient variable
+        self.generated_distance_label = tk.Label(self, textvariable=self.generated_distance_variable, bg='white', font='Helvetica, 20')
+        self.generated_distance_label.place(relx=0.82, rely=0.68, anchor='center')
 
         self.bet_button = tk.Button(self, text = "BET", bg = 'white', fg = 'black',
                                font='Helvetica, 25',
                                width=10,
-                               command=self.Bet_Start_Game)
+                               command=self.bet_start_game)
         self.bet_button.place(relx=0.86, rely=0.9, anchor='center')
 
         self.canvas = tk.Canvas(self, width=530, height=480, bg="white")
         self.canvas.place(relx=0.34, rely=0.59, anchor='center')
 
         self.update_plot()
+
+    def update_bid_scale_combobox_state(self, event=None):
+        # Check if bid_scale node combobox is empty
+        if not self.bid_scale.get():  
+            # Delete starting node selection
+            self.starting_node_combobox.set('')  
+            # Disable the combobox
+            self.starting_node_combobox['state'] = 'disabled'  
+        else:
+            # Enable starting_node combobox
+            self.starting_node_combobox['state'] = 'normal'  
+            # Disable bid_scale combobox
+            self.bid_scale.configure(state='disabled')
+
+            # Set the base score for the score generator
+            base_score = self.bid_scale.get()
+            self.game.set_base_score(int(base_score))
     
     def update_starting_ending_node_combobox_state(self, event=None):
         """Method makes ending node combobox disabled if starting node combobox is not chosen"""
@@ -325,7 +339,18 @@ class Play(tk.Frame):
             # Enable ending_node combobox
             self.ending_node_combobox['state'] = 'normal'  
             # Disable starting_node combobox
-            self.starting_node_combobox['state'] = 'disable'  
+            self.starting_node_combobox['state'] = 'disable' 
+
+            # Set the starting node for the graph game
+            starting_node = self.starting_node_combobox.get()
+            self.game.set_starting_node(int(starting_node))
+
+            # Update the plot with node scores
+            self.game.generate_cutoff()
+            self.update_plot(with_node_scores=True)
+
+            # Update the generated distance label of the game 
+            self.generated_distance_variable.set('Generated distance: ' + str(self.game.cutoff_distance))
 
     def update_plot(self, with_node_scores=False, result=False):
         # Create a matplotlib figure
@@ -391,7 +416,7 @@ class Play(tk.Frame):
     def update_max_bid(self):
         self.bid_scale.config(to=self.balance)
 
-    def Bet_Start_Game(self):
+    def bet_start_game(self):
         if self.game_started == True:
             # Create the variable that states if all parameters are selected
             all_inputs_valid = True
@@ -414,7 +439,6 @@ class Play(tk.Frame):
                 all_inputs_valid = False
             else:
                 self.Starting_node_combobox_Label.config(fg='black')
-                self.game.set_starting_node(int(starting_node))
 
             # Check if the ending node was selected and get its value
             ending_node = self.ending_node_combobox.get()
@@ -430,8 +454,6 @@ class Play(tk.Frame):
 
             # If all inputs are valid -> proceed with the game logic
             if all_inputs_valid:
-                self.game.set_base_score(bid_amount)
-                self.game.generate_cutoff()
                 score = self.game.get_player_score()
                 
                 if(self.game.check_player_wins() == True):
@@ -478,9 +500,9 @@ class Play(tk.Frame):
 
             self.bet_button.config(text="BET")
             self.bet_button.update()
-            
-            self.balance += score
-            
+
+            # Update the generated distance label of the game 
+            self.generated_distance_variable.set('Generated distance: -')        
 
         self.balance_variable.set(f'Balance: {self.balance}')
         self.update_max_bid()
