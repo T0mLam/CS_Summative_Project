@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import random as rand
 
-from utils.node import Node
-from utils.heap import MinHeap
-from utils.randomised_set import RandomisedSet
-from score_generation import RandomScoreGenerator as RSG
+from .utils.node import Node
+from .utils.heap import MinHeap
+from .utils.randomised_set import RandomisedSet
+from .score_generation import RandomScoreGenerator as RSG
 
 
 class Graph:
