@@ -1,6 +1,7 @@
 from typing import List
-from scipy.stats import norm 
+
 import numpy as np
+from scipy.stats import norm 
 
 
 class RandomScoreGenerator:

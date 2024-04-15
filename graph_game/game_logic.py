@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import List
-import random as rand
+
 import networkx as nx
 import numpy as np
-import matplotlib.pyplot as plt
+import random as rand
 
 from .graph import Graph
 from .score_generation import RandomScoreGenerator 
