@@ -58,7 +58,7 @@ class GraphGameGUI(tk.Tk):
         # Show the main menu frame
         self.frames[new_frame].pack(fill='both', expand=True)
         
-        
+
 class Login(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -484,7 +484,7 @@ class Play(tk.Frame):
             self.update_plot(result=False)  
             self.game_started = True
 
-            self.starting_node_combobox['state'] = 'normal'
+            self.starting_node_combobox['state'] = 'disabled'
             self.bid_scale['state'] = 'normal' 
 
             self.starting_node_combobox['values'] = self.game.get_nodes()
