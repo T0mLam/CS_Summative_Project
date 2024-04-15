@@ -35,19 +35,19 @@ def initialize_database():
     try:
         with DatabaseConnection('db') as connection:
             cursor = connection.cursor()
-            cursor.execute("CREATE TABLE IF NOT EXISTS players (id INTEGER PRIMARY KEY, name TEXT, balance INTEGER, username TEXT UNIQUE, password TEXT)")
+            cursor.execute("CREATE TABLE IF NOT EXISTS players (id INTEGER PRIMARY KEY, balance INTEGER, username TEXT UNIQUE, password TEXT)")
             cursor.execute("CREATE TABLE IF NOT EXISTS games (id INTEGER PRIMARY KEY, player_id INTEGER, nodes INTEGER, result TEXT)")
         print("Database initialized successfully.")
     except sqlite3.Error as e:
         print(f"Error initializing database: {e}")
 
 
-def register_player(name, initial_balance, username, password):
+def register_player(username, password, initial_balance):
     """Register a new player in the database."""
     try:
         with DatabaseConnection('db') as connection:
             cursor = connection.cursor()
-            cursor.execute("INSERT INTO players (name, balance, username, password) VALUES (?, ?, ?, ?)", (name, initial_balance, username, password))
+            cursor.execute("INSERT INTO players (balance, username, password) VALUES (?, ?, ?)", (initial_balance, username, password))
         print("Player registered successfully.")
     except sqlite3.Error as e:
         print(f"Error registering player: {e}")
