@@ -1,13 +1,14 @@
 import os
-import tkinter as tk
-import pygame
-from tkinter import ttk
-import networkx as nx
-from matplotlib.figure import Figure 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure 
+import networkx as nx
+import pygame
+import tkinter as tk
+from tkinter import ttk
+
+from .db.database import DatabaseConnection, authenticate, initialize_database, log_game, register_player
 from .game_logic import GraphGame
-from .db.database import DatabaseConnection, initialize_database, authenticate, log_game, register_player
 # To run app.py, enter 'python3 -m graph_game.app_copy' in terminal.
 
 
