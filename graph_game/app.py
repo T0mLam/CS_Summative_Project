@@ -58,7 +58,110 @@ class GraphGameGUI(tk.Tk):
         # Show the main menu frame
         self.frames[new_frame].pack(fill='both', expand=True)
         
+class Login(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.configure(bg="white")
+        
+        title = tk.Label(self, text="Graph Game", font=('Helvetica', 60), bg='white')
+        title.place(relx=0.5, rely=0.12, anchor='center')
 
+        self.username_Label = tk.Label(self, text = "Username:",
+                                       font = 'Helvetica 30',
+                                       bg = 'white'
+                                       )
+        self.username_Label.place(relx=0.2, rely=0.3, anchor='center')
+        self.username_Entry = tk.Entry(self, text = 'Username', 
+                                       font = 'Helvetica, 30',
+                                       width = 15,
+                                       bg = 'white')
+        self.username_Entry.place(relx = 0.5, rely = 0.3, anchor='center')
+
+        self.password_Label = tk.Label(self, text = "Password:",
+                                       font = 'Helvetica 30',
+                                       bg = 'white'
+                                       )
+        self.password_Label.place(relx=0.2, rely=0.4, anchor='center')
+        self.password_Entry = tk.Entry(self, text = 'Password:', 
+                                       font = 'Helvetica, 30',
+                                       width = 15,
+                                       bg = 'white',
+                                       show = '*')
+        self.password_Entry.place(relx = 0.5, rely = 0.4, anchor='center')
+        
+        self.register_Button = tk.Button(self, text='Register',
+                                         font = 'Helvetica 30',
+                                         bg = 'white',
+                                         command=lambda: parent.switch_frame('login', 'register')
+                                         )
+        self.register_Button.place(relx = 0.5, rely = 0.5, anchor = 'center')
+
+        self.login_Button = tk.Button(self, text='Login',
+                                         font = 'Helvetica 30',
+                                         bg = 'white',
+                                         command=lambda: parent.switch_frame('login', 'menu')
+                                         )
+        self.login_Button.place(relx = 0.5, rely = 0.6, anchor = 'center')
+
+
+class Register(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.configure(bg="white")
+        
+        title = tk.Label(self, text="Register", font=('Helvetica', 60), bg='white')
+        title.place(relx=0.5, rely=0.12, anchor='center')
+
+        self.username_Label = tk.Label(self, text = "Username:",
+                                       font = 'Helvetica 30',
+                                       bg = 'white'
+                                       )
+        self.username_Label.place(relx=0.2, rely=0.3, anchor='center')
+
+        self.username_Entry = tk.Entry(self, text = 'Username', 
+                                       font = 'Helvetica, 30',
+                                       width = 15,
+                                       bg = 'white')
+        self.username_Entry.place(relx = 0.5, rely = 0.3, anchor='center')
+
+        self.password_Label = tk.Label(self, text = "Password:",
+                                       font = 'Helvetica 30',
+                                       bg = 'white'
+                                       )
+        self.password_Label.place(relx=0.2, rely=0.4, anchor='center')
+        self.password_Entry = tk.Entry(self, text = 'Password:', 
+                                       font = 'Helvetica, 30',
+                                       width = 15,
+                                       bg = 'white',
+                                       show = '*')
+        self.password_Entry.place(relx = 0.5, rely = 0.4, anchor='center')
+        
+        self.password_repeat_Label = tk.Label(self, text = "Repeat:",
+                                       font = 'Helvetica 30',
+                                       bg = 'white'
+                                       )
+        self.password_repeat_Label.place(relx=0.22, rely=0.5, anchor='center')
+        self.password_repeat_Entry = tk.Entry(self, text = 'Login:', 
+                                       font = 'Helvetica, 30',
+                                       width = 15,
+                                       bg = 'white',
+                                       show = '*')
+        self.password_repeat_Entry.place(relx = 0.5, rely = 0.5, anchor='center')
+
+        self.register_Button = tk.Button(self, text='Register',
+                                         font = 'Helvetica 30',
+                                         bg = 'white',
+                                         command=lambda: parent.switch_frame('register', 'menu')
+                                         )
+        self.register_Button.place(relx = 0.5, rely = 0.6, anchor = 'center')
+
+        self.login_Button = tk.Button(self, text='Login',
+                                         font = 'Helvetica 30',
+                                         bg = 'white',
+                                         command=lambda: parent.switch_frame('register', 'login')
+                                         )
+        self.login_Button.place(relx = 0.5, rely = 0.7, anchor = 'center')
+        
 class MainMenu(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
