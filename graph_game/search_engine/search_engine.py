@@ -47,7 +47,7 @@ class SearchEngine:
         with DatabaseConnection('db') as conn:
             for player in players:
                 # Fetch the player name and score from the database
-                player_name_score = conn.cursor.execute(
+                player_name_score = conn.cursor().execute(
                     'SELECT name, balance FROM players WHERE name = ?', (player,)
                 ).fetchone()
 
