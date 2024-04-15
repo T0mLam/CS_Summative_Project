@@ -167,7 +167,7 @@ class GraphGame(Graph):
         """
         if (not self.starting_node or not self.ending_node):
             raise NameError('The starting node and ending node have not been defined')
-        if not self.cutoff_distance:
+        if self.cutoff_distance is None:
             raise NameError('The generate_cutoff method has to be called before this method')
         
         # Find the shortest distance between the starting node and the ending node
@@ -187,7 +187,7 @@ class GraphGame(Graph):
         """
         if (not self.starting_node or not self.ending_node):
             raise NameError('The starting node and ending node have not been defined')
-        if not self.cutoff_distance:
+        if self.cutoff_distance is None:
             raise NameError('The generate_cutoff method has to be called before this method')
 
         # Find the shortest distance between the starting node and the ending node
