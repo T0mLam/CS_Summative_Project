@@ -47,7 +47,6 @@ class GraphGameGUI(tk.Tk):
         # Show main menu frame
         self.frames['login'].pack(fill='both', expand=True)
 
-
     def switch_soundtrack(self):
         if self.soundtrack_state.get():
             pygame.mixer.music.unpause()
@@ -561,6 +560,7 @@ class Lose(tk.Frame):
                                                 font='Helvetica, 30',
                                                 bg = 'white')
         self.amount_of_loosing_label.place(relx= 0.5, rely= 0.88, anchor='center')
+
 
 # To run app.py, enter 'python3 -m graph_game.app_copy' in terminal.
 if __name__ == '__main__':
