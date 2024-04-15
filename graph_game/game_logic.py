@@ -5,8 +5,8 @@ import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 
-from graph import Graph
-from score_generation import RandomScoreGenerator 
+from .graph import Graph
+from .score_generation import RandomScoreGenerator 
 
 
 class GraphGame(Graph):
