@@ -276,12 +276,6 @@ class Play(tk.Frame):
         self.generated_distance_variable = tk.StringVar()
         self.generated_distance_variable.set("Generated distance: -")
 
-        # Chance of winning variable
-        self.chance_of_winning = int(0)
-        # Chance of winning variable for putting into Label
-        self.chance_of_winning_variable = tk.StringVar()
-        self.chance_of_winning_variable.set("Chance of Win: " + str(self.chance_of_winning) + "%")
-
         # Put the back arrow image for the button
         self.back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
         # Make the image 10 times smaller
@@ -332,9 +326,9 @@ class Play(tk.Frame):
         self.starting_node_combobox.bind("<FocusOut>", self.update_starting_ending_node_combobox_state)
 
         # Starting node combobox label
-        self.Starting_node_combobox_Label = tk.Label(self, text="Starting node:", bg='white', fg='black',
+        self.starting_node_combobox_label = tk.Label(self, text="Starting node:", bg='white', fg='black',
                                     font='Helvetica, 20')
-        self.Starting_node_combobox_Label.place(relx=0.81, rely=0.46, anchor='center')
+        self.starting_node_combobox_label.place(relx=0.81, rely=0.46, anchor='center')
 
         # Ending node combobox
         self.ending_node_combobox = ttk.Combobox(self, width=5, state='disabled')
@@ -492,10 +486,10 @@ class Play(tk.Frame):
             starting_node = self.starting_node_combobox.get()
             if (not starting_node 
                 or self.starting_node_combobox.get() == self.ending_node_combobox):
-                self.Starting_node_combobox_Label.config(fg='red')
+                self.starting_node_combobox_label.config(fg='red')
                 all_inputs_valid = False
             else:
-                self.Starting_node_combobox_Label.config(fg='black')
+                self.starting_node_combobox_label.config(fg='black')
 
             # Check if the ending node was selected and get its value
             ending_node = self.ending_node_combobox.get()
@@ -636,10 +630,10 @@ class Lose(tk.Frame):
         self.you_lost_label = tk.Label(self, text="you lost):", font = 'Helvetica, 50', bg = 'white')
         self.you_lost_label.place(relx=0.5, rely=0.1, anchor='center')
         
-        self.amount_of_loosing_label = tk.Label(self, textvariable=self.amount_of_lose_variable, 
+        self.amount_of_losing_label = tk.Label(self, textvariable=self.amount_of_lose_variable, 
                                                 font='Helvetica, 30',
                                                 bg = 'white')
-        self.amount_of_loosing_label.place(relx= 0.5, rely= 0.88, anchor='center')
+        self.amount_of_losing_label.place(relx= 0.5, rely= 0.88, anchor='center')
 
 
 # To run app.py, enter 'python3 -m graph_game.app' in terminal.
