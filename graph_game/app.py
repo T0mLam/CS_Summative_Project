@@ -9,6 +9,7 @@ from tkinter import ttk
 
 from .db.database import DatabaseConnection, authenticate, initialize_database, log_game, register_player
 from .game_logic import GraphGame
+from .search_engine.search_engine import SearchEngine
 # To run app.py, enter 'python3 -m graph_game.app' in terminal.
 
 
@@ -135,7 +136,7 @@ class Register(tk.Frame):
         password = self.password_Entry.get()
         password_repeat = self.password_repeat_Entry.get()
         if password == password_repeat:
-            register_player(username, password, 0)
+            register_player(username, password, 100)
             self.parent.switch_frame('register', 'menu')
         else:
             print("Passwords do not match.")
@@ -185,6 +186,7 @@ class Leaderboards(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
+        self.search_engine = SearchEngine()
         
         # Set the backgroung color to white
         self.configure(bg="white")
@@ -219,31 +221,32 @@ class Leaderboards(tk.Frame):
         self.tree.column("Score", width=150, anchor=tk.CENTER)
 
         # Set font size and row height for the table
-        style = ttk.Style()
-        style.configure("Treeview", font=('Helvetica', 30), rowheight=40)
-        style.configure("Treeview.Heading", font=('Helvetica', 30),rowheight=40)
-        style.configure("Treeview.Row", font=('Helvetica', 30), rowheight=40)
+        self.style = ttk.Style()
+        self.style.configure("Treeview", font=('Helvetica', 30), rowheight=40)
+        self.style.configure("Treeview.Heading", font=('Helvetica', 30),rowheight=40)
+        self.style.configure("Treeview.Row", font=('Helvetica', 30), rowheight=40)
 
         # Add scrollbars if there are to much columns
-        y_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
-        y_scrollbar.pack(side="right", fill="y")
-        x_scrollbar = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
-        x_scrollbar.pack(side="bottom", fill="x")
+        self.y_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
+        self.y_scrollbar.pack(side="right", fill="y")
+        self.x_scrollbar = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
+        self.x_scrollbar.pack(side="bottom", fill="x")
 
         # Set scrollbars to the table
-        self.tree.configure(yscrollcommand=y_scrollbar.set, xscrollcommand=x_scrollbar.set)
+        self.tree.configure(yscrollcommand=self.y_scrollbar.set, xscrollcommand=self.x_scrollbar.set)
+
+        self.update_treeview()
+
+    def update_treeview(self):
+        # Delete all previous data in the treeview
+        self.tree.delete(*self.tree.get_children())
         # Example data 
-        data = [
-            ("1", "Artem", "300"),
-            ("2", "Tom", "200"),
-            ("3", "Femiqweqwe131231", "150"),
-            ("4", "Zifan", "125")
-
-        ]
+        leaders = self.search_engine.get_leaders(5)
         # Insert data into the treeview
-        for row in data:
-            self.tree.insert("", "end", values=row, tags=("Treeview.Row", "Treeview", "Treeview.Heading"))
+        for i, row in enumerate(leaders):
+            self.tree.insert("", "end", values=(i + 1, *row), tags=("Treeview.Row", "Treeview", "Treeview.Heading"))
 
+        self.tree.after(1000, self.update_treeview)
 
 class Play(tk.Frame):
     def __init__(self, parent):
