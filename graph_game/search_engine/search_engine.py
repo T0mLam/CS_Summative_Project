@@ -48,7 +48,7 @@ class SearchEngine:
             for player in players:
                 # Fetch the player name and score from the database
                 player_name_score = conn.cursor().execute(
-                    'SELECT name, balance FROM players WHERE name = ?', (player,)
+                    'SELECT username, balance FROM players WHERE name = ?', (player,)
                 ).fetchone()
 
                 # Append the records of the players to the res list
@@ -73,7 +73,7 @@ class SearchEngine:
 
         with DatabaseConnection('db') as conn:
             leaders_name_score = conn.cursor().execute(
-                'SELECT name, balance FROM players ORDER BY balance DESC'
+                'SELECT username, balance FROM players ORDER BY balance DESC'
             ).fetchall()
             
         return leaders_name_score[:n]
@@ -83,7 +83,7 @@ class SearchEngine:
         with DatabaseConnection('db') as conn:
             # Get a list of all players
             players = conn.cursor().execute(
-                'SELECT name FROM players'
+                'SELECT username FROM players'
             ).fetchall()
         
         self.trie = Trie()
