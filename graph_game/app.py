@@ -48,7 +48,7 @@ class GraphGameGUI(tk.Tk):
             'lose': Lose(self),
             'login': Login(self),
             'register': Register(self),
-            'leaderboards' : Leaderboards(self)
+            'leaderboard' : Leaderboard(self)
         }
 
         # Show main menu frame
@@ -136,7 +136,7 @@ class Register(tk.Frame):
         self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=self.register)
         self.register_Button.place(relx=0.5, rely=0.6, anchor='center')
 
-        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=lambda: parent.switch_frame('register', 'login'))
+        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=lambda: self.parent.switch_frame('register', 'login'))
         self.login_Button.place(relx=0.5, rely=0.7, anchor='center')
         
     def register(self):
@@ -175,10 +175,10 @@ class MainMenu(tk.Frame):
         how_to_play_button.place(relx=0.5, rely=0.45, anchor='center')
 
         # Leaderboard Button
-        leaderboard_button = tk.Button(self, text='Leaderboards', bg='white', fg='black',
+        leaderboard_button = tk.Button(self, text='Leaderboard', bg='white', fg='black',
                                      font='Helvetica, 40', width=10,
-                                     command = lambda: self.parent.switch_frame('menu', 'leaderboards'))
-        # command=self.show_leaderboards_frame)
+                                     command = lambda: self.parent.switch_frame('menu', 'leaderboard'))
+        # command=self.show_leaderboard_frame)
         leaderboard_button.place(relx=0.5, rely=0.6, anchor='center')
 
         # Quit Button
@@ -194,7 +194,7 @@ class MainMenu(tk.Frame):
         soundtrack_switch.place(relx=0.93, rely=0.95, anchor='center')
 
 
-class Leaderboards(tk.Frame):
+class Leaderboard(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
@@ -204,7 +204,7 @@ class Leaderboards(tk.Frame):
         self.configure(bg="white")
 
         # Title
-        leaderboard_label = tk.Label(self, text="Leaderboards", font=('Helvetica', 60), bg='white')
+        leaderboard_label = tk.Label(self, text="Leaderboard", font=('Helvetica', 60), bg='white')
         leaderboard_label.place(relx=0.5, rely=0.12, anchor='center')
 
         # Put the back arrow image for the button
@@ -212,11 +212,11 @@ class Leaderboards(tk.Frame):
         # Make the image 10 times smaller
         self.resized_back_image = self.back_image.subsample(10, 10) 
         # Back Button 
-        self.back_button = tk.Button(self, command=lambda: self.parent.switch_frame('leaderboards', 'menu'),
+        self.back_button = tk.Button(self, command=lambda: self.parent.switch_frame('leaderboard', 'menu'),
                              image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
 
-        # Leaderboards Table: 
+        # Leaderboard Table: 
 
         # Create a treeview widget
         self.tree = ttk.Treeview(self, columns=("Place", "Name", "Score"), show="headings")
