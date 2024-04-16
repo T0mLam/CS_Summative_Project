@@ -19,10 +19,15 @@ class GraphGameGUI(tk.Tk):
         self.title('Graph Game')
         self.geometry('800x600')
         self['bg'] = 'white'
-        self.resizable(False, False)  # Make the window resizable
+        # Make the window resizable
+        self.resizable(False, False)  
 
         # Initialize the database
         initialize_database()
+
+        # Create a variable for storing the current player and their score
+        self.current_player = None
+        self.current_balance = None
 
         # Initialize pygame mixer for music
         pygame.mixer.init()
@@ -98,6 +103,9 @@ class Login(tk.Frame):
         password = self.password_Entry.get()
         user = authenticate(username, password)
         if user:
+            name, balance = user
+            self.parent.current_player = name
+            self.parent.current_balance = balance
             self.parent.switch_frame('login', 'menu')
 
 
@@ -137,6 +145,8 @@ class Register(tk.Frame):
         password_repeat = self.password_repeat_Entry.get()
         if password == password_repeat:
             register_player(username, password, 100)
+            self.parent.current_player = username
+            self.parent.current_balance = 100
             self.parent.switch_frame('register', 'menu')
         else:
             print("Passwords do not match.")
@@ -181,6 +191,7 @@ class MainMenu(tk.Frame):
                                            onvalue=True, offvalue=False,
                                            bg='white', font='Helvetica, 20')
         soundtrack_switch.place(relx=0.93, rely=0.95, anchor='center')
+
 
 class Leaderboards(tk.Frame):
     def __init__(self, parent):
@@ -248,6 +259,7 @@ class Leaderboards(tk.Frame):
 
         self.tree.after(1000, self.update_treeview)
 
+
 class Play(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -259,11 +271,6 @@ class Play(tk.Frame):
         self.game_started = True
 
         self.configure(bg="white")
-
-        self.balance = int(100)
-        # Balance variable for putting into Label
-        self.balance_variable = tk.StringVar()
-        self.balance_variable.set("Balance: " + str(self.balance))
 
         # generated_distance_variable for putting into Label
         self.generated_distance_variable = tk.StringVar()
@@ -295,8 +302,9 @@ class Play(tk.Frame):
         self.buy_button.pack(side="top", anchor="ne", padx=10, pady=10)
 
         #Label with the balance and balance wariable
-        self.Balance_Label = tk.Label(self, textvariable=self.balance_variable, bg='white', fg='black', font='Helvetica, 20')
+        self.Balance_Label = tk.Label(self, text='', bg='white', fg='black', font='Helvetica, 20')
         self.Balance_Label.place(relx=0.8, rely=0.05, anchor='center')
+        self.update_balance_label()
 
         # Label Bid before the scale
         self.Bid_Label = tk.Label(self, text = "Bid:", bg='white', fg='black',
@@ -304,7 +312,7 @@ class Play(tk.Frame):
         self.Bid_Label.place(relx=0.76, rely=0.35, anchor='center')
 
         # Scale with changing the bid
-        self.bid_scale = tk.Scale(self, from_=0, to=self.balance, orient=tk.HORIZONTAL,
+        self.bid_scale = tk.Scale(self, from_=0, to=self.parent.current_balance, orient=tk.HORIZONTAL,
                                   length=160,
                                   bg='white', fg='black',
                                   font = 'Helvetica, 20',
@@ -353,6 +361,10 @@ class Play(tk.Frame):
         self.canvas.place(relx=0.34, rely=0.59, anchor='center')
 
         self.update_plot()
+
+    def update_balance_label(self):
+        self.Balance_Label.config(text="Balance: " + str(self.parent.current_balance))
+        self.Balance_Label.after(1000, self.update_balance_label)
 
     def update_bid_scale_combobox_state(self, event=None):
         # Check if bid_scale node combobox is empty
@@ -459,7 +471,7 @@ class Play(tk.Frame):
 
     # Function to update the maximum value of the bid scale
     def update_max_bid(self):
-        self.bid_scale.config(to=self.balance)
+        self.bid_scale.config(to=self.parent.current_balance)
 
     def bet_start_game(self):
         if self.game_started == True:
@@ -523,7 +535,8 @@ class Play(tk.Frame):
             self.bid_scale.set(0)
             self.bid_scale['state'] = 'disabled' 
             
-            self.balance += score
+            self.parent.current_balance += score
+            # update player score in db ...
 
         else:
             self.bet_button.config(text="Play Again")
@@ -551,7 +564,6 @@ class Play(tk.Frame):
             # Update the generated distance label of the game 
             self.generated_distance_variable.set('Generated distance: -')        
 
-        self.balance_variable.set(f'Balance: {self.balance}')
         self.update_max_bid()
         # update ... user score in db
             
