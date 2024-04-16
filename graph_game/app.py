@@ -174,12 +174,12 @@ class MainMenu(tk.Frame):
         # command=self.show_how_to_play_frame)
         how_to_play_button.place(relx=0.5, rely=0.45, anchor='center')
 
-        # Leaderboards Button
-        leaderboards_button = tk.Button(self, text='Leaderboards', bg='white', fg='black',
+        # Leaderboard Button
+        leaderboard_button = tk.Button(self, text='Leaderboards', bg='white', fg='black',
                                      font='Helvetica, 40', width=10,
                                      command = lambda: self.parent.switch_frame('menu', 'leaderboards'))
         # command=self.show_leaderboards_frame)
-        leaderboards_button.place(relx=0.5, rely=0.6, anchor='center')
+        leaderboard_button.place(relx=0.5, rely=0.6, anchor='center')
 
         # Quit Button
         logout_button = tk.Button(self, text='Logout', command=lambda: self.parent.switch_frame('menu', 'login'), bg='white', fg='black', font='Helvetica, 40', width=10)
@@ -204,8 +204,8 @@ class Leaderboards(tk.Frame):
         self.configure(bg="white")
 
         # Title
-        leaderboards_Label = tk.Label(self, text="Leaderboards", font=('Helvetica', 60), bg='white')
-        leaderboards_Label.place(relx=0.5, rely=0.12, anchor='center')
+        leaderboard_label = tk.Label(self, text="Leaderboards", font=('Helvetica', 60), bg='white')
+        leaderboard_label.place(relx=0.5, rely=0.12, anchor='center')
 
         # Put the back arrow image for the button
         self.back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
@@ -297,14 +297,14 @@ class Play(tk.Frame):
         self.buy_button.pack(side="top", anchor="ne", padx=10, pady=10)
 
         #Label with the balance and balance wariable
-        self.Balance_Label = tk.Label(self, text='', bg='white', fg='black', font='Helvetica, 20')
-        self.Balance_Label.place(relx=0.8, rely=0.05, anchor='center')
+        self.balance_label = tk.Label(self, text='', bg='white', fg='black', font='Helvetica, 20')
+        self.balance_label.place(relx=0.8, rely=0.05, anchor='center')
         self.update_balance_label()
 
         # Label Bid before the scale
-        self.Bid_Label = tk.Label(self, text = "Bid:", bg='white', fg='black',
+        self.bid_label = tk.Label(self, text = "Bid:", bg='white', fg='black',
                              font='Helvetica, 20')
-        self.Bid_Label.place(relx=0.76, rely=0.35, anchor='center')
+        self.bid_label.place(relx=0.76, rely=0.35, anchor='center')
 
         # Scale with changing the bid
         self.bid_scale = tk.Scale(self, from_=0, to=self.parent.current_balance, orient=tk.HORIZONTAL,
@@ -358,8 +358,8 @@ class Play(tk.Frame):
         self.update_plot()
 
     def update_balance_label(self):
-        self.Balance_Label.config(text="Balance: " + str(self.parent.current_balance))
-        self.Balance_Label.after(1000, self.update_balance_label)
+        self.balance_label.config(text="Balance: " + str(self.parent.current_balance))
+        self.balance_label.after(1000, self.update_balance_label)
 
     def update_bid_scale_combobox_state(self, event=None):
         # Check if bid_scale node combobox is empty
@@ -478,10 +478,10 @@ class Play(tk.Frame):
 
             # Check if the bid amount is higher that zero, if it is zero, paint the label red
             if bid_amount == 0:
-                self.Bid_Label.config(fg='red')
+                self.bid_label.config(fg='red')
                 all_inputs_valid = False
             else:
-                self.Bid_Label.config(fg='black')
+                self.bid_label.config(fg='black')
 
             # Check if the starting noded was selected, if it not, paint the label red
             starting_node = self.starting_node_combobox.get()
