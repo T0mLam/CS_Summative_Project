@@ -91,12 +91,16 @@ class RandomScoreGenerator:
         # Check if distance is a non-negative integer
         if not isinstance(dist, int) or dist < 0:
             raise ValueError("Distance must be a non-negative integer.")
+            
         # If generated distance is not already set, generate it    
         if self._generated_distance is None:
             self._generated_distance = self.generate_random_distance()
+            
         # Calculate score
         norm_distribution = stats.norm(self._mean, self._sd)
+        # Calculate the probability that the node dist < the random generated distance
         prob = 1 - norm_distribution.cdf(dist)
+        # Take the inverse of prob so the longer the node distance (the lower the prob), the higher the score
         return int(1 / prob * self._sd + self.base_score)
     
     @staticmethod
