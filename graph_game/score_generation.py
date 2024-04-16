@@ -1,7 +1,7 @@
 from typing import List
 
 import numpy as np
-from scipy.stats import norm 
+import scipy.stats as stats
 
 
 class RandomScoreGenerator:
@@ -74,7 +74,7 @@ class RandomScoreGenerator:
         if self._mean is None or self._sd is None:
             raise ValueError("Mean and standard deviation must be set.")
         # Generate random distance
-        return int(np.random.normal(loc=self._mean, scale=self._sd))
+        return max(int(np.random.normal(loc=self._mean, scale=self._sd)), 0)
 
     def calculate_score(self, dist: int) -> int:
         """Calculates a score based on the given distance and base score.
@@ -95,8 +95,9 @@ class RandomScoreGenerator:
         if self._generated_distance is None:
             self._generated_distance = self.generate_random_distance()
         # Calculate score
-        score = self.base_score - dist + self._generated_distance
-        return max(score, 0)
+        norm_distribution = stats.norm(self._mean, self._sd)
+        prob = 1 - norm_distribution.cdf(dist)
+        return int(1 / prob * self._sd + self.base_score)
     
     @staticmethod
     def generate_random_edge(mean: int, sd: int | float) -> int:
