@@ -7,7 +7,7 @@ import pygame
 import tkinter as tk
 from tkinter import ttk
 
-from .db.database import DatabaseConnection, authenticate, initialize_database, log_game, register_player
+from .db.database import authenticate, initialize_database, register_player, update_balance
 from .game_logic import GraphGame
 from .search_engine.search_engine import SearchEngine
 # To run app.py, enter 'python3 -m graph_game.app' in terminal.
@@ -92,7 +92,7 @@ class Login(tk.Frame):
         self.password_Entry = tk.Entry(self, font='Helvetica, 30', width=15, bg='white', show='*')
         self.password_Entry.place(relx=0.5, rely=0.4, anchor='center')
         
-        self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=lambda: parent.switch_frame('login', 'register'))
+        self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=lambda: self.parent.switch_frame('login', 'register'))
         self.register_Button.place(relx=0.5, rely=0.5, anchor='center')
 
         self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=self.login)
@@ -156,9 +156,10 @@ class MainMenu(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.configure(bg="white")
+        self.parent = parent
 
         # Play button
-        play_button = tk.Button(self, text="Play", command=lambda: parent.switch_frame('menu', 'play')
+        play_button = tk.Button(self, text="Play", command=lambda: self.parent.switch_frame('menu', 'play')
                              , bg='white', fg='black',
                              font='Helvetica, 40', width=10)
         play_button.place(relx=0.5, rely=0.3, anchor='center')
@@ -176,18 +177,18 @@ class MainMenu(tk.Frame):
         # Leaderboards Button
         leaderboards_button = tk.Button(self, text='Leaderboards', bg='white', fg='black',
                                      font='Helvetica, 40', width=10,
-                                     command = lambda: parent.switch_frame('menu', 'leaderboards'))
+                                     command = lambda: self.parent.switch_frame('menu', 'leaderboards'))
         # command=self.show_leaderboards_frame)
         leaderboards_button.place(relx=0.5, rely=0.6, anchor='center')
 
         # Quit Button
-        quit_button = tk.Button(self, text='Quit', bg='white', fg='black', font='Helvetica, 40', width=10)
+        logout_button = tk.Button(self, text='Logout', command=lambda: self.parent.switch_frame('menu', 'login'), bg='white', fg='black', font='Helvetica, 40', width=10)
         # command=self.master.quit)
-        quit_button.place(relx=0.5, rely=0.75, anchor='center')
+        logout_button.place(relx=0.5, rely=0.75, anchor='center')
 
         # Soundtrack Switch
-        soundtrack_switch = tk.Checkbutton(self, text='Music', var=parent.soundtrack_state,
-                                           command=parent.switch_soundtrack,
+        soundtrack_switch = tk.Checkbutton(self, text='Music', var=self.parent.soundtrack_state,
+                                           command=self.parent.switch_soundtrack,
                                            onvalue=True, offvalue=False,
                                            bg='white', font='Helvetica, 20')
         soundtrack_switch.place(relx=0.93, rely=0.95, anchor='center')
@@ -211,7 +212,7 @@ class Leaderboards(tk.Frame):
         # Make the image 10 times smaller
         self.resized_back_image = self.back_image.subsample(10, 10) 
         # Back Button 
-        self.back_button = tk.Button(self, command=lambda: parent.switch_frame('leaderboards', 'menu'),
+        self.back_button = tk.Button(self, command=lambda: self.parent.switch_frame('leaderboards', 'menu'),
                              image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
 
@@ -530,7 +531,8 @@ class Play(tk.Frame):
             self.bid_scale['state'] = 'disabled' 
             
             self.parent.current_balance += score
-            # update player score in db ...
+            # Update player's balance in db ...
+            update_balance(self.parent.current_player, self.parent.current_balance)
 
         else:
             self.bet_button.config(text="Play Again")
@@ -559,7 +561,6 @@ class Play(tk.Frame):
             self.generated_distance_variable.set('Generated distance: -')        
 
         self.update_max_bid()
-        # update ... user score in db
             
 
 class Win(tk.Frame):
