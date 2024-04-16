@@ -1,11 +1,13 @@
 import os
-import tkinter as tk
-import pygame
-from tkinter import ttk
-import networkx as nx
-from matplotlib.figure import Figure 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure 
+import networkx as nx
+import pygame
+import tkinter as tk
+from tkinter import ttk
+
+from .db.database import DatabaseConnection, authenticate, initialize_database, log_game, register_player
 from .game_logic import GraphGame
 # To run app.py, enter 'python3 -m graph_game.app' in terminal.
 
@@ -17,6 +19,9 @@ class GraphGameGUI(tk.Tk):
         self.geometry('800x600')
         self['bg'] = 'white'
         self.resizable(False, False)  # Make the window resizable
+
+        # Initialize the database
+        initialize_database()
 
         # Initialize pygame mixer for music
         pygame.mixer.init()
@@ -34,11 +39,14 @@ class GraphGameGUI(tk.Tk):
             'menu': MainMenu(self),
             'play': Play(self),
             'win': Win(self),
-            'lose' : Lose(self)
+            'lose': Lose(self),
+            'login': Login(self),
+            'register': Register(self),
+            'leaderboards' : Leaderboards(self)
         }
 
         # Show main menu frame
-        self.frames['menu'].pack(fill='both', expand=True)
+        self.frames['login'].pack(fill='both', expand=True)
 
     def switch_soundtrack(self):
         if self.soundtrack_state.get():
@@ -62,106 +70,76 @@ class GraphGameGUI(tk.Tk):
 class Login(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
+        self.parent = parent
         self.configure(bg="white")
         
         title = tk.Label(self, text="Graph Game", font=('Helvetica', 60), bg='white')
         title.place(relx=0.5, rely=0.12, anchor='center')
 
-        self.username_Label = tk.Label(self, text = "Username:",
-                                       font = 'Helvetica 30',
-                                       bg = 'white'
-                                       )
+        self.username_Label = tk.Label(self, text="Username:", font='Helvetica 30', bg='white')
         self.username_Label.place(relx=0.2, rely=0.3, anchor='center')
-        self.username_Entry = tk.Entry(self, text = 'Username', 
-                                       font = 'Helvetica, 30',
-                                       width = 15,
-                                       bg = 'white')
-        self.username_Entry.place(relx = 0.5, rely = 0.3, anchor='center')
+        self.username_Entry = tk.Entry(self, font='Helvetica, 30', width=15, bg='white')
+        self.username_Entry.place(relx=0.5, rely=0.3, anchor='center')
 
-        self.password_Label = tk.Label(self, text = "Password:",
-                                       font = 'Helvetica 30',
-                                       bg = 'white'
-                                       )
+        self.password_Label = tk.Label(self, text="Password:", font='Helvetica 30', bg='white')
         self.password_Label.place(relx=0.2, rely=0.4, anchor='center')
-        self.password_Entry = tk.Entry(self, text = 'Password:', 
-                                       font = 'Helvetica, 30',
-                                       width = 15,
-                                       bg = 'white',
-                                       show = '*')
-        self.password_Entry.place(relx = 0.5, rely = 0.4, anchor='center')
+        self.password_Entry = tk.Entry(self, font='Helvetica, 30', width=15, bg='white', show='*')
+        self.password_Entry.place(relx=0.5, rely=0.4, anchor='center')
         
-        self.register_Button = tk.Button(self, text='Register',
-                                         font = 'Helvetica 30',
-                                         bg = 'white',
-                                         command=lambda: parent.switch_frame('login', 'register')
-                                         )
-        self.register_Button.place(relx = 0.5, rely = 0.5, anchor = 'center')
+        self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=lambda: parent.switch_frame('login', 'register'))
+        self.register_Button.place(relx=0.5, rely=0.5, anchor='center')
 
-        self.login_Button = tk.Button(self, text='Login',
-                                         font = 'Helvetica 30',
-                                         bg = 'white',
-                                         command=lambda: parent.switch_frame('login', 'menu')
-                                         )
-        self.login_Button.place(relx = 0.5, rely = 0.6, anchor = 'center')
+        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=self.login)
+        self.login_Button.place(relx=0.5, rely=0.6, anchor='center')
+
+    def login(self):
+        username = self.username_Entry.get()
+        password = self.password_Entry.get()
+        user = authenticate(username, password)
+        if user:
+            self.parent.switch_frame('login', 'menu')
 
 
 class Register(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
+        self.parent = parent
         self.configure(bg="white")
         
         title = tk.Label(self, text="Register", font=('Helvetica', 60), bg='white')
         title.place(relx=0.5, rely=0.12, anchor='center')
 
-        self.username_Label = tk.Label(self, text = "Username:",
-                                       font = 'Helvetica 30',
-                                       bg = 'white'
-                                       )
+        self.username_Label = tk.Label(self, text="Username:", font='Helvetica 30', bg='white')
         self.username_Label.place(relx=0.2, rely=0.3, anchor='center')
+        self.username_Entry = tk.Entry(self, font='Helvetica, 30', width=15, bg='white')
+        self.username_Entry.place(relx=0.5, rely=0.3, anchor='center')
 
-        self.username_Entry = tk.Entry(self, text = 'Username', 
-                                       font = 'Helvetica, 30',
-                                       width = 15,
-                                       bg = 'white')
-        self.username_Entry.place(relx = 0.5, rely = 0.3, anchor='center')
-
-        self.password_Label = tk.Label(self, text = "Password:",
-                                       font = 'Helvetica 30',
-                                       bg = 'white'
-                                       )
+        self.password_Label = tk.Label(self, text="Password:", font='Helvetica 30', bg='white')
         self.password_Label.place(relx=0.2, rely=0.4, anchor='center')
-        self.password_Entry = tk.Entry(self, text = 'Password:', 
-                                       font = 'Helvetica, 30',
-                                       width = 15,
-                                       bg = 'white',
-                                       show = '*')
-        self.password_Entry.place(relx = 0.5, rely = 0.4, anchor='center')
+        self.password_Entry = tk.Entry(self, font='Helvetica, 30', width=15, bg='white', show='*')
+        self.password_Entry.place(relx=0.5, rely=0.4, anchor='center')
         
-        self.password_repeat_Label = tk.Label(self, text = "Repeat:",
-                                       font = 'Helvetica 30',
-                                       bg = 'white'
-                                       )
+        self.password_repeat_Label = tk.Label(self, text="Repeat:", font='Helvetica 30', bg='white')
         self.password_repeat_Label.place(relx=0.22, rely=0.5, anchor='center')
-        self.password_repeat_Entry = tk.Entry(self, text = 'Login:', 
-                                       font = 'Helvetica, 30',
-                                       width = 15,
-                                       bg = 'white',
-                                       show = '*')
-        self.password_repeat_Entry.place(relx = 0.5, rely = 0.5, anchor='center')
+        self.password_repeat_Entry = tk.Entry(self, font='Helvetica, 30', width=15, bg='white', show='*')
+        self.password_repeat_Entry.place(relx=0.5, rely=0.5, anchor='center')
 
-        self.register_Button = tk.Button(self, text='Register',
-                                         font = 'Helvetica 30',
-                                         bg = 'white',
-                                         command=lambda: parent.switch_frame('register', 'menu')
-                                         )
-        self.register_Button.place(relx = 0.5, rely = 0.6, anchor = 'center')
+        self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=self.register)
+        self.register_Button.place(relx=0.5, rely=0.6, anchor='center')
 
-        self.login_Button = tk.Button(self, text='Login',
-                                         font = 'Helvetica 30',
-                                         bg = 'white',
-                                         command=lambda: parent.switch_frame('register', 'login')
-                                         )
-        self.login_Button.place(relx = 0.5, rely = 0.7, anchor = 'center')
+        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=lambda: parent.switch_frame('register', 'login'))
+        self.login_Button.place(relx=0.5, rely=0.7, anchor='center')
+        
+    def register(self):
+        username = self.username_Entry.get()
+        password = self.password_Entry.get()
+        password_repeat = self.password_repeat_Entry.get()
+        if password == password_repeat:
+            register_player(username, password, 0)
+            self.parent.switch_frame('register', 'menu')
+        else:
+            print("Passwords do not match.")
+
         
 class MainMenu(tk.Frame):
     def __init__(self, parent):
@@ -186,7 +164,8 @@ class MainMenu(tk.Frame):
 
         # Leaderboards Button
         leaderboards_button = tk.Button(self, text='Leaderboards', bg='white', fg='black',
-                                     font='Helvetica, 40', width=10)
+                                     font='Helvetica, 40', width=10,
+                                     command = lambda: parent.switch_frame('menu', 'leaderboards'))
         # command=self.show_leaderboards_frame)
         leaderboards_button.place(relx=0.5, rely=0.6, anchor='center')
 
@@ -201,6 +180,69 @@ class MainMenu(tk.Frame):
                                            onvalue=True, offvalue=False,
                                            bg='white', font='Helvetica, 20')
         soundtrack_switch.place(relx=0.93, rely=0.95, anchor='center')
+
+class Leaderboards(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        
+        # Set the backgroung color to white
+        self.configure(bg="white")
+
+        # Title
+        leaderboards_Label = tk.Label(self, text="Leaderboards", font=('Helvetica', 60), bg='white')
+        leaderboards_Label.place(relx=0.5, rely=0.12, anchor='center')
+
+        # Put the back arrow image for the button
+        self.back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
+        # Make the image 10 times smaller
+        self.resized_back_image = self.back_image.subsample(10, 10) 
+        # Back Button 
+        self.back_button = tk.Button(self, command=lambda: parent.switch_frame('leaderboards', 'menu'),
+                             image=self.resized_back_image, background="white")
+        self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
+
+        # Leaderboards Table: 
+
+        # Create a treeview widget
+        self.tree = ttk.Treeview(self, columns=("Place", "Name", "Score"), show="headings")
+        self.tree.pack(side="top", pady=(50, 0))
+
+        # Add Column headings
+        self.tree.heading("Place", text="Place", anchor=tk.CENTER)
+        self.tree.heading("Name", text="Name", anchor=tk.CENTER)
+        self.tree.heading("Score", text="Score", anchor=tk.CENTER)
+
+        # Change the width of rows
+        self.tree.column("Place", width=100, anchor=tk.CENTER)
+        self.tree.column("Name", width=400, anchor=tk.CENTER)
+        self.tree.column("Score", width=150, anchor=tk.CENTER)
+
+        # Set font size and row height for the table
+        style = ttk.Style()
+        style.configure("Treeview", font=('Helvetica', 30), rowheight=40)
+        style.configure("Treeview.Heading", font=('Helvetica', 30),rowheight=40)
+        style.configure("Treeview.Row", font=('Helvetica', 30), rowheight=40)
+
+        # Add scrollbars if there are to much columns
+        y_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
+        y_scrollbar.pack(side="right", fill="y")
+        x_scrollbar = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
+        x_scrollbar.pack(side="bottom", fill="x")
+
+        # Set scrollbars to the table
+        self.tree.configure(yscrollcommand=y_scrollbar.set, xscrollcommand=x_scrollbar.set)
+        # Example data 
+        data = [
+            ("1", "Artem", "300"),
+            ("2", "Tom", "200"),
+            ("3", "Femiqweqwe131231", "150"),
+            ("4", "Zifan", "125")
+
+        ]
+        # Insert data into the treeview
+        for row in data:
+            self.tree.insert("", "end", values=row, tags=("Treeview.Row", "Treeview", "Treeview.Heading"))
 
 
 class Play(tk.Frame):
@@ -296,7 +338,7 @@ class Play(tk.Frame):
 
         # generated_distance_label with coefficient variable
         self.generated_distance_label = tk.Label(self, textvariable=self.generated_distance_variable, bg='white', font='Helvetica, 20')
-        self.generated_distance_label.place(relx=0.82, rely=0.68, anchor='center')
+        self.generated_distance_label.place(relx=0.86, rely=0.68, anchor='center')
 
         self.bet_button = tk.Button(self, text = "BET", bg = 'white', fg = 'black',
                                font='Helvetica, 25',
@@ -460,7 +502,9 @@ class Play(tk.Frame):
                     self.parent.frames['win'].amount_of_winning_variable.set("Amount of winning: " + str(score))
                     self.parent.switch_frame('play', 'win')
                 else:
+                    score*=-1
                     self.parent.frames['lose'].amount_of_lose_variable.set("You lost: " + str(score)) 
+                    score*=-1
                     self.parent.switch_frame('play', 'lose')
 
             self.update_plot(result=True, with_node_scores=True)
@@ -583,6 +627,7 @@ class Lose(tk.Frame):
         self.amount_of_loosing_label.place(relx= 0.5, rely= 0.88, anchor='center')
 
 
+# To run app.py, enter 'python3 -m graph_game.app' in terminal.
 if __name__ == '__main__':
     app = GraphGameGUI()
     app.mainloop()
