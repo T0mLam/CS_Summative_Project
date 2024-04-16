@@ -98,7 +98,7 @@ class RandomScoreGenerator:
             
         # Calculate score
         norm_distribution = stats.norm(self._mean, self._sd)
-        # Calculate the probability that the node dist < the random generated distance
+        # Calculate the probability that the node dist > a random generated distance
         prob = 1 - norm_distribution.cdf(dist)
         # Take the inverse of prob so the longer the node distance (the lower the prob), the higher the score
         return int(1 / prob * self._sd + self.base_score)
