@@ -5,7 +5,7 @@ from matplotlib.figure import Figure
 import networkx as nx
 import pygame
 import tkinter as tk
-from tkinter import ttk
+from tkinter import messagebox, ttk
 
 from .db.database import authenticate, initialize_database, register_player, update_balance
 from .game_logic import GraphGame
@@ -99,7 +99,7 @@ class Login(tk.Frame):
         self.login_Button.place(relx=0.5, rely=0.6, anchor='center')
 
     def login(self):
-        username = self.username_Entry.get()
+        username = self.username_Entry.get()    
         password = self.password_Entry.get()
         user = authenticate(username, password)
         if user:
@@ -107,6 +107,8 @@ class Login(tk.Frame):
             self.parent.current_player = name
             self.parent.current_balance = balance
             self.parent.switch_frame('login', 'menu')
+        else:
+            messagebox.showinfo("Error", "The player is not found.")
 
 
 class Register(tk.Frame):
@@ -143,13 +145,16 @@ class Register(tk.Frame):
         username = self.username_Entry.get()
         password = self.password_Entry.get()
         password_repeat = self.password_repeat_Entry.get()
+        if not username or not password or not password_repeat:
+            messagebox.showinfo("Error", "Please fill in all the information.")
+            return
         if password == password_repeat:
             register_player(username, password, 100)
             self.parent.current_player = username
             self.parent.current_balance = 100
             self.parent.switch_frame('register', 'menu')
         else:
-            print("Passwords do not match.")
+            messagebox.showinfo("Error", "Passwords do not match.")
 
         
 class MainMenu(tk.Frame):
