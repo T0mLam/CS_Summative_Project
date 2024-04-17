@@ -1,6 +1,8 @@
 import random
 import unittest
+
 from graph_game.utils.randomised_set import RandomisedSet
+
 
 class TestRandomisedSet(unittest.TestCase):
     def setUp(self):
@@ -18,7 +20,6 @@ class TestRandomisedSet(unittest.TestCase):
         self.randomised_set.add_edge_to_set(1, 2)
         self.assertEqual(self.randomised_set.edges, [(1, 2)])
         self.assertEqual(self.randomised_set.edge_to_idx, {(1, 2): 0})
-
 
     def test_remove_edge(self):
         """Remove an edge from the RandomisedSet"""
@@ -42,6 +43,7 @@ class TestRandomisedSet(unittest.TestCase):
         self.assertIn(extracted_edges, edges_to_add)
         self.assertEqual(len(self.randomised_set.edges), 1)
         self.assertNotIn(extracted_edges, self.randomised_set.edge_to_idx)
+
 
 if __name__ == '__main__':
     unittest.main()

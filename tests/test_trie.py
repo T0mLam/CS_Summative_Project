@@ -1,6 +1,6 @@
-
 import unittest
-from graph_game.utils.trie import  Trie, TrieNode
+from graph_game.utils.trie import Trie
+
 
 class TestTrie(unittest.TestCase):
     def setUp(self):
@@ -28,6 +28,3 @@ class TestTrie(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-
-
