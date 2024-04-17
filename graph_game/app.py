@@ -204,8 +204,9 @@ class Leaderboard(tk.Frame):
         super().__init__(parent)
         self.parent = parent
         self.search_engine = SearchEngine()
-        
-        # Set the backgroung color to white
+        self.players = self.search_engine.get_leaders(100)  # Get all players initially
+
+        # Set the background color to white
         self.configure(bg="white")
 
         # Title
@@ -221,11 +222,21 @@ class Leaderboard(tk.Frame):
                              image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
 
+        # Search Entry
+        self.search_entry = tk.Entry(self, font=('Helvetica', 30))
+        self.search_entry.insert(0, "Search")
+        # Place the search text inside the Entry if the user does not use it 
+        self.search_entry.bind("<FocusIn>", self.Text_search_if_empty)
+        self.search_entry.bind("<FocusOut>", self.Text_search_if_empty_focus_out)
+        # Bind the command to the entry if the key is released 
+        self.search_entry.bind("<KeyRelease>", self.Searching)  
+        self.search_entry.pack(side="top", padx=20, pady=(40, 0))
+
         # Leaderboard Table: 
 
-        # Create a treeview widget
+        # Create a treeview widget for the table
         self.tree = ttk.Treeview(self, columns=("Place", "Name", "Score"), show="headings")
-        self.tree.pack(side="top", pady=(50, 0))
+        self.tree.pack(side="top", pady=(30, 0))
 
         # Add Column headings
         self.tree.heading("Place", text="Place", anchor=tk.CENTER)
@@ -243,7 +254,7 @@ class Leaderboard(tk.Frame):
         self.style.configure("Treeview.Heading", font=('Helvetica', 30),rowheight=40)
         self.style.configure("Treeview.Row", font=('Helvetica', 30), rowheight=40)
 
-        # Add scrollbars if there are to much columns
+        # Add scrollbars if there are too much columns
         self.y_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
         self.y_scrollbar.pack(side="right", fill="y")
         self.x_scrollbar = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
@@ -252,18 +263,36 @@ class Leaderboard(tk.Frame):
         # Set scrollbars to the table
         self.tree.configure(yscrollcommand=self.y_scrollbar.set, xscrollcommand=self.x_scrollbar.set)
 
+        # Call the function to set the values in the table
         self.update_treeview()
 
     def update_treeview(self):
         # Delete all previous data in the treeview
         self.tree.delete(*self.tree.get_children())
-        # Example data 
-        leaders = self.search_engine.get_leaders(5)
-        # Insert data into the treeview
-        for i, row in enumerate(leaders):
+        # Populate the treeview with all players initially
+        for i, row in enumerate(self.players):
             self.tree.insert("", "end", values=(i + 1, *row), tags=("Treeview.Row", "Treeview", "Treeview.Heading"))
 
-        self.tree.after(1000, self.update_treeview)
+    def Text_search_if_empty(self, event):
+        if self.search_entry.get() == "Search":
+            self.search_entry.delete(0, tk.END)
+
+    def Text_search_if_empty_focus_out(self, event):
+        if not self.search_entry.get():
+            self.search_entry.insert(0, "Search")
+
+    def Searching(self, event):
+        # Set the search text to lower letters for a more comfortabel search
+        search_text = self.search_entry.get().strip().lower()
+        # If the search is empty, show all players 
+        if not search_text or search_text == "search": 
+            self.players = self.search_engine.get_leaders(100)
+        else:
+            # Show the only players whose name starts with the letters in the search_entry
+            self.players = [player for player in self.search_engine.get_leaders(100) if player[0].lower().startswith(search_text)]
+        # Update the table to see changes
+        self.update_treeview()
+
 
 
 class Play(tk.Frame):
