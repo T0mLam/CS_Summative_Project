@@ -25,7 +25,6 @@ class GraphGame(Graph):
         set_starting_node: A setter method for the starting node.
         set_ending_node: A setter method for the ending node.
         generate_cutoff: Generate and store the random distance in the cutoff_distance variable.
-        calculate_node_scores: Calculate the score of each nodes based on its distance and update the plot.
         check_player_wins: Check whether the player wins.
         get_player_score: Get the score awarded for the player for the current round.
         random_start: A classmethod for generating a random game.
@@ -128,34 +127,6 @@ class GraphGame(Graph):
 
         # Generate a random distance
         self.cutoff_distance = self.score_generator.generate_random_distance()
-
-    def calculate_node_scores(self) -> None:
-        """Calculate the score of each nodes based on its distance and update the plot.
-        
-        Raises:
-            NameError: if the score_generator or the starting node have not been defined.
-        """
-        if not self.starting_node or not self.score_generator:
-            raise NameError('The score_generator or the starting node have not been defined.')
-
-        # Get the shortest distances from the starting node to all other nodes
-        node_to_dist = self.shortest_path(starting_node=self.starting_node)
-
-        # Map the distance to each node to its score using the score_generator
-        for node, dist in node_to_dist.items():
-            node_to_dist[node] = self.score_generator.calculate_score(dist)
-
-        # Create score labels for the networkx graph visualization
-        label_pos = {}
-        for node, coords in self.node_position.items():
-            # Set the label to be 0.135 units above the original node position
-            label_pos[node] = (coords[0], coords[1] + 0.135)
-
-        nx.draw_networkx_labels(self.G, 
-                                pos=label_pos,
-                                labels=node_to_dist,
-                                font_size=10, 
-                                font_weight='bold')
         
     def check_player_wins(self) -> bool:
         """Check whether the player wins.
