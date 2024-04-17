@@ -11,10 +11,10 @@ from .utils.randomised_set import RandomisedSet
 
 
 class Graph:
-    """An undirected and connected graph data structure storing uniquely indexed nodes with weighted edges.
+    """A randomly generated undirected and fully connected graph data structure.
 
     Notes:
-        Class attributes can not be directed accessed.
+        Class attributes should not be directed accessed.
 
     Attributes:
         G: An instance of the Graph class of the networkx module.
@@ -330,7 +330,7 @@ class Graph:
             self.num_edges += 1
             
     def graph_visualize(self, with_labels=True, node_size=700) -> None:
-        """Graphical visualization of the graph using matplotlib libary.
+        """Graphical visualization of the graph using matplotlib libary for testing.
 
         Args:
             with_labels (bool): If True, nodes will show their ID as label.
