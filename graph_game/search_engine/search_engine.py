@@ -40,7 +40,7 @@ class SearchEngine:
             A list of tuples consist of the players' name and balance. 
         """
         # Get at most 10 users with at most 2 Levenshtein distance away from the name input
-        players = self.trie.fizzy_search(name, threshold=3, num_return=10)
+        players = self.trie.fizzy_search(name, threshold=5, num_return=10)
 
         res = []
 
