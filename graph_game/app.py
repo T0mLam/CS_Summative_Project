@@ -69,6 +69,8 @@ class GraphGameGUI(tk.Tk):
         self.update_idletasks()
         # Restore the window size
         self.geometry('800x600')
+
+        self.frames[current_frame].pack_forget()
         # Show the main menu frame
         self.frames[new_frame].pack(fill='both', expand=True)
         
@@ -138,8 +140,8 @@ class Register(tk.Frame):
         self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=self.register)
         self.register_Button.place(relx=0.5, rely=0.6, anchor='center')
 
-        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=lambda: self.parent.switch_frame('register', 'login'))
-        self.login_Button.place(relx=0.5, rely=0.7, anchor='center')
+        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=lambda: parent.switch_frame('register', 'login'))
+        self.login_Button.pack(pady=(0,160),side=tk.BOTTOM)
         
     def register(self):
         username = self.username_Entry.get()
@@ -190,7 +192,7 @@ class MainMenu(tk.Frame):
         # Quit Button
         logout_button = tk.Button(self, text='Logout', command=lambda: self.parent.switch_frame('menu', 'login'), bg='white', fg='black', font='Helvetica, 40', width=10)
         # command=self.master.quit)
-        logout_button.place(relx=0.5, rely=0.75, anchor='center')
+        logout_button.pack(pady=(0,120),side=tk.BOTTOM)
 
         # Soundtrack Switch
         soundtrack_switch = tk.Checkbutton(self, text='Music', var=self.parent.soundtrack_state,
