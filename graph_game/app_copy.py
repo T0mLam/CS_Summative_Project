@@ -595,6 +595,10 @@ class Play(tk.Frame):
             self.generated_distance_variable.set('Generated distance: -')        
 
         self.update_max_bid()
+        
+        player_history_path = os.path.join("graph_game/db", "Player_History.txt")
+        with open(player_history_path, "a") as file:
+                file.write(f"{self.parent.current_player} Bid: {bid_amount} Starting node: {starting_node} Ending node: {ending_node} Win: {self.game.check_player_wins()} Score: {score}\n")
             
 
 class Win(tk.Frame):
