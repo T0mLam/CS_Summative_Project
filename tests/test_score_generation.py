@@ -1,6 +1,7 @@
 import unittest
 from graph_game.score_generation import RandomScoreGenerator
 from unittest.mock import patch
+import scipy.stats as stats
 import numpy as np
 
 
@@ -57,19 +58,22 @@ class TestRandomScoreGenerator(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.generator.generate_random_distance()
 
-    def test_calculate_score(self):
+    @patch('numpy.random.normal')
+    def test_calculate_score(self, mock_normal):
         """Test calculate_score calculates correctly."""
-        self.generator._generated_distance = 10
-        self.generator.base_score = 100
-        score = self.generator.calculate_score(20)
-        self.assertEqual(score, 90)
-
-    def test_calculate_score_negative_score(self):
-        """Test calculate_score never returns negative scores."""
-        self.generator._generated_distance = 10
-        self.generator.base_score = 100
-        score = self.generator.calculate_score(120)
-        self.assertEqual(score, 0)
+        mean = 10
+        sd = 5
+        self.generator.set_mean(mean)
+        self.generator.set_sd(sd)
+        mock_normal.return_value = 10
+        '''calculate score'''
+        dist = 20
+        expected_score = self.generator.calculate_score(dist)
+        '''check if score is correct'''
+        norm_distribution = stats.norm(mean, sd)
+        prob = 1 - norm_distribution.cdf(dist)
+        manual_score = int(1 / prob * sd + self.generator.base_score)
+        self.assertEqual(expected_score, manual_score)
 
     @patch('numpy.random.normal')
     def test_generate_random_edge(self, mock_normal):
