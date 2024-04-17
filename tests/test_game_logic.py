@@ -1,24 +1,9 @@
-import unittest
-from graph_game.game_logic import GraphGame
 import numpy as np
+import unittest
 
-class RandomScoreGenerator:
-    def __init__(self, base_score):
-        self.base_score = base_score
-        self.mean = 0
-        self.sd = 0
+from graph_game.game_logic import GraphGame
+from graph_game.score_generation import RandomScoreGenerator
 
-    def set_mean(self, mean):
-        self.mean = mean
-
-    def set_sd(self, sd):
-        self.sd = sd
-
-    def generate_random_distance(self):
-        return np.random.normal(self.mean, self.sd)
-
-    def calculate_score(self, distance):
-        return max(int(self.base_score - distance), 0)
 
 class TestGraphGame(unittest.TestCase):
     def setUp(self):
