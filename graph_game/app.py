@@ -152,6 +152,7 @@ class Register(tk.Frame):
             register_player(username, password, 100)
             self.parent.current_player = username
             self.parent.current_balance = 100
+            self.parent.frames['leaderboard'].search_engine.fetch_all_users_to_trie()
             self.parent.switch_frame('register', 'menu')
         else:
             messagebox.showinfo("Error", "Passwords do not match.")
@@ -222,6 +223,8 @@ class Leaderboard(tk.Frame):
                              image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
 
+
+        '''
         # Search Entry
         self.search_entry = tk.Entry(self, font=('Helvetica', 30))
         self.search_entry.insert(0, "Search")
@@ -230,8 +233,20 @@ class Leaderboard(tk.Frame):
         self.search_entry.bind("<FocusOut>", self.Text_search_if_empty_focus_out)
         # Bind the command to the entry if the key is released 
         self.search_entry.bind("<KeyRelease>", self.Searching)  
+        # Bind the autocomplete command to entry
+        self.search_entry.bind("<Up>", lambda event: self.autocomplete(event, next=False))  
+        self.search_entry.bind("<Down>", lambda event: self.autocomplete(event, next=True))  
         self.search_entry.pack(side="top", padx=20, pady=(40, 0))
+        '''
 
+        self.words_for_autocompletion = []
+        # Search entry combobox
+        self.search_entry = ttk.Combobox(self, values=self.words_for_autocompletion) 
+        self.search_entry.bind("<FocusIn>", self.Text_search_if_empty)  
+        self.search_entry.bind("<FocusOut>", self.Text_search_if_empty_focus_out)
+        # Bind the command to the entry if the key is released 
+        self.search_entry.bind("<KeyRelease>", self.Searching)
+        self.search_entry.pack(side="top", padx=20, pady=(40, 0))  
         # Leaderboard Table: 
 
         # Create a treeview widget for the table
@@ -283,13 +298,18 @@ class Leaderboard(tk.Frame):
 
     def Searching(self, event):
         # Set the search text to lower letters for a more comfortabel search
-        search_text = self.search_entry.get().strip().lower()
+        #search_text = self.search_entry.get().strip().lower()
+        search_text = self.search_entry.get().strip()
+        # Search for the list of words for autocompletion
+        self.words_for_autocompletion = self.search_engine.complete_search(search_text)
+        self.search_entry.config(values=self.words_for_autocompletion[:5])
         # If the search is empty, show all players 
         if not search_text or search_text == "search": 
             self.players = self.search_engine.get_leaders(100)
         else:
             # Show the only players whose name starts with the letters in the search_entry
-            self.players = [player for player in self.search_engine.get_leaders(100) if player[0].lower().startswith(search_text)]
+            #self.players = [player for player in self.search_engine.get_leaders(100) if player[0].lower().startswith(search_text)]
+            self.players = self.search_engine.search_results(search_text)
         # Update the table to see changes
         self.update_treeview()
 
