@@ -27,6 +27,7 @@ class GraphGame(Graph):
         generate_cutoff: Generate and store the random distance in the cutoff_distance variable.
         calculate_node_scores: Calculate the score of each nodes based on its distance and update the plot.
         check_player_wins: Check whether the player wins.
+        get_player_score: Get the score awarded for the player for the current round.
         random_start: A classmethod for generating a random game.
     """
 
