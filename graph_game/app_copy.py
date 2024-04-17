@@ -5,10 +5,11 @@ from matplotlib.figure import Figure
 import networkx as nx
 import pygame
 import tkinter as tk
-from tkinter import ttk
+from tkinter import messagebox, ttk
 
-from .db.database import DatabaseConnection, authenticate, initialize_database, log_game, register_player
+from .db.database import authenticate, initialize_database, register_player, update_balance
 from .game_logic import GraphGame
+from .search_engine.search_engine import SearchEngine
 # To run app.py, enter 'python3 -m graph_game.app_copy' in terminal.
 
 
@@ -18,10 +19,15 @@ class GraphGameGUI(tk.Tk):
         self.title('Graph Game')
         self.geometry('800x600')
         self['bg'] = 'white'
-        self.resizable(False, False)  # Make the window resizable
+        # Make the window resizable
+        self.resizable(False, False)  
 
         # Initialize the database
         initialize_database()
+
+        # Create a variable for storing the current player and their score
+        self.current_player = None
+        self.current_balance = None
 
         # Initialize pygame mixer for music
         pygame.mixer.init()
@@ -41,7 +47,8 @@ class GraphGameGUI(tk.Tk):
             'win': Win(self),
             'lose': Lose(self),
             'login': Login(self),
-            'register': Register(self)
+            'register': Register(self),
+            'leaderboard' : Leaderboard(self)
         }
 
         # Show main menu frame
@@ -85,18 +92,23 @@ class Login(tk.Frame):
         self.password_Entry = tk.Entry(self, font='Helvetica, 30', width=15, bg='white', show='*')
         self.password_Entry.place(relx=0.5, rely=0.4, anchor='center')
         
-        self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=lambda: parent.switch_frame('login', 'register'))
+        self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=lambda: self.parent.switch_frame('login', 'register'))
         self.register_Button.place(relx=0.5, rely=0.5, anchor='center')
 
         self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=self.login)
         self.login_Button.place(relx=0.5, rely=0.6, anchor='center')
 
     def login(self):
-        username = self.username_Entry.get()
+        username = self.username_Entry.get()    
         password = self.password_Entry.get()
         user = authenticate(username, password)
         if user:
+            name, balance = user
+            self.parent.current_player = name
+            self.parent.current_balance = balance
             self.parent.switch_frame('login', 'menu')
+        else:
+            messagebox.showinfo("Error", "The player is not found.")
 
 
 class Register(tk.Frame):
@@ -126,27 +138,33 @@ class Register(tk.Frame):
         self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=self.register)
         self.register_Button.place(relx=0.5, rely=0.6, anchor='center')
 
-        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=lambda: parent.switch_frame('register', 'login'))
+        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=lambda: self.parent.switch_frame('register', 'login'))
         self.login_Button.place(relx=0.5, rely=0.7, anchor='center')
         
     def register(self):
         username = self.username_Entry.get()
         password = self.password_Entry.get()
         password_repeat = self.password_repeat_Entry.get()
+        if not username or not password or not password_repeat:
+            messagebox.showinfo("Error", "Please fill in all the information.")
+            return
         if password == password_repeat:
-            register_player(username, password, 0)
+            register_player(username, password, 100)
+            self.parent.current_player = username
+            self.parent.current_balance = 100
             self.parent.switch_frame('register', 'menu')
         else:
-            print("Passwords do not match.")
+            messagebox.showinfo("Error", "Passwords do not match.")
 
         
 class MainMenu(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.configure(bg="white")
+        self.parent = parent
 
         # Play button
-        play_button = tk.Button(self, text="Play", command=lambda: parent.switch_frame('menu', 'play')
+        play_button = tk.Button(self, text="Play", command=lambda: self.parent.switch_frame('menu', 'play')
                              , bg='white', fg='black',
                              font='Helvetica, 40', width=10)
         play_button.place(relx=0.5, rely=0.3, anchor='center')
@@ -161,23 +179,120 @@ class MainMenu(tk.Frame):
         # command=self.show_how_to_play_frame)
         how_to_play_button.place(relx=0.5, rely=0.45, anchor='center')
 
-        # Leaderboards Button
-        leaderboards_button = tk.Button(self, text='Leaderboards', bg='white', fg='black',
-                                     font='Helvetica, 40', width=10)
-        # command=self.show_leaderboards_frame)
-        leaderboards_button.place(relx=0.5, rely=0.6, anchor='center')
+        # Leaderboard Button
+        leaderboard_button = tk.Button(self, text='Leaderboard', bg='white', fg='black',
+                                     font='Helvetica, 40', width=10,
+                                     command = lambda: self.parent.switch_frame('menu', 'leaderboard'))
+        # command=self.show_leaderboard_frame)
+        leaderboard_button.place(relx=0.5, rely=0.6, anchor='center')
 
         # Quit Button
-        quit_button = tk.Button(self, text='Quit', bg='white', fg='black', font='Helvetica, 40', width=10)
+        logout_button = tk.Button(self, text='Logout', command=lambda: self.parent.switch_frame('menu', 'login'), bg='white', fg='black', font='Helvetica, 40', width=10)
         # command=self.master.quit)
-        quit_button.place(relx=0.5, rely=0.75, anchor='center')
+        logout_button.place(relx=0.5, rely=0.75, anchor='center')
 
         # Soundtrack Switch
-        soundtrack_switch = tk.Checkbutton(self, text='Music', var=parent.soundtrack_state,
-                                           command=parent.switch_soundtrack,
+        soundtrack_switch = tk.Checkbutton(self, text='Music', var=self.parent.soundtrack_state,
+                                           command=self.parent.switch_soundtrack,
                                            onvalue=True, offvalue=False,
                                            bg='white', font='Helvetica, 20')
         soundtrack_switch.place(relx=0.93, rely=0.95, anchor='center')
+
+
+class Leaderboard(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.search_engine = SearchEngine()
+        self.players = self.search_engine.get_leaders(100)  # Get all players initially
+
+        # Set the background color to white
+        self.configure(bg="white")
+
+        # Title
+        leaderboard_label = tk.Label(self, text="Leaderboard", font=('Helvetica', 60), bg='white')
+        leaderboard_label.place(relx=0.5, rely=0.12, anchor='center')
+
+        # Put the back arrow image for the button
+        self.back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
+        # Make the image 10 times smaller
+        self.resized_back_image = self.back_image.subsample(10, 10) 
+        # Back Button 
+        self.back_button = tk.Button(self, command=lambda: self.parent.switch_frame('leaderboard', 'menu'),
+                             image=self.resized_back_image, background="white")
+        self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
+
+        # Search Entry
+        self.search_entry = tk.Entry(self, font=('Helvetica', 30))
+        self.search_entry.insert(0, "Search")
+        # Place the search text inside the Entry if the user does not use it 
+        self.search_entry.bind("<FocusIn>", self.Text_search_if_empty)
+        self.search_entry.bind("<FocusOut>", self.Text_search_if_empty_focus_out)
+        # Bind the command to the entry if the key is released 
+        self.search_entry.bind("<KeyRelease>", self.Searching)  
+        self.search_entry.pack(side="top", padx=20, pady=(40, 0))
+
+        # Leaderboard Table: 
+
+        # Create a treeview widget for the table
+        self.tree = ttk.Treeview(self, columns=("Place", "Name", "Score"), show="headings")
+        self.tree.pack(side="top", pady=(30, 0))
+
+        # Add Column headings
+        self.tree.heading("Place", text="Place", anchor=tk.CENTER)
+        self.tree.heading("Name", text="Name", anchor=tk.CENTER)
+        self.tree.heading("Score", text="Score", anchor=tk.CENTER)
+
+        # Change the width of rows
+        self.tree.column("Place", width=100, anchor=tk.CENTER)
+        self.tree.column("Name", width=400, anchor=tk.CENTER)
+        self.tree.column("Score", width=150, anchor=tk.CENTER)
+
+        # Set font size and row height for the table
+        self.style = ttk.Style()
+        self.style.configure("Treeview", font=('Helvetica', 30), rowheight=40)
+        self.style.configure("Treeview.Heading", font=('Helvetica', 30),rowheight=40)
+        self.style.configure("Treeview.Row", font=('Helvetica', 30), rowheight=40)
+
+        # Add scrollbars if there are too much columns
+        self.y_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
+        self.y_scrollbar.pack(side="right", fill="y")
+        self.x_scrollbar = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
+        self.x_scrollbar.pack(side="bottom", fill="x")
+
+        # Set scrollbars to the table
+        self.tree.configure(yscrollcommand=self.y_scrollbar.set, xscrollcommand=self.x_scrollbar.set)
+
+        # Call the function to set the values in the table
+        self.update_treeview()
+
+    def update_treeview(self):
+        # Delete all previous data in the treeview
+        self.tree.delete(*self.tree.get_children())
+        # Populate the treeview with all players initially
+        for i, row in enumerate(self.players):
+            self.tree.insert("", "end", values=(i + 1, *row), tags=("Treeview.Row", "Treeview", "Treeview.Heading"))
+
+    def Text_search_if_empty(self, event):
+        if self.search_entry.get() == "Search":
+            self.search_entry.delete(0, tk.END)
+
+    def Text_search_if_empty_focus_out(self, event):
+        if not self.search_entry.get():
+            self.search_entry.insert(0, "Search")
+
+    def Searching(self, event):
+        # Set the search text to lower letters for a more comfortabel search
+        search_text = self.search_entry.get().strip().lower()
+        # If the search is empty, show all players 
+        if not search_text or search_text == "search": 
+            self.players = self.search_engine.get_leaders(100)
+        else:
+            # Show the only players whose name starts with the letters in the search_entry
+            self.players = [player for player in self.search_engine.get_leaders(100) if player[0].lower().startswith(search_text)]
+        # Update the table to see changes
+        self.update_treeview()
+
 
 
 class Play(tk.Frame):
@@ -192,20 +307,9 @@ class Play(tk.Frame):
 
         self.configure(bg="white")
 
-        self.balance = int(100)
-        # Balance variable for putting into Label
-        self.balance_variable = tk.StringVar()
-        self.balance_variable.set("Balance: " + str(self.balance))
-
         # generated_distance_variable for putting into Label
         self.generated_distance_variable = tk.StringVar()
         self.generated_distance_variable.set("Generated distance: -")
-
-        # Chance of winning variable
-        self.chance_of_winning = int(0)
-        # Chance of winning variable for putting into Label
-        self.chance_of_winning_variable = tk.StringVar()
-        self.chance_of_winning_variable.set("Chance of Win: " + str(self.chance_of_winning) + "%")
 
         # Put the back arrow image for the button
         self.back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
@@ -227,16 +331,17 @@ class Play(tk.Frame):
         self.buy_button.pack(side="top", anchor="ne", padx=10, pady=10)
 
         #Label with the balance and balance wariable
-        self.Balance_Label = tk.Label(self, textvariable=self.balance_variable, bg='white', fg='black', font='Helvetica, 20')
-        self.Balance_Label.place(relx=0.8, rely=0.05, anchor='center')
+        self.balance_label = tk.Label(self, text='', bg='white', fg='black', font='Helvetica, 20')
+        self.balance_label.place(relx=0.8, rely=0.05, anchor='center')
+        self.update_balance_label()
 
         # Label Bid before the scale
-        self.Bid_Label = tk.Label(self, text = "Bid:", bg='white', fg='black',
+        self.bid_label = tk.Label(self, text = "Bid:", bg='white', fg='black',
                              font='Helvetica, 20')
-        self.Bid_Label.place(relx=0.76, rely=0.35, anchor='center')
+        self.bid_label.place(relx=0.76, rely=0.35, anchor='center')
 
         # Scale with changing the bid
-        self.bid_scale = tk.Scale(self, from_=0, to=self.balance, orient=tk.HORIZONTAL,
+        self.bid_scale = tk.Scale(self, from_=0, to=self.parent.current_balance, orient=tk.HORIZONTAL,
                                   length=160,
                                   bg='white', fg='black',
                                   font = 'Helvetica, 20',
@@ -256,9 +361,9 @@ class Play(tk.Frame):
         self.starting_node_combobox.bind("<FocusOut>", self.update_starting_ending_node_combobox_state)
 
         # Starting node combobox label
-        self.Starting_node_combobox_Label = tk.Label(self, text="Starting node:", bg='white', fg='black',
+        self.starting_node_combobox_label = tk.Label(self, text="Starting node:", bg='white', fg='black',
                                     font='Helvetica, 20')
-        self.Starting_node_combobox_Label.place(relx=0.81, rely=0.46, anchor='center')
+        self.starting_node_combobox_label.place(relx=0.81, rely=0.46, anchor='center')
 
         # Ending node combobox
         self.ending_node_combobox = ttk.Combobox(self, width=5, state='disabled')
@@ -285,6 +390,10 @@ class Play(tk.Frame):
         self.canvas.place(relx=0.34, rely=0.59, anchor='center')
 
         self.update_plot()
+
+    def update_balance_label(self):
+        self.balance_label.config(text="Balance: " + str(self.parent.current_balance))
+        self.balance_label.after(1000, self.update_balance_label)
 
     def update_bid_scale_combobox_state(self, event=None):
         # Check if bid_scale node combobox is empty
@@ -391,7 +500,7 @@ class Play(tk.Frame):
 
     # Function to update the maximum value of the bid scale
     def update_max_bid(self):
-        self.bid_scale.config(to=self.balance)
+        self.bid_scale.config(to=self.parent.current_balance)
 
     def bet_start_game(self):
         if self.game_started == True:
@@ -403,19 +512,19 @@ class Play(tk.Frame):
 
             # Check if the bid amount is higher that zero, if it is zero, paint the label red
             if bid_amount == 0:
-                self.Bid_Label.config(fg='red')
+                self.bid_label.config(fg='red')
                 all_inputs_valid = False
             else:
-                self.Bid_Label.config(fg='black')
+                self.bid_label.config(fg='black')
 
             # Check if the starting noded was selected, if it not, paint the label red
             starting_node = self.starting_node_combobox.get()
             if (not starting_node 
                 or self.starting_node_combobox.get() == self.ending_node_combobox):
-                self.Starting_node_combobox_Label.config(fg='red')
+                self.starting_node_combobox_label.config(fg='red')
                 all_inputs_valid = False
             else:
-                self.Starting_node_combobox_Label.config(fg='black')
+                self.starting_node_combobox_label.config(fg='black')
 
             # Check if the ending node was selected and get its value
             ending_node = self.ending_node_combobox.get()
@@ -455,7 +564,9 @@ class Play(tk.Frame):
             self.bid_scale.set(0)
             self.bid_scale['state'] = 'disabled' 
             
-            self.balance += score
+            self.parent.current_balance += score
+            # Update player's balance in db ...
+            update_balance(self.parent.current_player, self.parent.current_balance)
 
         else:
             self.bet_button.config(text="Play Again")
@@ -483,9 +594,7 @@ class Play(tk.Frame):
             # Update the generated distance label of the game 
             self.generated_distance_variable.set('Generated distance: -')        
 
-        self.balance_variable.set(f'Balance: {self.balance}')
         self.update_max_bid()
-        # update ... user score in db
             
 
 class Win(tk.Frame):
@@ -556,14 +665,13 @@ class Lose(tk.Frame):
         self.you_lost_label = tk.Label(self, text="you lost):", font = 'Helvetica, 50', bg = 'white')
         self.you_lost_label.place(relx=0.5, rely=0.1, anchor='center')
         
-        self.amount_of_loosing_label = tk.Label(self, textvariable=self.amount_of_lose_variable, 
+        self.amount_of_losing_label = tk.Label(self, textvariable=self.amount_of_lose_variable, 
                                                 font='Helvetica, 30',
                                                 bg = 'white')
-        self.amount_of_loosing_label.place(relx= 0.5, rely= 0.88, anchor='center')
+        self.amount_of_losing_label.place(relx= 0.5, rely= 0.88, anchor='center')
 
 
-# To run app.py, enter 'python3 -m graph_game.app_copy' in terminal.
+# To run app.py, enter 'python3 -m graph_game.app' in terminal.
 if __name__ == '__main__':
     app = GraphGameGUI()
-    register_player("Artem123", "123", 100)
     app.mainloop()

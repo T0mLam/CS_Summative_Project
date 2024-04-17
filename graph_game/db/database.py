@@ -80,6 +80,17 @@ def authenticate(username, password):
     except sqlite3.Error as e:
         print(f"Error authenticating user: {e}")
         return False
+    
+def update_balance(username, new_balance):
+    """Update the balance of a player."""
+    try:
+        with DatabaseConnection('db') as connection:
+            cursor = connection.cursor()
+            cursor.execute("UPDATE players SET balance = ? WHERE username = ?", (new_balance, username))
+        print("Balance updated successfully.")
+    except sqlite3.Error as e:
+        print(f"Error updating balance: {e}")
+
 
 
 if __name__ == '__main__':
