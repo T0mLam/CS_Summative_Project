@@ -175,7 +175,7 @@ class Trie:
             curr_row = [prev_row[0] + 1]
 
             for col in range(1, cols):
-                if word[col - 1] == letter:
+                if word[col - 1].lower() == letter.lower():
                     curr_row.append(prev_row[col - 1])
                     continue
             
