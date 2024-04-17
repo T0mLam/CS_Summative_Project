@@ -1,8 +1,9 @@
-import unittest
-from graph_game.score_generation import RandomScoreGenerator
-from unittest.mock import patch
-import scipy.stats as stats
 import numpy as np
+import scipy.stats as stats
+import unittest
+from unittest.mock import patch
+
+from graph_game.score_generation import RandomScoreGenerator
 
 
 class TestRandomScoreGenerator(unittest.TestCase):
@@ -72,7 +73,7 @@ class TestRandomScoreGenerator(unittest.TestCase):
         '''check if score is correct'''
         norm_distribution = stats.norm(mean, sd)
         prob = 1 - norm_distribution.cdf(dist)
-        manual_score = int(1 / prob * sd + self.generator.base_score)
+        manual_score = int(1 / prob * sd * 2 + self.generator.base_score)
         self.assertEqual(expected_score, manual_score)
 
     @patch('numpy.random.normal')

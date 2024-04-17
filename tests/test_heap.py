@@ -1,4 +1,5 @@
 import unittest
+
 from graph_game.utils.node import Node
 from graph_game.utils.heap import MinHeap
 
@@ -67,6 +68,7 @@ class TestHeap(unittest.TestCase):
         self.assertEqual(heap.pop()[0],1)
         heap.push((0, self.nodes[0]))
         self.assertEqual(heap.pop()[0],0)
+
 
 if __name__ == '__main__':
     unittest.main()

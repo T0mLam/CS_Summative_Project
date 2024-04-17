@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import patch
-from graph_game.graph import  Graph
+
+from graph_game.graph import Graph
+
 
 class TestGraph(unittest.TestCase):
     def setUp(self):
