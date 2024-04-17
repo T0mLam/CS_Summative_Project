@@ -12,7 +12,7 @@ class SearchEngine:
         
         Methods:
             complete_search: Complete a word based on the input and return the list of word combinations ordered by their length.
-            search_result: Get a list of the players with their balance according to the user input.
+            search_results: Get a list of the players with their balance according to the user input.
             get_leaders: Get the n players with the highest balance.
             fetch_all_users_to_trie: Fetch all the players from the database to the trie.
         """
@@ -30,7 +30,7 @@ class SearchEngine:
         """
         return self.trie.complete(input_str)
     
-    def search_result(self, name: str) -> List[Tuple[str, int]]:
+    def search_results(self, name: str) -> List[Tuple[str, int]]:
         """Get a list of the players with their balance according to the user input.
 
         Args:
@@ -40,7 +40,7 @@ class SearchEngine:
             A list of tuples consist of the players' name and balance. 
         """
         # Get at most 10 users with at most 2 Levenshtein distance away from the name input
-        players = self.trie.fizzy_search(name, threshold=2, num_return=10)
+        players = self.trie.fizzy_search(name, threshold=3, num_return=10)
 
         res = []
 
@@ -48,7 +48,7 @@ class SearchEngine:
             for player in players:
                 # Fetch the player name and score from the database
                 player_name_score = conn.cursor().execute(
-                    'SELECT username, balance FROM players WHERE name = ?', (player,)
+                    'SELECT username, balance FROM players WHERE username = ?', (player,)
                 ).fetchone()
 
                 # Append the records of the players to the res list
