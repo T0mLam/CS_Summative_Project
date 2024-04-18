@@ -1,1 +1,0 @@
-Artem123 Bid: 30 Starting node: 3 Ending node: 4 Win: False Score: -30

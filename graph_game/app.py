@@ -7,7 +7,7 @@ import pygame
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from .db.database import authenticate, initialize_database, register_player, update_balance
+from .db.database import authenticate, get_player_history, initialize_database, log_game, register_player, update_balance
 from .game_logic import GraphGame
 from .search_engine.search_engine import SearchEngine
 # To run app.py, enter 'python3 -m graph_game.app' in terminal.
@@ -301,6 +301,7 @@ class Leaderboard(tk.Frame):
         # Update the table to see changes
         self.update_treeview()
 
+
 class Player_History(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -340,7 +341,6 @@ class Player_History(tk.Frame):
         self.history_text.config(state='disabled')
         # Place the history text box
         self.history_text.place(relx=0.5, rely=0.5, anchor='center')
-
     """
     def load_player_history(self):
         # Get the directory of the Player history file in the database
@@ -353,10 +353,15 @@ class Player_History(tk.Frame):
                     # Print the line in the textbox
                     self.history_text.insert(tk.END, line)
     """
-    
-    
-    
+    def load_player_history(self):
+        history = get_player_history(self.parent.current_player) 
+        if not history:
+            return
+        for bid, start, end, outcome, score in history:
+            line = f'Bid: {bid} Starting node: {start} Ending node: {end} Outcome: {outcome} Score: {score}\n'
+            self.history_text.insert(tk.END, line)
 
+    
 class Play(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -653,11 +658,16 @@ class Play(tk.Frame):
             self.generated_distance_variable.set('Generated distance: -')        
 
         self.update_max_bid()
-
+        """
         player_history_path = os.path.join("graph_game/db", "Player_History.txt")
         with open(player_history_path, "a") as file:
                 file.write(f"{self.parent.current_player} Bid: {bid_amount} Starting node: {starting_node} Ending node: {ending_node} Win: {self.game.check_player_wins()} Score: {score}\n")
-            
+        """  
+        outcome = 'win' if self.game.check_player_wins() else 'loss'
+        log_game(self.parent.current_player, int(bid_amount), int(starting_node), int(ending_node), outcome, score)
+
+        self.parent.frames['history'].load_player_history()
+
 
 class Win(tk.Frame):
     def __init__(self, parent):
