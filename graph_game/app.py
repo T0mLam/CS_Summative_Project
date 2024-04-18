@@ -109,6 +109,7 @@ class Login(tk.Frame):
             name, balance = user
             self.parent.current_player = name
             self.parent.current_balance = balance
+            self.parent.frames['play'].update_max_bid()
             self.parent.switch_frame('login', 'menu')
         else:
             messagebox.showinfo("Error", "The player is not found.")
@@ -356,7 +357,6 @@ class Play(tk.Frame):
         super().__init__(parent)
         self.parent = parent
         self.game = GraphGame.random_start()
-        self.game.set_base_score(100)
 
         # The variable for new game
         self.game_started = True
@@ -375,8 +375,6 @@ class Play(tk.Frame):
         self.back_button = tk.Button(self, command=lambda: parent.switch_frame('play', 'menu'),
                              image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
-
-        
 
         #Label with the balance and balance wariable
         self.balance_label = tk.Label(self, text='', bg='white', fg='black', font='Helvetica, 20')
@@ -436,8 +434,6 @@ class Play(tk.Frame):
 
         self.canvas = tk.Canvas(self, width=530, height=480, bg="white")
         self.canvas.place(relx=0.34, rely=0.59, anchor='center')
-
-        
 
         self.update_plot()
 
@@ -556,7 +552,6 @@ class Play(tk.Frame):
             # Create the variable that states if all parameters are selected
             all_inputs_valid = True
         
-
             # Get the value of the bid 
             bid_amount = self.bid_scale.get()
 
@@ -591,7 +586,6 @@ class Play(tk.Frame):
             # If all inputs are valid -> proceed with the game logic
             if all_inputs_valid:
                 score = self.game.get_player_score()
-
 
                 if(self.game.check_player_wins() == True):
                     self.parent.frames['win'].amount_of_winning_variable.set("Amount of winning: " + str(score))
@@ -654,6 +648,7 @@ class Play(tk.Frame):
 
             if(self.parent.current_balance < 1):
                 tk.messagebox.showinfo(title="Broke", message="Your balance is less than 1, here are 50 extra score")
+                update_balance(self.parent.current_player, 50)
                 self.parent.current_balance = 50
 
         self.update_max_bid()
