@@ -36,7 +36,7 @@ def initialize_database():
         with DatabaseConnection('db') as connection:
             cursor = connection.cursor()
             cursor.execute("CREATE TABLE IF NOT EXISTS players (id INTEGER PRIMARY KEY, balance INTEGER, username TEXT UNIQUE, password TEXT)")
-            cursor.execute("CREATE TABLE IF NOT EXISTS games (id INTEGER PRIMARY KEY, username TEXT, bid INTEGER, start INTEGER, end INTEGER, outcome TEXT, score INTEGER)")
+            cursor.execute("CREATE TABLE IF NOT EXISTS games (id INTEGER PRIMARY KEY, username TEXT, bid INTEGER, start INTEGER, end INTEGER, outcome TEXT, score INTEGER, entry_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
         print("Database initialized successfully.")
     except sqlite3.Error as e:
         print(f"Error initializing database: {e}")
@@ -68,7 +68,7 @@ def get_player_history(username):
     try:
         with DatabaseConnection('db') as connection:
             cursor = connection.cursor()
-            cursor.execute("SELECT bid, start, end, outcome, score FROM games WHERE username = ?", (username,))
+            cursor.execute("SELECT bid, start, end, outcome, score, entry_date FROM games WHERE username = ? ORDER BY entry_date DESC", (username,))
             records = cursor.fetchall()
         print("Fetch records successfully.")
         return records
