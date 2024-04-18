@@ -36,7 +36,7 @@ def initialize_database():
         with DatabaseConnection('db') as connection:
             cursor = connection.cursor()
             cursor.execute("CREATE TABLE IF NOT EXISTS players (id INTEGER PRIMARY KEY, balance INTEGER, username TEXT UNIQUE, password TEXT)")
-            cursor.execute("CREATE TABLE IF NOT EXISTS games (id INTEGER PRIMARY KEY, player_id INTEGER, nodes INTEGER, result TEXT)")
+            cursor.execute("CREATE TABLE IF NOT EXISTS games (id INTEGER PRIMARY KEY, username TEXT, bid INTEGER, start INTEGER, end INTEGER, outcome TEXT, score INTEGER)")
         print("Database initialized successfully.")
     except sqlite3.Error as e:
         print(f"Error initializing database: {e}")
@@ -53,16 +53,27 @@ def register_player(username, password, initial_balance):
         print(f"Error registering player: {e}")
     
 
-def log_game(player_id, nodes, result):
+def log_game(username, bid, start, end, outcome, score):
     """Log a game played by a player in the database."""
     try:
         with DatabaseConnection('db') as connection:
             cursor = connection.cursor()
-            cursor.execute("INSERT INTO games (player_id, nodes, result) VALUES (?, ?, ?)", (player_id, nodes, result))
+            cursor.execute("INSERT INTO games (username, bid, start, end, outcome, score) VALUES (?, ?, ?, ?, ?, ?)", (username, bid, start, end, outcome, score))
         print("Game logged successfully.")
     except sqlite3.Error as e:
         print(f"Error logging game: {e}")
 
+def get_player_history(username):
+    """Extract the game history of a player."""
+    try:
+        with DatabaseConnection('db') as connection:
+            cursor = connection.cursor()
+            cursor.execute("SELECT bid, start, end, outcome, score FROM games WHERE username = ?", (username,))
+            records = cursor.fetchall()
+        print("Fetch records successfully.")
+        return records
+    except sqlite3.Error as e:
+        print(f"Error fetching records: {e}")
 
 def authenticate(username, password):
     """Authenticate the user based on provided username and password."""
@@ -90,7 +101,6 @@ def update_balance(username, new_balance):
         print("Balance updated successfully.")
     except sqlite3.Error as e:
         print(f"Error updating balance: {e}")
-
 
 
 if __name__ == '__main__':
