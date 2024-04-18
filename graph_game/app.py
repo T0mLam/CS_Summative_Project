@@ -161,6 +161,7 @@ class Register(tk.Frame):
             self.parent.current_player = username
             self.parent.current_balance = 100
             self.parent.frames['leaderboard'].search_engine.fetch_all_users_to_trie()
+            self.parent.frames['leaderboard'].update_all_players()
             self.parent.switch_frame('register', 'menu')
         else:
             messagebox.showinfo("Error", "Passwords do not match.")
@@ -274,6 +275,10 @@ class Leaderboard(tk.Frame):
         # Call the function to set the values in the table
         self.update_treeview()
 
+    def update_all_players(self):
+        self.players = self.search_engine.get_leaders(100)
+        self.update_treeview()
+
     def update_treeview(self):
         # Delete all previous data in the treeview
         self.tree.delete(*self.tree.get_children())
@@ -366,7 +371,6 @@ class PlayerHistory(tk.Frame):
         if history:
             # Insert history into treeview
             for bid, start, end, outcome, score, entry_date in history:
-                print(entry_date)
                 self.history_tree.insert("", "end", values=(bid, start, end, outcome, score))
     
 class Play(tk.Frame):
