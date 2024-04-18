@@ -160,7 +160,7 @@ class Trie:
         if not isinstance(num_return, int) or num_return < 1:
             raise ValueError("The input parameter 'num_return' must be a positive integer")
         '''
-        Intuition: using a 2d matrix to find the the Levenshtein distance between 2 strings
+        Method: using a 2d matrix to find the the Levenshtein distance between 2 strings
         e.g.
 
             k a t e
@@ -172,6 +172,7 @@ class Trie:
         x: target_word
         y: possible combination in trie
 
+        Steps:
         1. First fill the first row with range(len(target_word))
         2. Iterate through the rows from left to right
         3. For each grid, if the letter of the target word != the letter of the combination,
@@ -179,11 +180,16 @@ class Trie:
             Otherwise, just take the value of the top left grid (the previous cost) without adding 1.
         4. The difference between the 2 words will be grid[len(target_word)][len(combination)]
     
+        Results:
         Difference between 'kate' and 'cat' = 2 (grid[4, 3])
         - Replace c by k and insert e
 
         Difference between 'kat' and 'ca' = 2 (grid[3, 2])
         - Replace c by k and insert t
+
+        As this algorithm performs dfs on the trie while completing the grid, 
+        new character will be added to the y-axis in every iteration. 
+        We just have to keep track of the previous row and the current row of characters.
         '''
         # Use a minheap to extract words with the lower difference
         heap = MinHeap()
@@ -209,23 +215,31 @@ class Trie:
                 if word[col - 1].lower() == letter.lower():
                     curr_row.append(prev_row[col - 1])
                     continue
-            
+                
+                # Otherwise calculate each cost of the 3 grids at the 3 directions
                 replace_cost = prev_row[col - 1] + 1
                 insert_cost = curr_row[col - 1] + 1
                 delete_cost = prev_row[col] + 1
 
+                # Append the minimum cost to the curr_row
                 curr_row.append(min(replace_cost, insert_cost, delete_cost))
 
+            # If the last value of the row is less than the threshold
+            # and it is a word stored in the trie, push the word along with the Levenshtein distance to the heap 
             if curr_row[-1] <= threshold and node.end_of_word:
                 heap.push((curr_row[-1], curr_str))
 
+            # If the minimum value of the row has not exceeded the threshold, 
+            # it is possible that adding additional characters to the end of the word will still be valid
             if min(curr_row) <= threshold:
                 for child in node.children:
                     dfs(node.children[child], child, curr_str, curr_row)
 
+        # Start the recursion from every child of the trie root
         for child in root.children:
             dfs(root.children[child], child, '', curr_row)
 
+        # Pop the words with the lowest Levenshtein distance from the heap and return
         while len(heap) and num_return:
             res.append(heap.pop()[1])
             num_return -= 1
