@@ -63,6 +63,7 @@ def log_game(username, bid, start, end, outcome, score):
     except sqlite3.Error as e:
         print(f"Error logging game: {e}")
 
+
 def get_player_history(username):
     """Extract the game history of a player."""
     try:
@@ -74,6 +75,7 @@ def get_player_history(username):
         return records
     except sqlite3.Error as e:
         print(f"Error fetching records: {e}")
+
 
 def authenticate(username, password):
     """Authenticate the user based on provided username and password."""
@@ -91,6 +93,7 @@ def authenticate(username, password):
     except sqlite3.Error as e:
         print(f"Error authenticating user: {e}")
         return False
+    
     
 def update_balance(username, new_balance):
     """Update the balance of a player."""
