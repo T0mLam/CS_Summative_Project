@@ -373,6 +373,7 @@ class PlayerHistory(tk.Frame):
             for bid, start, end, outcome, score, entry_date in history:
                 self.history_tree.insert("", "end", values=(bid, start, end, outcome, score))
     
+    
 class Play(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
