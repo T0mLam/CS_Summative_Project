@@ -109,6 +109,7 @@ class Login(tk.Frame):
             name, balance = user
             self.parent.current_player = name
             self.parent.current_balance = balance
+            self.parent.frames['history'].load_player_history()
             self.parent.frames['play'].update_max_bid()
             self.parent.switch_frame('login', 'menu')
         else:
