@@ -1,10 +1,10 @@
 import unittest
 from unittest.mock import MagicMock, patch
+
 from graph_game.search_engine.search_engine import SearchEngine
 
 
 class TestSearchEngine(unittest.TestCase):
-
     def setUp(self):
         """Set up test fixtures"""
         self.search_engine = SearchEngine()
@@ -39,7 +39,6 @@ class TestSearchEngine(unittest.TestCase):
         self.assertRaises(ValueError, self.search_engine.get_leaders, 0)
 
     def test_fetch_all_users_to_trie(self):
-
         """Test the fetch_all_users_to_trie method"""
         self.search_engine.trie = None
         self.trie = MagicMock()
