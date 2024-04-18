@@ -32,6 +32,7 @@ class Graph:
         generate_random_edges: Generate a random number of weighted edges.
         add_edge_to_graph: Add an edge with random weight to the graph.
         shortest_path: Find the shortest path between 2 nodes.
+        graph_visualize: Graphical visualization of the graph using matplotlib libary for testing.
     """
 
     def __init__(self,
