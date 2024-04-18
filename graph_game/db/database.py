@@ -42,6 +42,18 @@ def initialize_database():
         print(f"Error initializing database: {e}")
 
 
+def registered(username):
+    """Check whether the player has registered an account."""
+    try:
+        with DatabaseConnection('db') as connection:
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM players WHERE username = ?", (username,))
+            player = cursor.fetchone()
+        return bool(player)
+    except sqlite3.Error as e:
+        print(f"Error validating player's registration status: {e}")
+
+
 def register_player(username, password, initial_balance):
     """Register a new player in the database."""
     try:

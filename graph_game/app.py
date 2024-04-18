@@ -7,7 +7,7 @@ import pygame
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from .db.database import authenticate, get_player_history, initialize_database, log_game, register_player, update_balance
+from .db.database import authenticate, get_player_history, initialize_database, log_game, registered, register_player, update_balance
 from .game_logic import GraphGame
 from .search_engine.search_engine import SearchEngine
 # To run app.py, enter 'python3 -m graph_game.app' in terminal.
@@ -49,7 +49,7 @@ class GraphGameGUI(tk.Tk):
             'login': Login(self),
             'register': Register(self),
             'leaderboard' : Leaderboard(self),
-            'history' : Player_History(self)
+            'history' : PlayerHistory(self)
         }
 
         # Show main menu frame
@@ -154,6 +154,9 @@ class Register(tk.Frame):
             messagebox.showinfo("Error", "Please fill in all the information.")
             return
         if password == password_repeat:
+            if registered(username):
+                messagebox.showinfo("Error", "The account has been registered.")
+                return 
             register_player(username, password, 100)
             self.parent.current_player = username
             self.parent.current_balance = 100
@@ -304,7 +307,7 @@ class Leaderboard(tk.Frame):
         self.update_treeview()
 
 
-class Player_History(tk.Frame):
+class PlayerHistory(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
