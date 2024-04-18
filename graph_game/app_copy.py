@@ -10,7 +10,7 @@ from tkinter import messagebox, ttk
 from .db.database import authenticate, initialize_database, register_player, update_balance
 from .game_logic import GraphGame
 from .search_engine.search_engine import SearchEngine
-# To run app.py, enter 'python3 -m graph_game.app_copy' in terminal.
+# To run app.py, enter 'python3 -m graph_game.app' in terminal.
 
 
 class GraphGameGUI(tk.Tk):
@@ -69,6 +69,8 @@ class GraphGameGUI(tk.Tk):
         self.update_idletasks()
         # Restore the window size
         self.geometry('800x600')
+
+        self.frames[current_frame].pack_forget()
         # Show the main menu frame
         self.frames[new_frame].pack(fill='both', expand=True)
         
@@ -138,8 +140,8 @@ class Register(tk.Frame):
         self.register_Button = tk.Button(self, text='Register', font='Helvetica 30', bg='white', command=self.register)
         self.register_Button.place(relx=0.5, rely=0.6, anchor='center')
 
-        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=lambda: self.parent.switch_frame('register', 'login'))
-        self.login_Button.place(relx=0.5, rely=0.7, anchor='center')
+        self.login_Button = tk.Button(self, text='Login', font='Helvetica 30', bg='white', command=lambda: parent.switch_frame('register', 'login'))
+        self.login_Button.pack(pady=(0,160),side=tk.BOTTOM)
         
     def register(self):
         username = self.username_Entry.get()
@@ -152,6 +154,7 @@ class Register(tk.Frame):
             register_player(username, password, 100)
             self.parent.current_player = username
             self.parent.current_balance = 100
+            self.parent.frames['leaderboard'].search_engine.fetch_all_users_to_trie()
             self.parent.switch_frame('register', 'menu')
         else:
             messagebox.showinfo("Error", "Passwords do not match.")
@@ -189,7 +192,7 @@ class MainMenu(tk.Frame):
         # Quit Button
         logout_button = tk.Button(self, text='Logout', command=lambda: self.parent.switch_frame('menu', 'login'), bg='white', fg='black', font='Helvetica, 40', width=10)
         # command=self.master.quit)
-        logout_button.place(relx=0.5, rely=0.75, anchor='center')
+        logout_button.pack(pady=(0,120),side=tk.BOTTOM)
 
         # Soundtrack Switch
         soundtrack_switch = tk.Checkbutton(self, text='Music', var=self.parent.soundtrack_state,
@@ -222,16 +225,14 @@ class Leaderboard(tk.Frame):
                              image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
 
-        # Search Entry
-        self.search_entry = tk.Entry(self, font=('Helvetica', 30))
-        self.search_entry.insert(0, "Search")
-        # Place the search text inside the Entry if the user does not use it 
-        self.search_entry.bind("<FocusIn>", self.Text_search_if_empty)
-        self.search_entry.bind("<FocusOut>", self.Text_search_if_empty_focus_out)
+        self.words_for_autocompletion = []
+        # Search entry combobox
+        self.search_entry = ttk.Combobox(self, values=self.words_for_autocompletion) 
+        self.search_entry.bind("<FocusIn>", self.text_search_if_empty)  
+        self.search_entry.bind("<FocusOut>", self.text_search_if_empty_focus_out)
         # Bind the command to the entry if the key is released 
-        self.search_entry.bind("<KeyRelease>", self.Searching)  
-        self.search_entry.pack(side="top", padx=20, pady=(40, 0))
-
+        self.search_entry.bind("<KeyRelease>", self.searching)
+        self.search_entry.pack(side="top", padx=20, pady=(40, 0))  
         # Leaderboard Table: 
 
         # Create a treeview widget for the table
@@ -273,26 +274,30 @@ class Leaderboard(tk.Frame):
         for i, row in enumerate(self.players):
             self.tree.insert("", "end", values=(i + 1, *row), tags=("Treeview.Row", "Treeview", "Treeview.Heading"))
 
-    def Text_search_if_empty(self, event):
+    def text_search_if_empty(self, event):
         if self.search_entry.get() == "Search":
             self.search_entry.delete(0, tk.END)
 
-    def Text_search_if_empty_focus_out(self, event):
+    def text_search_if_empty_focus_out(self, event):
         if not self.search_entry.get():
             self.search_entry.insert(0, "Search")
 
-    def Searching(self, event):
+    def searching(self, event):
         # Set the search text to lower letters for a more comfortabel search
-        search_text = self.search_entry.get().strip().lower()
+        #search_text = self.search_entry.get().strip().lower()
+        search_text = self.search_entry.get().strip()
+        # Search for the list of words for autocompletion
+        self.words_for_autocompletion = self.search_engine.complete_search(search_text)
+        self.search_entry.config(values=self.words_for_autocompletion[:5])
         # If the search is empty, show all players 
         if not search_text or search_text == "search": 
             self.players = self.search_engine.get_leaders(100)
         else:
             # Show the only players whose name starts with the letters in the search_entry
-            self.players = [player for player in self.search_engine.get_leaders(100) if player[0].lower().startswith(search_text)]
+            #self.players = [player for player in self.search_engine.get_leaders(100) if player[0].lower().startswith(search_text)]
+            self.players = self.search_engine.search_results(search_text)
         # Update the table to see changes
         self.update_treeview()
-
 
 
 class Play(tk.Frame):
@@ -435,9 +440,6 @@ class Play(tk.Frame):
             self.game.generate_cutoff()
             self.update_plot(with_node_scores=True)
 
-            # Update the generated distance label of the game 
-            self.generated_distance_variable.set('Generated distance: ' + str(self.game.cutoff_distance))
-
     def update_plot(self, with_node_scores=False, result=False):
         # Create a matplotlib figure
         self.fig = Figure(figsize=(3,3), dpi=200)
@@ -474,8 +476,10 @@ class Play(tk.Frame):
                                     labels=node_to_dist,
                                     font_size=4, 
                                     font_weight='bold')
+            
+            # Expand the graph to accomodate the score labels
+            self.ax.set_ylim(tuple(i*1.2 for i in self.ax.get_ylim()))
         
-        # If the labels exist - draw them
         if result:
             # Find the shortest distance between the starting node and the ending node
             shortest_dist = self.game.shortest_path(self.game.starting_node, self.game.ending_node)
@@ -563,10 +567,16 @@ class Play(tk.Frame):
             self.ending_node_combobox.set('')
             self.bid_scale.set(0)
             self.bid_scale['state'] = 'disabled' 
+
+            # Update the generated distance label of the game 
+            self.generated_distance_variable.set('Generated distance: ' + str(self.game.cutoff_distance))
             
             self.parent.current_balance += score
             # Update player's balance in db ...
             update_balance(self.parent.current_player, self.parent.current_balance)
+
+            # Update the leaderboard
+            self.parent.frames['leaderboard'].searching(event=None)
 
         else:
             self.bet_button.config(text="Play Again")
@@ -595,7 +605,7 @@ class Play(tk.Frame):
             self.generated_distance_variable.set('Generated distance: -')        
 
         self.update_max_bid()
-        
+
         player_history_path = os.path.join("graph_game/db", "Player_History.txt")
         with open(player_history_path, "a") as file:
                 file.write(f"{self.parent.current_player} Bid: {bid_amount} Starting node: {starting_node} Ending node: {ending_node} Win: {self.game.check_player_wins()} Score: {score}\n")
