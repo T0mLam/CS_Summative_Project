@@ -159,22 +159,53 @@ class Trie:
             raise ValueError("The input parameter 'threshold' must be a non-negative integer")
         if not isinstance(num_return, int) or num_return < 1:
             raise ValueError("The input parameter 'num_return' must be a positive integer")
+        '''
+        Intuition: using a 2d matrix to find the the Levenshtein distance between 2 strings
+        e.g.
 
+            k a t e
+          0 1 2 3 4
+        c 1 1 2 3 4
+        a 2 2 1 2 3
+        t 3 3 2 1 2
+
+        x: target_word
+        y: possible combination in trie
+
+        1. First fill the first row with range(len(target_word))
+        2. Iterate through the rows from left to right
+        3. For each grid, if the letter of the target word != the letter of the combination,
+            compute the lowest cost by taking the lowest values at the top left, left and the grid above + 1.
+            Otherwise, just take the value of the top left grid (the previous cost) without adding 1.
+        4. The difference between the 2 words will be grid[len(target_word)][len(combination)]
+    
+        Difference between 'kate' and 'cat' = 2 (grid[4, 3])
+        - Replace c by k and insert e
+
+        Difference between 'kat' and 'ca' = 2 (grid[3, 2])
+        - Replace c by k and insert t
+        '''
+        # Use a minheap to extract words with the lower difference
         heap = MinHeap()
         root = self.root
         res = []
+        # Create the first row of the 2d matrix
         curr_row = range(len(word) + 1)
 
         def dfs(node: type[TrieNode],
                 letter: str,
                 curr_str: str,
                 prev_row: int) -> None:
+            # Add the new letter to the string storing the combination
             curr_str += letter
 
             cols = len(word) + 1
+            # Create the first value of the new row
             curr_row = [prev_row[0] + 1]
 
             for col in range(1, cols):
+                # Add the value of the top left grid to curr_row 
+                # if the combination and target share the same letter 
                 if word[col - 1].lower() == letter.lower():
                     curr_row.append(prev_row[col - 1])
                     continue
