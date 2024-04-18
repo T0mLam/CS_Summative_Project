@@ -318,37 +318,53 @@ class Player_History(tk.Frame):
         self.back_button = tk.Button(self, command=lambda: self.parent.switch_frame('history', 'menu'),
                              image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
-        # History Laber
-        self.history_label = tk.Label(self, text = "History", font= "Helvetica, 60", background= "white")
-        self.history_label.place(relx=0.5, rely=0.1, anchor='center')
+        # History Label
+        self.history_label = tk.Label(self, text="History", font="Helvetica, 60", background="white")
+        self.history_label.place(relx=0.5, rely=0.05, anchor='center')
     
-        # Create the text box for storing the history of the playeer
-        self.history_text = tk.Text(self, 
-                                    width = 50, 
-                                    height = 15,
-                                    font = 'Helvetica, 20',
-                                    state='normal')
+        # Create the treeview for storing the history of the player
+        self.history_tree = ttk.Treeview(self, columns=("Bid", "Start Node", "End Node", "Outcome", "Score"), 
+                                         show="headings")
         
-        # Set the scrollbar for the text box
-        self.history_text_vertical_scrollbar = tk.Scrollbar(self)
-        self.history_text_vertical_scrollbar.config(command=self.history_text.yview)
-        self.history_text.config(yscrollcommand=self.history_text_vertical_scrollbar.set)
+        # Set column headings
+        self.history_tree.heading("Bid", text="Bid")
+        self.history_tree.heading("Start Node", text="Starting Node")
+        self.history_tree.heading("End Node", text="Ending Node")
+        self.history_tree.heading("Outcome", text="Outcome")
+        self.history_tree.heading("Score", text="Score")
+        
+        # Set column widths
+        self.history_tree.column("Bid", width=50)
+        self.history_tree.column("Start Node", width=150)
+        self.history_tree.column("End Node", width=150)
+        self.history_tree.column("Outcome", width=60)
+        self.history_tree.column("Score", width=40)
+        
+        # set font size
+        self.history_tree.tag_configure("Treeview", font=("Helvetica", 10))
+        self.history_tree.tag_configure("Treeview.Heading", font=("Helvetica", 10))
 
+        # Add scrollbar
+        self.history_tree_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.history_tree.yview)
+        self.history_tree.configure(yscrollcommand=self.history_tree_scrollbar.set)
+        
+        self.history_tree.pack(side="top", padx=10, pady=10, fill="both", expand=True)
+        self.history_tree_scrollbar.pack(side="right", fill="y")
+
+        # Load player history
         self.load_player_history()
-        self.history_text.config(state='disabled') 
-
-        # Place the history text box
-        self.history_text.place(relx=0.5, rely=0.5, anchor='center')
 
     def load_player_history(self):
+        # Clear existing data
+        for item in self.history_tree.get_children():
+            self.history_tree.delete(item)
+        
+        # Get player history
         history = get_player_history(self.parent.current_player) 
-        if not history:
-            return
-        for bid, start, end, outcome, score in history:
-            line = f'Bid: {bid} Starting node: {start} Ending node: {end} Outcome: {outcome} Score: {score}\n'
-            self.history_text.config(state='normal')  
-            self.history_text.insert(tk.END, line)
-            self.history_text.config(state='disabled') 
+        if history:
+            # Insert history into treeview
+            for bid, start, end, outcome, score in history:
+                self.history_tree.insert("", "end", values=(bid, start, end, outcome, score))
 
     
 class Play(tk.Frame):
