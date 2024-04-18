@@ -48,7 +48,8 @@ class GraphGameGUI(tk.Tk):
             'lose': Lose(self),
             'login': Login(self),
             'register': Register(self),
-            'leaderboard' : Leaderboard(self)
+            'leaderboard' : Leaderboard(self),
+            'history' : Player_History(self)
         }
 
         # Show main menu frame
@@ -177,15 +178,16 @@ class MainMenu(tk.Frame):
         title.place(relx=0.5, rely=0.12, anchor='center')
 
         # How To Play Button
-        how_to_play_button = tk.Button(self, text='How To Play', bg='white', fg='black',
-                                    font='Helvetica, 40', width=10)
+        history_Button = tk.Button(self, text='History', bg='white', fg='black',
+                                    font='Helvetica, 40', width=10,
+                                    command = lambda: self.parent.switch_frame('menu', 'history'))
         # command=self.show_how_to_play_frame)
-        how_to_play_button.place(relx=0.5, rely=0.45, anchor='center')
+        history_Button.place(relx=0.5, rely=0.45, anchor='center')
 
         # Leaderboard Button
         leaderboard_button = tk.Button(self, text='Leaderboard', bg='white', fg='black',
-                                     font='Helvetica, 40', width=10,
-                                     command = lambda: self.parent.switch_frame('menu', 'leaderboard'))
+                                    font='Helvetica, 40', width=10,
+                                    command = lambda: self.parent.switch_frame('menu', 'leaderboard'))
         # command=self.show_leaderboard_frame)
         leaderboard_button.place(relx=0.5, rely=0.6, anchor='center')
 
@@ -299,6 +301,61 @@ class Leaderboard(tk.Frame):
         # Update the table to see changes
         self.update_treeview()
 
+class Player_History(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+        # Set the background color to white        
+        self.configure(bg="white")
+        
+        # Put the back arrow image for the button
+        self.back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
+        # Make the image 10 times smaller
+        self.resized_back_image = self.back_image.subsample(10, 10) 
+        # Back Button 
+        self.back_button = tk.Button(self, command=lambda: self.parent.switch_frame('history', 'menu'),
+                             image=self.resized_back_image, background="white")
+        self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
+        # History Laber
+        self.history_label = tk.Label(self, text = "History", font= "Helvetica, 60", background= "white")
+        self.history_label.place(relx=0.5, rely=0.1, anchor='center')
+    
+        # Create the text box for storing the history of the playeer
+        self.history_text = tk.Text(self, 
+                                    width = 50, 
+                                    height = 15,
+                                    font = 'Helvetica, 20',
+                                    state= 'normal')
+        
+        # Set the scrollbar for the text box
+        self.history_text_vertical_scrollbar = tk.Scrollbar(self)
+        self.history_text_vertical_scrollbar.config(command=self.history_text.yview)
+        self.history_text.config(yscrollcommand=self.history_text_vertical_scrollbar.set)
+
+        #self.load_player_history()
+        self.history_text.insert(tk.END,"Text")
+        
+        # Set the text box so it can be only readable
+        self.history_text.config(state='disabled')
+        # Place the history text box
+        self.history_text.place(relx=0.5, rely=0.5, anchor='center')
+
+    """
+    def load_player_history(self):
+        # Get the directory of the Player history file in the database
+        player_history_path = os.path.join("graph_game/db", "Player_History.txt")
+        # Open the file for read
+        with open(player_history_path, "r") as file:
+            # Check if the line contains the name of the user
+            for line in file:
+                if self.parent.current_player in line:
+                    # Print the line in the textbox
+                    self.history_text.insert(tk.END, line)
+    """
+    
+    
+    
 
 class Play(tk.Frame):
     def __init__(self, parent):
@@ -325,15 +382,6 @@ class Play(tk.Frame):
                              image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
 
-        # Put the back arrow image for the button
-        self.buy_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/shopping_cart.png")
-        # Make the image 10 times smaller
-        self.resized_buy_image = self.buy_image.subsample(10, 10)
-
-        # Button for buying credits
-        self.buy_button = tk.Button(self, command=lambda: parent.switch_frame('play', 'lose'),
-                            image=self.resized_buy_image, background="white")
-        self.buy_button.pack(side="top", anchor="ne", padx=10, pady=10)
 
         #Label with the balance and balance wariable
         self.balance_label = tk.Label(self, text='', bg='white', fg='black', font='Helvetica, 20')
