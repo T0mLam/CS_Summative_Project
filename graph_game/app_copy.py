@@ -7,7 +7,7 @@ import pygame
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from .db.database import authenticate, initialize_database, register_player, update_balance
+from .db.database import authenticate, get_player_history, initialize_database, log_game, register_player, update_balance
 from .game_logic import GraphGame
 from .search_engine.search_engine import SearchEngine
 # To run app.py, enter 'python3 -m graph_game.app' in terminal.
@@ -48,7 +48,8 @@ class GraphGameGUI(tk.Tk):
             'lose': Lose(self),
             'login': Login(self),
             'register': Register(self),
-            'leaderboard' : Leaderboard(self)
+            'leaderboard' : Leaderboard(self),
+            'history' : Player_History(self)
         }
 
         # Show main menu frame
@@ -177,15 +178,16 @@ class MainMenu(tk.Frame):
         title.place(relx=0.5, rely=0.12, anchor='center')
 
         # How To Play Button
-        how_to_play_button = tk.Button(self, text='How To Play', bg='white', fg='black',
-                                    font='Helvetica, 40', width=10)
+        history_Button = tk.Button(self, text='History', bg='white', fg='black',
+                                    font='Helvetica, 40', width=10,
+                                    command = lambda: self.parent.switch_frame('menu', 'history'))
         # command=self.show_how_to_play_frame)
-        how_to_play_button.place(relx=0.5, rely=0.45, anchor='center')
+        history_Button.place(relx=0.5, rely=0.45, anchor='center')
 
         # Leaderboard Button
         leaderboard_button = tk.Button(self, text='Leaderboard', bg='white', fg='black',
-                                     font='Helvetica, 40', width=10,
-                                     command = lambda: self.parent.switch_frame('menu', 'leaderboard'))
+                                    font='Helvetica, 40', width=10,
+                                    command = lambda: self.parent.switch_frame('menu', 'leaderboard'))
         # command=self.show_leaderboard_frame)
         leaderboard_button.place(relx=0.5, rely=0.6, anchor='center')
 
@@ -300,6 +302,55 @@ class Leaderboard(tk.Frame):
         self.update_treeview()
 
 
+class Player_History(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+        # Set the background color to white        
+        self.configure(bg="white")
+        
+        # Put the back arrow image for the button
+        self.back_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/back_arrow.png")
+        # Make the image 10 times smaller
+        self.resized_back_image = self.back_image.subsample(10, 10) 
+        # Back Button 
+        self.back_button = tk.Button(self, command=lambda: self.parent.switch_frame('history', 'menu'),
+                             image=self.resized_back_image, background="white")
+        self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
+        # History Laber
+        self.history_label = tk.Label(self, text = "History", font= "Helvetica, 60", background= "white")
+        self.history_label.place(relx=0.5, rely=0.1, anchor='center')
+    
+        # Create the text box for storing the history of the playeer
+        self.history_text = tk.Text(self, 
+                                    width = 50, 
+                                    height = 15,
+                                    font = 'Helvetica, 20',
+                                    state='normal')
+        
+        # Set the scrollbar for the text box
+        self.history_text_vertical_scrollbar = tk.Scrollbar(self)
+        self.history_text_vertical_scrollbar.config(command=self.history_text.yview)
+        self.history_text.config(yscrollcommand=self.history_text_vertical_scrollbar.set)
+
+        self.load_player_history()
+        self.history_text.config(state='disabled') 
+
+        # Place the history text box
+        self.history_text.place(relx=0.5, rely=0.5, anchor='center')
+
+    def load_player_history(self):
+        history = get_player_history(self.parent.current_player) 
+        if not history:
+            return
+        for bid, start, end, outcome, score in history:
+            line = f'Bid: {bid} Starting node: {start} Ending node: {end} Outcome: {outcome} Score: {score}\n'
+            self.history_text.config(state='normal')  
+            self.history_text.insert(tk.END, line)
+            self.history_text.config(state='disabled') 
+
+    
 class Play(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -325,15 +376,7 @@ class Play(tk.Frame):
                              image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
 
-        # Put the back arrow image for the button
-        self.buy_image = tk.PhotoImage(file=os.path.dirname(__file__) + "/images/shopping_cart.png")
-        # Make the image 10 times smaller
-        self.resized_buy_image = self.buy_image.subsample(10, 10)
-
-        # Button for buying credits
-        self.buy_button = tk.Button(self, command=lambda: parent.switch_frame('play', 'lose'),
-                            image=self.resized_buy_image, background="white")
-        self.buy_button.pack(side="top", anchor="ne", padx=10, pady=10)
+        
 
         #Label with the balance and balance wariable
         self.balance_label = tk.Label(self, text='', bg='white', fg='black', font='Helvetica, 20')
@@ -393,6 +436,8 @@ class Play(tk.Frame):
 
         self.canvas = tk.Canvas(self, width=530, height=480, bg="white")
         self.canvas.place(relx=0.34, rely=0.59, anchor='center')
+
+        
 
         self.update_plot()
 
@@ -510,6 +555,7 @@ class Play(tk.Frame):
         if self.game_started == True:
             # Create the variable that states if all parameters are selected
             all_inputs_valid = True
+        
 
             # Get the value of the bid 
             bid_amount = self.bid_scale.get()
@@ -545,7 +591,8 @@ class Play(tk.Frame):
             # If all inputs are valid -> proceed with the game logic
             if all_inputs_valid:
                 score = self.game.get_player_score()
-                
+
+
                 if(self.game.check_player_wins() == True):
                     self.parent.frames['win'].amount_of_winning_variable.set("Amount of winning: " + str(score))
                     self.parent.switch_frame('play', 'win')
@@ -580,6 +627,7 @@ class Play(tk.Frame):
 
         else:
             self.bet_button.config(text="Play Again")
+
             self.game = GraphGame.random_start()
             self.update_plot(result=False)  
             self.game_started = True
@@ -604,12 +652,21 @@ class Play(tk.Frame):
             # Update the generated distance label of the game 
             self.generated_distance_variable.set('Generated distance: -')        
 
-        self.update_max_bid()
+            if(self.parent.current_balance < 1):
+                tk.messagebox.showinfo(title="Broke", message="Your balance is less than 1, here are 50 extra score")
+                self.parent.current_balance = 50
 
+        self.update_max_bid()
+        """
         player_history_path = os.path.join("graph_game/db", "Player_History.txt")
         with open(player_history_path, "a") as file:
                 file.write(f"{self.parent.current_player} Bid: {bid_amount} Starting node: {starting_node} Ending node: {ending_node} Win: {self.game.check_player_wins()} Score: {score}\n")
-            
+        """  
+        outcome = 'win' if self.game.check_player_wins() else 'loss'
+        log_game(self.parent.current_player, int(bid_amount), int(starting_node), int(ending_node), outcome, score)
+
+        self.parent.frames['history'].load_player_history()
+
 
 class Win(tk.Frame):
     def __init__(self, parent):
