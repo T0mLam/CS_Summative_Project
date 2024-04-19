@@ -312,7 +312,7 @@ class Leaderboard(tk.Frame):
         self.update_treeview()
 
 
-class Player_History(tk.Frame):
+class PlayerHistory(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
