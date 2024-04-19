@@ -173,41 +173,32 @@ class MainMenu(tk.Frame):
         self.configure(bg="white")
         self.parent = parent
 
-        # Play button
-        play_button = tk.Button(self, text="Play", command=lambda: self.parent.switch_frame('menu', 'play')
-                             , bg='white', fg='black',
-                             font='Helvetica, 40', width=10)
-        play_button.place(relx=0.5, rely=0.3, anchor='center')
-
         # Title
         title = tk.Label(self, text="Graph Game", font=('Helvetica', 60), bg='white')
-        title.place(relx=0.5, rely=0.12, anchor='center')
+        title.pack(pady=(50,20),side=tk.TOP)
+
+        # Play button
+        play_button = tk.Button(self, text="Play", command=lambda: self.parent.switch_frame('menu', 'play'),
+                                bg='white', fg='black', font='Helvetica, 40', width=10)
+        play_button.pack(pady = 10, side = tk.TOP)
+
 
         # How To Play Button
         history_Button = tk.Button(self, text='History', bg='white', fg='black',
-                                    font='Helvetica, 40', width=10,
-                                    command = lambda: self.parent.switch_frame('menu', 'history'))
-        # command=self.show_how_to_play_frame)
-        history_Button.place(relx=0.5, rely=0.45, anchor='center')
+                                   font='Helvetica, 40', width=10,
+                                   command=lambda: self.parent.switch_frame('menu', 'history'))
+        history_Button.pack(pady= 10)
 
         # Leaderboard Button
         leaderboard_button = tk.Button(self, text='Leaderboard', bg='white', fg='black',
-                                    font='Helvetica, 40', width=10,
-                                    command = lambda: self.parent.switch_frame('menu', 'leaderboard'))
-        # command=self.show_leaderboard_frame)
-        leaderboard_button.place(relx=0.5, rely=0.6, anchor='center')
+                                       font='Helvetica, 40', width=10,
+                                       command=lambda: self.parent.switch_frame('menu', 'leaderboard'))
+        leaderboard_button.pack(pady=10)
 
         # Quit Button
-        logout_button = tk.Button(self, text='Logout', command=lambda: self.parent.switch_frame('menu', 'login'), bg='white', fg='black', font='Helvetica, 40', width=10)
-        # command=self.master.quit)
-        logout_button.pack(pady=(0,120),side=tk.BOTTOM)
-
-        # Soundtrack Switch
-        soundtrack_switch = tk.Checkbutton(self, text='Music', var=self.parent.soundtrack_state,
-                                           command=self.parent.switch_soundtrack,
-                                           onvalue=True, offvalue=False,
-                                           bg='white', font='Helvetica, 20')
-        soundtrack_switch.place(relx=0.93, rely=0.95, anchor='center')
+        logout_button = tk.Button(self, text='Logout', command=lambda: self.parent.switch_frame('menu', 'login'),
+                                  bg='white', fg='black', font='Helvetica, 40', width=10)
+        logout_button.pack(pady=10)
 
 
 class Leaderboard(tk.Frame):
@@ -457,7 +448,7 @@ class Play(tk.Frame):
                                font='Helvetica, 25',
                                width=10,
                                command=self.bet_start_game)
-        self.bet_button.place(relx=0.86, rely=0.9, anchor='center')
+        self.bet_button.pack(padx = (550,0), pady= (0,30), side = tk.BOTTOM)
 
         self.canvas = tk.Canvas(self, width=530, height=480, bg="white")
         self.canvas.place(relx=0.34, rely=0.59, anchor='center')

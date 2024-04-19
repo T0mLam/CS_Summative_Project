@@ -7,7 +7,7 @@ import pygame
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from .db.database import authenticate, get_player_history, initialize_database, log_game, register_player, update_balance
+from .db.database import authenticate, get_player_history, initialize_database, log_game, registered, register_player, update_balance
 from .game_logic import GraphGame
 from .search_engine.search_engine import SearchEngine
 # To run app.py, enter 'python3 -m graph_game.app' in terminal.
@@ -49,7 +49,7 @@ class GraphGameGUI(tk.Tk):
             'login': Login(self),
             'register': Register(self),
             'leaderboard' : Leaderboard(self),
-            'history' : Player_History(self)
+            'history' : PlayerHistory(self)
         }
 
         # Show main menu frame
@@ -109,6 +109,8 @@ class Login(tk.Frame):
             name, balance = user
             self.parent.current_player = name
             self.parent.current_balance = balance
+            self.parent.frames['history'].load_player_history()
+            self.parent.frames['play'].update_max_bid()
             self.parent.switch_frame('login', 'menu')
         else:
             messagebox.showinfo("Error", "The player is not found.")
@@ -152,10 +154,14 @@ class Register(tk.Frame):
             messagebox.showinfo("Error", "Please fill in all the information.")
             return
         if password == password_repeat:
+            if registered(username):
+                messagebox.showinfo("Error", "The account has been registered.")
+                return 
             register_player(username, password, 100)
             self.parent.current_player = username
             self.parent.current_balance = 100
             self.parent.frames['leaderboard'].search_engine.fetch_all_users_to_trie()
+            self.parent.frames['leaderboard'].update_all_players()
             self.parent.switch_frame('register', 'menu')
         else:
             messagebox.showinfo("Error", "Passwords do not match.")
@@ -167,41 +173,32 @@ class MainMenu(tk.Frame):
         self.configure(bg="white")
         self.parent = parent
 
-        # Play button
-        play_button = tk.Button(self, text="Play", command=lambda: self.parent.switch_frame('menu', 'play')
-                             , bg='white', fg='black',
-                             font='Helvetica, 40', width=10)
-        play_button.place(relx=0.5, rely=0.3, anchor='center')
-
         # Title
         title = tk.Label(self, text="Graph Game", font=('Helvetica', 60), bg='white')
-        title.place(relx=0.5, rely=0.12, anchor='center')
+        title.pack(pady=(50,20),side=tk.TOP)
+
+        # Play button
+        play_button = tk.Button(self, text="Play", command=lambda: self.parent.switch_frame('menu', 'play'),
+                                bg='white', fg='black', font='Helvetica, 40', width=10)
+        play_button.pack(pady = 10, side = tk.TOP)
+
 
         # How To Play Button
         history_Button = tk.Button(self, text='History', bg='white', fg='black',
-                                    font='Helvetica, 40', width=10,
-                                    command = lambda: self.parent.switch_frame('menu', 'history'))
-        # command=self.show_how_to_play_frame)
-        history_Button.place(relx=0.5, rely=0.45, anchor='center')
+                                   font='Helvetica, 40', width=10,
+                                   command=lambda: self.parent.switch_frame('menu', 'history'))
+        history_Button.pack(pady= 10)
 
         # Leaderboard Button
         leaderboard_button = tk.Button(self, text='Leaderboard', bg='white', fg='black',
-                                    font='Helvetica, 40', width=10,
-                                    command = lambda: self.parent.switch_frame('menu', 'leaderboard'))
-        # command=self.show_leaderboard_frame)
-        leaderboard_button.place(relx=0.5, rely=0.6, anchor='center')
+                                       font='Helvetica, 40', width=10,
+                                       command=lambda: self.parent.switch_frame('menu', 'leaderboard'))
+        leaderboard_button.pack(pady=10)
 
         # Quit Button
-        logout_button = tk.Button(self, text='Logout', command=lambda: self.parent.switch_frame('menu', 'login'), bg='white', fg='black', font='Helvetica, 40', width=10)
-        # command=self.master.quit)
-        logout_button.pack(pady=(0,120),side=tk.BOTTOM)
-
-        # Soundtrack Switch
-        soundtrack_switch = tk.Checkbutton(self, text='Music', var=self.parent.soundtrack_state,
-                                           command=self.parent.switch_soundtrack,
-                                           onvalue=True, offvalue=False,
-                                           bg='white', font='Helvetica, 20')
-        soundtrack_switch.place(relx=0.93, rely=0.95, anchor='center')
+        logout_button = tk.Button(self, text='Logout', command=lambda: self.parent.switch_frame('menu', 'login'),
+                                  bg='white', fg='black', font='Helvetica, 40', width=10)
+        logout_button.pack(pady=10)
 
 
 class Leaderboard(tk.Frame):
@@ -269,6 +266,10 @@ class Leaderboard(tk.Frame):
         # Call the function to set the values in the table
         self.update_treeview()
 
+    def update_all_players(self):
+        self.players = self.search_engine.get_leaders(100)
+        self.update_treeview()
+
     def update_treeview(self):
         # Delete all previous data in the treeview
         self.tree.delete(*self.tree.get_children())
@@ -302,7 +303,7 @@ class Leaderboard(tk.Frame):
         self.update_treeview()
 
 
-class Player_History(tk.Frame):
+class PlayerHistory(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
@@ -319,11 +320,11 @@ class Player_History(tk.Frame):
                              image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
         # History Label
-        self.history_label = tk.Label(self, text="History", font="Helvetica, 60", background="white")
+        self.history_label = tk.Label(self, text="History", font="Helvetica 60", background="white")
         self.history_label.place(relx=0.5, rely=0.05, anchor='center')
     
         # Create the treeview for storing the history of the player
-        self.history_tree = ttk.Treeview(self, columns=("Bid", "Start Node", "End Node", "Outcome", "Score"), 
+        self.history_tree = ttk.Treeview(self, columns=("Bid", "Start Node", "End Node", "Outcome", "Score", "Date"), 
                                          show="headings")
         
         # Set column headings
@@ -332,17 +333,21 @@ class Player_History(tk.Frame):
         self.history_tree.heading("End Node", text="Ending Node")
         self.history_tree.heading("Outcome", text="Outcome")
         self.history_tree.heading("Score", text="Score")
+        self.history_tree.heading("Date", text="Date")
         
         # Set column widths
-        self.history_tree.column("Bid", width=50)
-        self.history_tree.column("Start Node", width=150)
-        self.history_tree.column("End Node", width=150)
-        self.history_tree.column("Outcome", width=60)
-        self.history_tree.column("Score", width=40)
+        self.history_tree.column("Bid", width=40)
+        self.history_tree.column("Start Node", width=100)
+        self.history_tree.column("End Node", width=80)
+        self.history_tree.column("Outcome", width=50)
+        self.history_tree.column("Score", width=20)
+        self.history_tree.column("Date", width=150)
         
-        # set font size
-        self.history_tree.tag_configure("Treeview", font=("Helvetica", 10))
-        self.history_tree.tag_configure("Treeview.Heading", font=("Helvetica", 10))
+        # Change the font size 
+        self.style = ttk.Style()
+        self.style.configure("Treeview", font=('Helvetica', 20))
+        self.style.configure("Treeview.Heading", font=('Helvetica', 20))
+        self.style.configure("Treeview.Row", font=('Helvetica', 20))
 
         # Add scrollbar
         self.history_tree_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.history_tree.yview)
@@ -350,9 +355,6 @@ class Player_History(tk.Frame):
         
         self.history_tree.pack(side="top", padx=10, pady=10, fill="both", expand=True)
         self.history_tree_scrollbar.pack(side="right", fill="y")
-
-        # Load player history
-        self.load_player_history()
 
     def load_player_history(self):
         # Clear existing data
@@ -363,16 +365,16 @@ class Player_History(tk.Frame):
         history = get_player_history(self.parent.current_player) 
         if history:
             # Insert history into treeview
-            for bid, start, end, outcome, score in history:
-                self.history_tree.insert("", "end", values=(bid, start, end, outcome, score))
-
+            for bid, start, end, outcome, score, date in history:
+                print(date)
+                self.history_tree.insert("", "end", values=(bid, start, end, outcome, score, date))
+    
     
 class Play(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
         self.game = GraphGame.random_start()
-        self.game.set_base_score(100)
 
         # The variable for new game
         self.game_started = True
@@ -391,8 +393,6 @@ class Play(tk.Frame):
         self.back_button = tk.Button(self, command=lambda: parent.switch_frame('play', 'menu'),
                              image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
-
-        
 
         #Label with the balance and balance wariable
         self.balance_label = tk.Label(self, text='', bg='white', fg='black', font='Helvetica, 20')
@@ -448,12 +448,10 @@ class Play(tk.Frame):
                                font='Helvetica, 25',
                                width=10,
                                command=self.bet_start_game)
-        self.bet_button.place(relx=0.86, rely=0.9, anchor='center')
+        self.bet_button.pack(padx = (550,0), pady= (0,30), side = tk.BOTTOM)
 
         self.canvas = tk.Canvas(self, width=530, height=480, bg="white")
         self.canvas.place(relx=0.34, rely=0.59, anchor='center')
-
-        
 
         self.update_plot()
 
@@ -572,7 +570,6 @@ class Play(tk.Frame):
             # Create the variable that states if all parameters are selected
             all_inputs_valid = True
         
-
             # Get the value of the bid 
             bid_amount = self.bid_scale.get()
 
@@ -608,7 +605,6 @@ class Play(tk.Frame):
             if all_inputs_valid:
                 score = self.game.get_player_score()
 
-
                 if(self.game.check_player_wins() == True):
                     self.parent.frames['win'].amount_of_winning_variable.set("Amount of winning: " + str(score))
                     self.parent.switch_frame('play', 'win')
@@ -640,6 +636,11 @@ class Play(tk.Frame):
 
             # Update the leaderboard
             self.parent.frames['leaderboard'].searching(event=None)
+        
+            outcome = 'win' if self.game.check_player_wins() else 'loss'
+            log_game(self.parent.current_player, int(bid_amount), int(starting_node), int(ending_node), outcome, score)
+
+            self.parent.frames['history'].load_player_history()
 
         else:
             self.bet_button.config(text="Play Again")
@@ -670,18 +671,10 @@ class Play(tk.Frame):
 
             if(self.parent.current_balance < 1):
                 tk.messagebox.showinfo(title="Broke", message="Your balance is less than 1, here are 50 extra score")
+                update_balance(self.parent.current_player, 50)
                 self.parent.current_balance = 50
-
-        self.update_max_bid()
-        """
-        player_history_path = os.path.join("graph_game/db", "Player_History.txt")
-        with open(player_history_path, "a") as file:
-                file.write(f"{self.parent.current_player} Bid: {bid_amount} Starting node: {starting_node} Ending node: {ending_node} Win: {self.game.check_player_wins()} Score: {score}\n")
-        """  
-        outcome = 'win' if self.game.check_player_wins() else 'loss'
-        log_game(self.parent.current_player, int(bid_amount), int(starting_node), int(ending_node), outcome, score)
-
-        self.parent.frames['history'].load_player_history()
+            
+            self.update_max_bid()
 
 
 class Win(tk.Frame):
