@@ -8,7 +8,7 @@ The `requirements.txt` file contains all external libraries required to run the 
 
 To install all dependencies, execute the following command from the project's root directory:
 ```bash
-pip install -r requirements.text
+pip install -r requirements.txt
 ```
 
 ## Run App
