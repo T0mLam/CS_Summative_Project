@@ -312,7 +312,7 @@ class Leaderboard(tk.Frame):
         self.update_treeview()
 
 
-class PlayerHistory(tk.Frame):
+class Player_History(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
@@ -328,12 +328,12 @@ class PlayerHistory(tk.Frame):
         self.back_button = tk.Button(self, command=lambda: self.parent.switch_frame('history', 'menu'),
                              image=self.resized_back_image, background="white")
         self.back_button.pack(side="top", anchor="nw", padx=10, pady=10)
-        # History Laber
-        self.history_label = tk.Label(self, text = "History", font= "Helvetica, 60", background= "white")
-        self.history_label.place(relx=0.5, rely=0.1, anchor='center')
+        # History Label
+        self.history_label = tk.Label(self, text="History", font="Helvetica 60", background="white")
+        self.history_label.place(relx=0.5, rely=0.05, anchor='center')
     
         # Create the treeview for storing the history of the player
-        self.history_tree = ttk.Treeview(self, columns=("Bid", "Start Node", "End Node", "Outcome", "Score"), 
+        self.history_tree = ttk.Treeview(self, columns=("Bid", "Start Node", "End Node", "Outcome", "Score", "Date"), 
                                          show="headings")
         
         # Set column headings
@@ -342,17 +342,21 @@ class PlayerHistory(tk.Frame):
         self.history_tree.heading("End Node", text="Ending Node")
         self.history_tree.heading("Outcome", text="Outcome")
         self.history_tree.heading("Score", text="Score")
+        self.history_tree.heading("Date", text="Date")
         
         # Set column widths
-        self.history_tree.column("Bid", width=50)
-        self.history_tree.column("Start Node", width=150)
-        self.history_tree.column("End Node", width=150)
-        self.history_tree.column("Outcome", width=60)
-        self.history_tree.column("Score", width=40)
+        self.history_tree.column("Bid", width=40)
+        self.history_tree.column("Start Node", width=100)
+        self.history_tree.column("End Node", width=80)
+        self.history_tree.column("Outcome", width=50)
+        self.history_tree.column("Score", width=20)
+        self.history_tree.column("Date", width=150)
         
-        # set font size
-        self.history_tree.tag_configure("Treeview", font=("Helvetica", 6))
-        self.history_tree.tag_configure("Treeview.Heading", font=("Helvetica", 6))
+        # Change the font size 
+        self.style = ttk.Style()
+        self.style.configure("Treeview", font=('Helvetica', 20))
+        self.style.configure("Treeview.Heading", font=('Helvetica', 20))
+        self.style.configure("Treeview.Row", font=('Helvetica', 20))
 
         # Add scrollbar
         self.history_tree_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.history_tree.yview)
@@ -370,8 +374,9 @@ class PlayerHistory(tk.Frame):
         history = get_player_history(self.parent.current_player) 
         if history:
             # Insert history into treeview
-            for bid, start, end, outcome, score, entry_date in history:
-                self.history_tree.insert("", "end", values=(bid, start, end, outcome, score))
+            for bid, start, end, outcome, score, date in history:
+                print(date)
+                self.history_tree.insert("", "end", values=(bid, start, end, outcome, score, date))
     
     
 class Play(tk.Frame):
