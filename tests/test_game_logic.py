@@ -1,8 +1,8 @@
 import numpy as np
 import unittest
 
-from graph_game.game_logic import GraphGame
-from graph_game.score_generation import RandomScoreGenerator
+from graph_game.game.game_logic import GraphGame
+from graph_game.game.score_generation import RandomScoreGenerator
 
 
 class TestGraphGame(unittest.TestCase):

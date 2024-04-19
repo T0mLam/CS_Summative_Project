@@ -3,7 +3,7 @@ import scipy.stats as stats
 import unittest
 from unittest.mock import patch
 
-from graph_game.score_generation import RandomScoreGenerator
+from graph_game.game.score_generation import RandomScoreGenerator
 
 
 class TestRandomScoreGenerator(unittest.TestCase):

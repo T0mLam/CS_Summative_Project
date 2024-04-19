@@ -8,8 +8,8 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 
 from .db.database import authenticate, get_player_history, initialize_database, log_game, registered, register_player, update_balance
-from .game_logic import GraphGame
-from .search_engine.search_engine import SearchEngine
+from .game.game_logic import GraphGame
+from .game.search_engine import SearchEngine
 # To run app.py, enter 'python3 -m graph_game.app' in terminal.
 
 

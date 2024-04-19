@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from graph_game.search_engine.search_engine import SearchEngine
+from graph_game.game.search_engine import SearchEngine
 
 
 class TestSearchEngine(unittest.TestCase):

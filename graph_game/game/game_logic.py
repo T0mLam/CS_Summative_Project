@@ -5,7 +5,7 @@ import networkx as nx
 import numpy as np
 import random as rand
 
-from .graph import Graph
+from ..data_structures.graph import Graph
 from .score_generation import RandomScoreGenerator 
 
 
