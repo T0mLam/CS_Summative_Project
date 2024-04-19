@@ -70,8 +70,6 @@ class GraphGameGUI(tk.Tk):
         self.update_idletasks()
         # Restore the window size
         self.geometry('800x600')
-
-        self.frames[current_frame].pack_forget()
         # Show the main menu frame
         self.frames[new_frame].pack(fill='both', expand=True)
         
@@ -366,7 +364,6 @@ class PlayerHistory(tk.Frame):
         if history:
             # Insert history into treeview
             for bid, start, end, outcome, score, date in history:
-                print(date)
                 self.history_tree.insert("", "end", values=(bid, start, end, outcome, score, date))
     
     
