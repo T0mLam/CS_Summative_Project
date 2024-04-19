@@ -645,8 +645,6 @@ class Play(tk.Frame):
 
             # Update the leaderboard
             self.parent.frames['leaderboard'].searching(event=None)
-
-            self.update_max_bid()
         
             outcome = 'win' if self.game.check_player_wins() else 'loss'
             log_game(self.parent.current_player, int(bid_amount), int(starting_node), int(ending_node), outcome, score)
@@ -684,6 +682,8 @@ class Play(tk.Frame):
                 tk.messagebox.showinfo(title="Broke", message="Your balance is less than 1, here are 50 extra score")
                 update_balance(self.parent.current_player, 50)
                 self.parent.current_balance = 50
+            
+            self.update_max_bid()
 
 
 class Win(tk.Frame):
