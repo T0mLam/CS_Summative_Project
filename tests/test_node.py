@@ -1,5 +1,5 @@
 import unittest
-from graph_game.utils.node import Node
+from graph_game.data_structures.node import Node
 
 
 class TestNode(unittest.TestCase):

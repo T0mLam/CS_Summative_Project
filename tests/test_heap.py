@@ -1,7 +1,7 @@
 import unittest
 
-from graph_game.utils.heap import MinHeap
-from graph_game.utils.node import Node
+from graph_game.data_structures.heap import MinHeap
+from graph_game.data_structures.node import Node
 
 
 class TestHeap(unittest.TestCase):

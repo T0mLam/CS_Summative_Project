@@ -1,7 +1,7 @@
 import random
 import unittest
 
-from graph_game.utils.randomised_set import RandomisedSet
+from graph_game.data_structures.randomised_set import RandomisedSet
 
 
 class TestRandomisedSet(unittest.TestCase):

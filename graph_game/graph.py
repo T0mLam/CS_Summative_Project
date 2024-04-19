@@ -5,9 +5,9 @@ import networkx as nx
 import random as rand
 
 from .score_generation import RandomScoreGenerator as RSG
-from .utils.heap import MinHeap
-from .utils.node import Node
-from .utils.randomised_set import RandomisedSet
+from .data_structures.heap import MinHeap
+from .data_structures.node import Node
+from .data_structures.randomised_set import RandomisedSet
 
 
 class Graph:

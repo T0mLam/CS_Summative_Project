@@ -1,5 +1,5 @@
 import unittest
-from graph_game.utils.trie import Trie
+from graph_game.data_structures.trie import Trie
 
 
 class TestTrie(unittest.TestCase):

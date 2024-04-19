@@ -1,6 +1,6 @@
 from typing import List, Tuple
 from ..db.database import DatabaseConnection
-from ..utils.trie import Trie
+from ..data_structures.trie import Trie
 
 
 class SearchEngine:
