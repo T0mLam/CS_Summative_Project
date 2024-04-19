@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from ..db.database import DatabaseConnection
+from ..database.database import DatabaseConnection
 from ..data_structures.trie import Trie
 
 
