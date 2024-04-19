@@ -210,6 +210,7 @@ class Trie:
                     continue
                 
                 # Otherwise calculate each cost of the 3 grids at the 3 directions
+                # according to the edit distance algorithm
                 replace_cost = prev_row[col - 1] + 1
                 insert_cost = curr_row[col - 1] + 1
                 delete_cost = prev_row[col] + 1
