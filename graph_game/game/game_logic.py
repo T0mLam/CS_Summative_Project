@@ -123,7 +123,7 @@ class GraphGame(Graph):
 
         # Configure the mean and sd of the score_generator
         self.score_generator.set_mean(mean_dist)
-        self.score_generator.set_sd(sd_dist*1.7)
+        self.score_generator.set_sd(sd_dist*2.2)
 
         # Generate a random distance
         self.cutoff_distance = self.score_generator.generate_random_distance()

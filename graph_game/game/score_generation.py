@@ -101,7 +101,8 @@ class RandomScoreGenerator:
         # Calculate the probability that the node dist > a random generated distance
         prob = 1 - norm_distribution.cdf(dist)
         # Take the inverse of prob so the longer the node distance (the lower the prob), the higher the score
-        return int(1 / prob * self._sd * 2 + self.base_score)
+        # Use expononential to exaggerate the difference
+        return int(np.exp(1 / prob) + self.base_score / 2)
     
     @staticmethod
     def generate_random_edge(mean: int, sd: int | float) -> int:
