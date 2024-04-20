@@ -198,6 +198,13 @@ class MainMenu(tk.Frame):
                                   bg='white', fg='black', font='Helvetica, 40', width=10)
         logout_button.pack(pady=10)
 
+        # Soundtrack Switch
+        soundtrack_switch = tk.Checkbutton(self, text='Music', var=self.parent.soundtrack_state,
+                                           command=self.parent.switch_soundtrack,
+                                           onvalue=True, offvalue=False,
+                                           bg='white', font='Helvetica, 20')
+        soundtrack_switch.place(relx=0.93, rely=0.95, anchor='center')
+
 
 class Leaderboard(tk.Frame):
     def __init__(self, parent):
