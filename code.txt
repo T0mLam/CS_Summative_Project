@@ -1606,6 +1606,7 @@ class Login(tk.Frame):
             name, balance = user
             self.parent.current_player = name
             self.parent.current_balance = balance
+            self.parent.frames['play'].restart_game()
             # Load the player's history from the db
             self.parent.frames['history'].load_player_history()
             # Update the max bid in the Play Frame
@@ -1686,6 +1687,12 @@ class Register(tk.Frame):
             self.parent.frames['leaderboard'].search_engine.fetch_all_users_to_trie()
             self.parent.frames['leaderboard'].update_all_players()
             self.parent.switch_frame('register', 'menu')
+
+            self.parent.frames['play'].restart_game()
+            # Load the player's history from the db
+            self.parent.frames['history'].load_player_history()
+            # Update the max bid in the Play Frame
+            self.parent.frames['play'].update_max_bid()
         else:
             # Raise an error if the passwords do not match
             messagebox.showinfo("Error", "Passwords do not match.")
@@ -1803,6 +1810,7 @@ class Leaderboard(tk.Frame):
         self.update_treeview()
 
     def update_all_players(self):
+        # Update all players in the treeview
         self.players = self.search_engine.get_leaders(100)
         self.update_treeview()
 
@@ -2120,6 +2128,44 @@ class Play(tk.Frame):
     def update_max_bid(self):
         self.bid_scale.config(to=self.parent.current_balance)
 
+    def restart_game(self):
+        """Re-generate a new game and clean up previous entries."""
+        # Start the new game
+        self.game = GraphGame.random_start()
+        self.update_plot(result=False)  
+        self.game_started = True
+
+        # Make the starting and ending node entry disabled as the bid has not been chosen
+        self.starting_node_combobox['state'] = 'disabled'
+        self.ending_node_combobox['state'] = 'disabled'
+
+        # Enable the bid scale
+        self.bid_scale['state'] = 'normal' 
+
+        # Update the values of starting end ending node comboboxes as there is a new graph  
+        self.starting_node_combobox['values'] = self.game.get_nodes()
+        self.ending_node_combobox['values'] = self.game.get_nodes()
+
+        # Clear the values of the comboboxes
+        self.starting_node_combobox.set('') 
+        self.ending_node_combobox.set('')  
+        self.bid_scale.set(0)
+
+        # Change the text of the bet button to BET
+        self.bet_button.config(text="BET")
+        self.bet_button.update()
+
+        # Update the generated distance label of the game 
+        self.generated_distance_variable.set('Generated distance: -')        
+
+        # Check if the player balance is less than one and give the player extra points
+        if(self.parent.current_balance < 1):
+            # Raise an alert
+            tk.messagebox.showinfo(title="Broke", message="Your balance is less than 1, here are 50 extra score")
+            # Update the new score in the database and in game
+            update_balance(self.parent.current_player, 50)
+            self.parent.current_balance = 50
+
     def bet_start_game(self):
         """A method that gets the input nodes and bid after the bet button was pressed and handle the play again button press."""
         if self.game_started:
@@ -2212,44 +2258,7 @@ class Play(tk.Frame):
             self.parent.frames['history'].load_player_history()
 
         else:
-            # Change the bet button text to play again
-            self.bet_button.config(text="Play Again")
-
-            # Start the new game
-            self.game = GraphGame.random_start()
-            self.update_plot(result=False)  
-            self.game_started = True
-
-            # Make the starting and ending node entry disabled as the bid has not been chosen
-            self.starting_node_combobox['state'] = 'disabled'
-            self.ending_node_combobox['state'] = 'disabled'
-
-            # Enable the bid scale
-            self.bid_scale['state'] = 'normal' 
-
-            # Update the values of starting end ending node comboboxes as there is a new graph  
-            self.starting_node_combobox['values'] = self.game.get_nodes()
-            self.ending_node_combobox['values'] = self.game.get_nodes()
-
-            # Clear the values of the comboboxes
-            self.starting_node_combobox.set('') 
-            self.ending_node_combobox.set('')  
-            self.bid_scale.set(0)
-
-            # Change the text of the bet button to BET
-            self.bet_button.config(text="BET")
-            self.bet_button.update()
-
-            # Update the generated distance label of the game 
-            self.generated_distance_variable.set('Generated distance: -')        
-
-            # Check if the player balance is less than one and give the player extra points
-            if(self.parent.current_balance < 1):
-                # Raise an alert
-                tk.messagebox.showinfo(title="Broke", message="Your balance is less than 1, here are 50 extra score")
-                # Update the new score in the database and in game
-                update_balance(self.parent.current_player, 50)
-                self.parent.current_balance = 50
+            self.restart_game()
             
             # Update the max value of the bid scale
             self.update_max_bid()
@@ -2262,7 +2271,7 @@ class Win(tk.Frame):
         # Change the background color to white
         self.configure(bg="white")
 
-        #Balance variable for putting into Label
+        # Balance variable for putting into Label
         self.amount_of_winning_variable = tk.StringVar()
         self.amount_of_winning_variable.set("Amount of winning: " + str(self.amount_of_winning_variable))
 
