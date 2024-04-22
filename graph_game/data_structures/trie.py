@@ -168,7 +168,8 @@ class Trie:
 
         Steps:
         1. First fill the first row with range(len(target_word))
-        2. Iterate through the rows from left to right
+        2. Iterate through the rows from the second left grid to the right,
+            set the first left grid as the index of the row.
         3. For each grid, if the letter of the target word != the letter of the combination,
             compute the lowest cost by taking the lowest values at the top left, left and the grid above + 1.
             Otherwise, just take the value of the top left grid (the previous cost) without adding 1.
