@@ -26,3 +26,16 @@ To run the tests, execute the following command from the project's root director
 python -m unittest tests.{test module}
 ```
 Replace `{test module}` with the name of the test module, e.g. `test_node` to run the tests 
+
+## Import Data Structures
+The `graph_game/data_structures` contains all the data structures utilized in the game.
+
+To import and use the data structure independently, add the following code in your program:
+```python
+from graph_game.data_structures.{module} import {data structure}
+```
+Replace `{module}` with the name of the module, {data structure} with the name of the class
+e.g. 
+```python
+from graph_game.data_structures.trie import Trie
+```
