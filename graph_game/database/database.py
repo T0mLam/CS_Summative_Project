@@ -116,7 +116,3 @@ def update_balance(username, new_balance):
         print("Balance updated successfully.")
     except sqlite3.Error as e:
         print(f"Error updating balance: {e}")
-
-
-if __name__ == '__main__':
-    pass

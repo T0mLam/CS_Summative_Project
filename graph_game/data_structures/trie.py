@@ -241,12 +241,3 @@ class Trie:
             num_return -= 1
 
         return res
-    
-
-if __name__ == '__main__':
-    trie = Trie()
-    trie.insert('goober')
-    trie.insert('goobers')
-    trie.insert('gowier')
-    trie.insert('goobr')
-    print(trie.fizzy_search('goober', threshold=3))

@@ -91,9 +91,3 @@ class SearchEngine:
         # Insert every player into the trie
         for player in players:
             self.trie.insert(*player)
-
-
-if __name__ == '__main__':
-    se = SearchEngine()
-    print(se.complete_search('Fem'))
-    print('success')

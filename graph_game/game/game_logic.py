@@ -185,17 +185,4 @@ class GraphGame(Graph):
         add_num_edges = init_num_nodes // rand.randint(2, 3)
         return cls(init_num_nodes, add_num_edges)
 
-if __name__ == '__main__':
-    game = GraphGame.random_start()
-    #print(game.get_node_numbers())
-    game.set_base_score(100)
-    
-    game.set_starting_node(1)
-    game.generate_cutoff()
-    game.calculate_node_scores()
-    game.set_ending_node(4)
-    print(game.check_player_wins())
-    print(game.get_player_score())
-    game.graph_visualize(with_labels=False)
-
     

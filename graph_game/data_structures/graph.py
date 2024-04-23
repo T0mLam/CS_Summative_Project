@@ -354,13 +354,4 @@ class Graph:
         plt.axis('off') 
 
         # Visualize the graph
-        plt.show() 
-
-
-if __name__ == '__main__':
-    graph = Graph(init_num_nodes=5, add_num_edges=3)
-    print(graph)
-    print(graph.shortest_path(1, 4))
-    print(graph.shortest_path(1, None))
-    graph.graph_visualize()
-    # set weight in __randomly_connect_all_nodes and add_edge_to_graph  
+        plt.show()
