@@ -36,5 +36,6 @@ from graph_game.data_structures.{module} import {data structure}
 ```
 Replace `{module}` with the name of the module, `{data structure}` with the name of the class, e.g.
 ```python
+# Import the trie data structure
 from graph_game.data_structures.trie import Trie
 ```
