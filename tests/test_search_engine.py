@@ -18,7 +18,7 @@ class TestSearchEngine(unittest.TestCase):
         self.assertEqual(result, ["Femi", "Femu", "Femo"])
         self.search_engine.trie.complete.assert_called_with("Fem")
 
-    @patch('graph_game.search_engine.search_engine.DatabaseConnection')
+    @patch('graph_game.game.search_engine.DatabaseConnection')
     def test_search_results(self, mock_db):
         """Test the search results method"""
         mock_conn = mock_db.return_value.__enter__.return_value
@@ -29,7 +29,7 @@ class TestSearchEngine(unittest.TestCase):
         result = self.search_engine.search_results("Femi")
         self.assertEqual(result, [("Femi", 100)])
 
-    @patch('graph_game.search_engine.search_engine.DatabaseConnection')
+    @patch('graph_game.game.search_engine.DatabaseConnection')
     def test_get_leaders(self, mock_db):
         """Test the get_leaders method"""
         mock_conn = mock_db.return_value.__enter__.return_value
@@ -42,7 +42,7 @@ class TestSearchEngine(unittest.TestCase):
         """Test the fetch_all_users_to_trie method"""
         self.search_engine.trie = None
         self.trie = MagicMock()
-        with patch('graph_game.search_engine.search_engine.DatabaseConnection') as mock_db:
+        with patch('graph_game.game.search_engine.DatabaseConnection') as mock_db:
             mock_conn = mock_db.return_value.__enter__.return_value
             mock_conn.cursor.return_value.execute.return_value.fetchall.return_value = [("Femi",), ("Tom",)]
             self.search_engine.fetch_all_users_to_trie()
