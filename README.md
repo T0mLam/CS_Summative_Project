@@ -1,6 +1,9 @@
 # Graph Game
 This work is submitted as my computer science foundation year summative project.
 
+## Project Description
+The Graph Game is a game that revolves around a randomly generated fully connected graph. <br>
+A player wins by randomly selecting a path that is shorter than the unknown generated distance.
 
 ## Install Dependencies
 The `requirements.txt` file contains all external libraries required to run the app.
