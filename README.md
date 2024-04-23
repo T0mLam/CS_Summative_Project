@@ -1,4 +1,6 @@
 # Graph Game
+This work is submitted as my computer science foundation year summative project.
+
 
 ## Install Dependencies
 The `requirements.txt` file contains all external libraries required to run the app.
