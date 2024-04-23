@@ -37,7 +37,8 @@ To import and use the data structure independently, add the following code in yo
 ```python
 from graph_game.data_structures.{module} import {data structure}
 ```
-Replace `{module}` with the name of the module, `{data structure}` with the name of the class, e.g.
+Replace `{module}` with the name of the module, `{data structure}` with the name of the class, <br>
+e.g.
 ```python
 # Import the trie data structure
 from graph_game.data_structures.trie import Trie
