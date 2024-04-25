@@ -1,5 +1,5 @@
 # Graph Game
-This work is submitted as my computer science foundation year summative project.
+This work has been submitted as my computer science foundation year summative project.
 
 ## Project Description
 The Graph Game is a game that revolves around a randomly generated fully connected graph. <br>
