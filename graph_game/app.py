@@ -5,7 +5,7 @@ from matplotlib.figure import Figure
 import networkx as nx
 import pygame
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import ttk
 
 from .database.database import (
     authenticate, 
@@ -142,7 +142,7 @@ class Login(tk.Frame):
             self.parent.switch_frame('login', 'menu')
         else:
             # Show the error if the player was not found
-            messagebox.showinfo("Error", "The player is not found.")
+            tk.messagebox.showinfo("Error", "The player is not found.")
 
 
 class Register(tk.Frame):
@@ -196,13 +196,13 @@ class Register(tk.Frame):
 
         # Check whether the entry boxes are filled in.
         if not username or not password or not password_repeat:
-            messagebox.showinfo("Error", "Please fill in all the information.")
+            tk.messagebox.showinfo("Error", "Please fill in all the information.")
             return
         
         # Check if the passwords in the two entry boxes are the same
         if password == password_repeat:
             if registered(username):
-                messagebox.showinfo("Error", "The account has been registered.")
+                tk.messagebox.showinfo("Error", "The account has been registered.")
                 return 
 
             # Register player with its username, password and starting balance 100
@@ -222,7 +222,7 @@ class Register(tk.Frame):
             self.parent.frames['play'].update_max_bid()
         else:
             # Raise an error if the passwords do not match
-            messagebox.showinfo("Error", "Passwords do not match.")
+            tk.messagebox.showinfo("Error", "Passwords do not match.")
 
         
 class MainMenu(tk.Frame):
